@@ -1,0 +1,34 @@
+name: Build/Test
+on:
+  pull_request:
+    branches:
+      - "*"
+jobs:
+  build-and-test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Branch
+        uses: actions/checkout@v3
+      - name: Read package.json node and npm engines version
+        uses: skjnldsv/read-package-engines-version-actions@v1.2
+        id: package-engines-versions
+      - name: Show node version number
+        run: echo "Node version is ${{ steps.package-engines-versions.outputs.nodeVersion }}"
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.2.0
+        with:
+          node-version: ${{ steps.package-engines-versions.outputs.nodeVersion }}
+      - name: Install Dependencies
+        run: yarn install
+        shell: bash
+      - name: Build App 
+        run: yarn build
+        shell: bash
+      - name: Run unit tests
+        run: yarn test
+        shell: bash
+      - name: Post coverage report
+        uses: romeovs/lcov-reporter-action@v0.2.16
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
