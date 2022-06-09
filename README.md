@@ -1,5 +1,5 @@
-# NestJS ![build](https://github.com/dltxio/nextjs-template/actions/workflows/build-project.yml/badge.svg)
-Template for Back End repos using NodeJS and Typescript
+# Idem Proxy Service
+Web service for proxying requests to exchange services.
 
 ## Technology
 - [NodeJs](https://nodejs.org/en/) -\

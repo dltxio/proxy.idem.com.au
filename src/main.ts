@@ -16,8 +16,8 @@ async function bootstrap() {
     app.useGlobalInterceptors(new GenericInterceptor());
 
     const options = new DocumentBuilder()
-        .setTitle("EasyCrypto Custody Service")
-        .setDescription("Manage asset balances")
+        .setTitle("Idem Proxy API")
+        .setDescription("Proxy requests to exchanges")
         .setVersion("1.0")
         .build();
     const document = SwaggerModule.createDocument(app, options);
