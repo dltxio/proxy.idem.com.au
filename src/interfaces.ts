@@ -117,3 +117,22 @@ export class AccountMissingIdError extends EntityMissingIdError {
         super(EntityNames.Account);
     }
 }
+
+export interface IUserService {
+    verify: (body: UserVerifyRequestBody) => Promise<boolean>;
+}
+
+export class UserVerifyRequestBody {
+    @ApiProperty()
+    @IsNotEmpty()
+    name: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    dob: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    email: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    address: string;
+}
