@@ -11,7 +11,7 @@ export class ExampleService implements IExampleService {
     private mySetting: string;
     constructor(private config: ConfigService) {
         this.mySetting = this.config.get("EXAMPLESERVICE_SETTING");
-    }   
+    }
 
     public getAll() {
         return ["1", "2", "3"];
