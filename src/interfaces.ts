@@ -1,66 +1,10 @@
 import { IsNotEmpty } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
-import { IdResponse } from "./utils";
-
-export enum EcAssetType {
-    BASE_ASSET = "BASE_ASSET",
-    ETH_CONTRACT = "ETH_CONTRACT",
-    FIAT = "FIAT"
-}
-
-export class EcVaultAccountName {
-    @ApiProperty()
-    @IsNotEmpty()
-    name: string;
-}
-
-export class EcVaultAccount {
-    id: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    name: string;
-}
-
-export type EcAsset = {
-    contractAddress: string;
-    decimals?: number;
-    id: string;
-    nativeAsset: string;
-    name: string;
-    type: EcAssetType;
-};
-
-export type EcAssetWallet = {
-    assetId: string;
-    accountId: string;
-    address: string;
-};
-
-export interface IAccountsService {
-    getAll: () => Promise<EcVaultAccount[]>;
-    getById(id: string): () => Promise<EcVaultAccount>;
-    getDepositAddress(vaultAccountId: string, assetId: string): Promise<string>;
-    create(EcVaultAccount): Promise<EcVaultAccount>;
-    createAssetWallet(accountId, assetId): Promise<IdResponse>;
-}
+import { User } from "./data/entities/user.entity";
 
 export interface IExampleService {
     getById(id: string): string;
     getAll(): string[];
-}
-
-export interface IEventStoreEvent {
-    data: unknown;
-    type: string;
-    revision: bigint;
-    streamName: string;
-    created: number;
-}
-
-export interface IEvent {
-    data: Record<string, unknown>;
-    metadata: Record<string, unknown>;
-    type: string;
 }
 
 // String values used in user-facing error messages
@@ -120,12 +64,17 @@ export class AccountMissingIdError extends EntityMissingIdError {
 
 export interface IUserService {
     verify: (body: UserVerifyRequestBody) => Promise<boolean>;
+    findAll: () => Promise<User[]>;
+    create: (newUser: UserVerifyRequestBody) => Promise<User>;
 }
 
 export class UserVerifyRequestBody {
     @ApiProperty()
     @IsNotEmpty()
-    name: string;
+    firstName: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    lastName: string;
     @ApiProperty()
     @IsNotEmpty()
     dob: string;
