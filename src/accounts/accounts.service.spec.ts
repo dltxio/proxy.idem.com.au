@@ -37,7 +37,7 @@ describe("AccountService", () => {
     describe("Creating a vault account", () => {
         it("should call the createVaultAccount method", async () => {
             const myId = "1";
-            
+
             Sinon.replace(service, "getById", () => {
                 return Promise.resolve(myId);
             });
