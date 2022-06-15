@@ -1,0 +1,26 @@
+alerts:
+- rule: DEPLOYMENT_FAILED
+- rule: DOMAIN_FAILED
+- rule: DEPLOYMENT_LIVE
+- rule: DOMAIN_LIVE
+domains:
+- domain: proxy.idem.com.au
+  type: PRIMARY
+  zone: idem.com.au
+name: idem-proxy
+region: sgp
+services:
+- build_command: yarn build
+  environment_slug: node-js
+  github:
+    branch: main
+    deploy_on_push: true
+    repo: dltxio/proxy.idem.com.au
+  http_port: 3000
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  name: proxy-idem-com-au
+  routes:
+  - path: /
+  run_command: yarn start:prod
+  source_dir: /
