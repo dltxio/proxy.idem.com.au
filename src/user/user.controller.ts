@@ -1,6 +1,20 @@
-import { Controller, Inject, Post, HttpStatus, Body } from "@nestjs/common";
+import {
+    Controller,
+    Inject,
+    Post,
+    HttpStatus,
+    Body,
+    Get,
+    Param,
+    Put
+} from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
-import { IUserService, UserVerifyRequestBody } from "../interfaces";
+import { User } from "../data/entities/user.entity";
+import {
+    IUserService,
+    UserExpoPushTokenRequestBody,
+    UserVerifyRequestBody
+} from "../interfaces";
 
 @Controller("user")
 export class UserController {
@@ -10,14 +24,40 @@ export class UserController {
     @ApiOperation({ summary: "Verify user" })
     @ApiResponse({
         status: HttpStatus.OK
-        //type: //TODO: Add type
     })
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async verify(@Body() body: UserVerifyRequestBody): Promise<boolean> {
+        await this.userService.create(body);
         //TODO: Implement TPA KYC verification
         return true;
+    }
+
+    @Get()
+    @ApiOperation({ summary: "Get users" })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async getAll(): Promise<User[]> {
+        return this.userService.findAll();
+    }
+
+    @Put(":userId/token")
+    @ApiOperation({ summary: "Put user token" })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async token(
+        @Param("userId") userId: string,
+        @Body() token: UserExpoPushTokenRequestBody
+    ): Promise<User> {
+        return this.userService.putToken(userId, token);
     }
 }

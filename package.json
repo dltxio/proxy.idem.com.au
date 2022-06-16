@@ -29,6 +29,7 @@
         "@nestjs/core": "^8.0.0",
         "@nestjs/platform-express": "^8.0.0",
         "@nestjs/swagger": "^5.2.1",
+        "@nestjs/typeorm": "^8.1.4",
         "@types/chai": "^4.3.1",
         "@types/sinon": "^10.0.11",
         "chai": "^4.3.6",
@@ -38,10 +39,12 @@
         "ethers": "^5.5.4",
         "lint-staged": "^12.3.7",
         "nyc": "^15.1.0",
+        "pg": "^8.7.3",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
         "rxjs": "^7.2.0",
         "swagger-ui-express": "^4.3.0",
+        "typeorm": "^0.3.6",
         "uuid": "^8.3.2"
     },
     "devDependencies": {
