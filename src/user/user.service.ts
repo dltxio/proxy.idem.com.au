@@ -1,7 +1,10 @@
 import { Injectable, Inject } from "@nestjs/common";
 import { User } from "../data/entities/user.entity";
 import { Repository } from "typeorm";
-import { UserVerifyRequestBody } from "../interfaces";
+import {
+    UserExpoPushTokenRequestBody,
+    UserVerifyRequestBody
+} from "../interfaces";
 
 @Injectable()
 export class UserService {
@@ -16,5 +19,17 @@ export class UserService {
 
     async create(newUser: UserVerifyRequestBody): Promise<User> {
         return this.userRepository.save(newUser);
+    }
+
+    async putToken(
+        userId: string,
+        token: UserExpoPushTokenRequestBody
+    ): Promise<User> {
+        const user = await this.userRepository.findOneBy({ userId: userId });
+        if (!user) {
+            throw new Error("User not found");
+        }
+        user.expoPushToken = token.token;
+        return this.userRepository.save(user);
     }
 }

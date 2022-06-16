@@ -66,6 +66,10 @@ export interface IUserService {
     verify: (body: UserVerifyRequestBody) => Promise<boolean>;
     findAll: () => Promise<User[]>;
     create: (newUser: UserVerifyRequestBody) => Promise<User>;
+    putToken: (
+        userId: string,
+        token: UserExpoPushTokenRequestBody
+    ) => Promise<User>;
 }
 
 export class UserVerifyRequestBody {
@@ -84,4 +88,10 @@ export class UserVerifyRequestBody {
     @ApiProperty()
     @IsNotEmpty()
     address: string;
+}
+
+export class UserExpoPushTokenRequestBody {
+    @ApiProperty()
+    @IsNotEmpty()
+    token: string;
 }

@@ -4,11 +4,17 @@ import {
     Post,
     HttpStatus,
     Body,
-    Get
+    Get,
+    Param,
+    Put
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { User } from "../data/entities/user.entity";
-import { IUserService, UserVerifyRequestBody } from "../interfaces";
+import {
+    IUserService,
+    UserExpoPushTokenRequestBody,
+    UserVerifyRequestBody
+} from "../interfaces";
 
 @Controller("user")
 export class UserController {
@@ -38,5 +44,20 @@ export class UserController {
     })
     async getAll(): Promise<User[]> {
         return this.userService.findAll();
+    }
+
+    @Put(":userId/token")
+    @ApiOperation({ summary: "Put user token" })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async token(
+        @Param("userId") userId: string,
+        @Body() token: UserExpoPushTokenRequestBody
+    ): Promise<User> {
+        return this.userService.putToken(userId, token);
     }
 }

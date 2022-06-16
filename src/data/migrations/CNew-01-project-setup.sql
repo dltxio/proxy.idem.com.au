@@ -11,20 +11,11 @@ $$ language "plpgsql";
 CREATE TABLE "users" (
   "userId" UUID NOT NULL DEFAULT uuid_generate_v4(),
   "email" VARCHAR NOT NULL,
-  "emailVerified" BOOLEAN DEFAULT FALSE NOT NULL,
-  "firstName" VARCHAR NOT NULL,
-  "lastName" VARCHAR NOT NULL,
-  "dob" VARCHAR,
-  "phoneNumber" VARCHAR,
-  "phoneNumberVerified" BOOLEAN DEFAULT FALSE NOT NULL,
   "createdAt" TIMESTAMPTZ DEFAULT NOW(),
   "updatedAt" TIMESTAMPTZ DEFAULT NOW(),
-  "address" VARCHAR NOT NULL,
-  "idVerified" BOOLEAN DEFAULT FALSE NOT NULL,
   "expoPushToken" VARCHAR,
   PRIMARY KEY("userId"),
-  UNIQUE("email"),
-  UNIQUE("phoneNumber")
+  UNIQUE("email")
 );
 
 CREATE TRIGGER update_users_updatedAt BEFORE UPDATE
