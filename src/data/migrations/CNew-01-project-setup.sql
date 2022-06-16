@@ -8,7 +8,8 @@ BEGIN
 END;
 $$ language "plpgsql";
 
-CREATE TABLE "users" (
+BEGIN;
+CREATE TABLE IF NOT EXISTS "users" (
   "userId" UUID NOT NULL DEFAULT uuid_generate_v4(),
   "email" VARCHAR NOT NULL,
   "createdAt" TIMESTAMPTZ DEFAULT NOW(),
@@ -21,3 +22,5 @@ CREATE TABLE "users" (
 CREATE TRIGGER update_users_updatedAt BEFORE UPDATE
   ON users FOR EACH ROW EXECUTE PROCEDURE 
   update_updatedAt();
+
+COMMIT;

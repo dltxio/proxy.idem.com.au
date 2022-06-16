@@ -11,8 +11,8 @@ export const databaseProviders = [
                 username: process.env.POSTGRES_USER,
                 password: process.env.POSTGRES_PASSWORD,
                 database: process.env.DATABASE,
-                entities: [__dirname + "/../**/*.entity{.ts,.js}"],
-                synchronize: true
+                entities: [__dirname + "/../**/*.entity{.ts,.js}"]
+                //synchronize: true //Setting synchronize: true shouldn't be used in production - otherwise you can lose production data.
             });
 
             return dataSource.initialize();
