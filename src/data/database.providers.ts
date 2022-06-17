@@ -12,7 +12,12 @@ export const databaseProviders = [
                 password: process.env.POSTGRES_PASSWORD,
                 database: process.env.POSTGRES_DB_NAME,
                 entities: [__dirname + "/../**/*.entity{.ts,.js}"],
-                ssl: process.env.CA_CERT ? process.env.CA_CERT : false
+                ssl: process.env.CA_CERT
+                    ? {
+                          rejectUnauthorized: true,
+                          ca: process.env.CA_CERT
+                      }
+                    : false
             });
 
             return dataSource.initialize();
