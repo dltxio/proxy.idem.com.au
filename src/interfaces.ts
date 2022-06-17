@@ -63,7 +63,7 @@ export class AccountMissingIdError extends EntityMissingIdError {
 }
 
 export interface IUserService {
-    verify: (body: UserVerifyRequestBody) => Promise<boolean>;
+    verify: (body: UserVerifyRequestBody) => Promise<string>;
     findAll: () => Promise<User[]>;
     create: (newUser: UserVerifyRequestBody) => Promise<User>;
     putToken: (
