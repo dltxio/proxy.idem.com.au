@@ -10,9 +10,9 @@ export const databaseProviders = [
                 port: Number(process.env.POSTGRES_PORT),
                 username: process.env.POSTGRES_USER,
                 password: process.env.POSTGRES_PASSWORD,
-                database: process.env.DATABASE,
+                database: process.env.POSTGRES_DB_NAME,
                 entities: [__dirname + "/../**/*.entity{.ts,.js}"],
-                ssl: process.env.CA_CERT ? true : false
+                ssl: process.env.CA_CERT ? process.env.CA_CERT : false
             });
 
             return dataSource.initialize();

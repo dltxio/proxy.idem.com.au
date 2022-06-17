@@ -1,26 +1,56 @@
 alerts:
-- rule: DEPLOYMENT_FAILED
-- rule: DOMAIN_FAILED
-- rule: DEPLOYMENT_LIVE
-- rule: DOMAIN_LIVE
+    - rule: DEPLOYMENT_FAILED
+    - rule: DOMAIN_FAILED
+    - rule: DEPLOYMENT_LIVE
+    - rule: DOMAIN_LIVE
+databases:
+    - cluster_name: db-postgresql-sgp1-16621
+      db_name: idem-dev
+      db_user: idem-dev
+      engine: PG
+      name: db-postgresql-sgp1-16621
+      production: true
+      version: "12"
 domains:
-- domain: proxy.idem.com.au
-  type: PRIMARY
-  zone: idem.com.au
+    - domain: proxy.idem.com.au
+      type: PRIMARY
+      zone: idem.com.au
 name: idem-proxy
 region: sgp
 services:
-- build_command: yarn build
-  environment_slug: node-js
-  github:
-    branch: main
-    deploy_on_push: true
-    repo: dltxio/proxy.idem.com.au
-  http_port: 3000
-  instance_count: 1
-  instance_size_slug: basic-xxs
-  name: proxy-idem-com-au
-  routes:
-  - path: /
-  run_command: yarn start:prod
-  source_dir: /
+    - build_command: yarn build
+      environment_slug: node-js
+      envs:
+          - key: DATABASE_URL
+            scope: RUN_TIME
+            value: ${db-postgresql-sgp1-16621.DATABASE_URL}
+          - key: POSTGRES_HOST
+            scope: RUN_AND_BUILD_TIME
+            value: ${db-postgresql-sgp1-16621.HOSTNAME}
+          - key: POSTGRES_DB_NAME
+            scope: RUN_AND_BUILD_TIME
+            value: ${db-postgresql-sgp1-16621.DATABASE}
+          - key: POSTGRES_PORT
+            scope: RUN_AND_BUILD_TIME
+            value: ${db-postgresql-sgp1-16621.PORT}
+          - key: POSTGRES_USER
+            scope: RUN_AND_BUILD_TIME
+            value: ${db-postgresql-sgp1-16621.USERNAME}
+          - key: POSTGRES_PASSWORD
+            scope: RUN_AND_BUILD_TIME
+            value: ${db-postgresql-sgp1-16621.PASSWORD}
+          - key: CA_CERT
+            scope: RUN_AND_BUILD_TIME
+            value: ${db-postgresql-sgp1-16621.CA_CERT}
+      github:
+          branch: main
+          deploy_on_push: true
+          repo: dltxio/proxy.idem.com.au
+      http_port: 3000
+      instance_count: 1
+      instance_size_slug: basic-xxs
+      name: proxy-idem-com-au
+      routes:
+          - path: /
+      run_command: yarn start:prod
+      source_dir: /

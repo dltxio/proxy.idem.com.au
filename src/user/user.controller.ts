@@ -28,10 +28,10 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async verify(@Body() body: UserVerifyRequestBody): Promise<boolean> {
-        await this.userService.create(body);
+    async verify(@Body() body: UserVerifyRequestBody): Promise<string> {
+        const user = await this.userService.create(body);
         //TODO: Implement TPA KYC verification
-        return true;
+        return user.userId;
     }
 
     @Get()

@@ -18,7 +18,13 @@ export class UserService {
     }
 
     async create(newUser: UserVerifyRequestBody): Promise<User> {
-        return this.userRepository.save(newUser);
+        const user = await this.userRepository.findOneBy({
+            email: newUser.email
+        });
+        if (!user) {
+            return this.userRepository.save(newUser);
+        }
+        return user;
     }
 
     async putToken(
