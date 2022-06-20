@@ -12,6 +12,10 @@ export enum EntityNames {
     Account = "Account"
 }
 
+export enum ConfigSettings {
+    EXPO_ACCESS_TOKEN = "EXPO_ACCESS_TOKEN"
+}
+
 //=== Abstract Error classes
 export abstract class EntityMissingIdError extends Error {
     constructor(entity: string) {
@@ -70,6 +74,8 @@ export interface IUserService {
         userId: string,
         token: UserExpoPushTokenRequestBody
     ) => Promise<User>;
+
+    pushNotification: (message: string) => Promise<void>;
 }
 
 export class UserVerifyRequestBody {
