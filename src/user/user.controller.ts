@@ -70,6 +70,6 @@ export class UserController {
         status: HttpStatus.BAD_REQUEST
     })
     async PushNotification(@Param("message") message: string): Promise<void> {
-        this.userService.pushNotification(message);
+        return this.userService.pushNotification(message);
     }
 }

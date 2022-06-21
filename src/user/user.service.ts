@@ -23,11 +23,11 @@ export class UserService {
         });
     }
 
-    async findAll(): Promise<User[]> {
+    public async findAll(): Promise<User[]> {
         return this.userRepository.find();
     }
 
-    async create(newUser: UserVerifyRequestBody): Promise<User> {
+    public async create(newUser: UserVerifyRequestBody): Promise<User> {
         const user = await this.userRepository.findOneBy({
             email: newUser.email
         });
@@ -38,7 +38,7 @@ export class UserService {
         return user;
     }
 
-    async putToken(
+    public async putToken(
         userId: string,
         token: UserExpoPushTokenRequestBody
     ): Promise<User> {
@@ -51,7 +51,7 @@ export class UserService {
         return this.userRepository.save(user);
     }
 
-    async pushNotification(message: string): Promise<void> {
+    public async pushNotification(message: string): Promise<void> {
         //TODO: Implement push notification
         const messages = [];
 
