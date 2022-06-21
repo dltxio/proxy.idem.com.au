@@ -60,4 +60,16 @@ export class UserController {
     ): Promise<User> {
         return this.userService.putToken(userId, token);
     }
+
+    @Post("notification/:message")
+    @ApiOperation({ summary: "Push notification" })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async PushNotification(@Param("message") message: string): Promise<void> {
+        return this.userService.pushNotification(message);
+    }
 }

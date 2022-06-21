@@ -105,9 +105,9 @@ Review some basic coding styles based on the rules set
 
 ### Running the app
 
-An .env file needs to be placed at the root for the app to work. Copy/swap the sibling _env.development_ file. Use:
+An .env file needs to be placed at the root for the app to work. Copy/swap the sibling \_env.local file. Use:
 
-> cp .env.development .env
+> cp .env.local .env
 
 To run the (NestJS) API:
 
