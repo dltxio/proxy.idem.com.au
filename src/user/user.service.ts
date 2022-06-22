@@ -51,7 +51,7 @@ export class UserService {
         return this.userRepository.save(user);
     }
 
-    public async pushNotification(message: string): Promise<void> {
+    public async pushNotifications(message: string): Promise<void> {
         //TODO: Implement push notification
         const messages = [];
 
