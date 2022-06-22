@@ -1,6 +1,6 @@
 import { ThirdPartyService } from "./../services/ThirdPartyService";
 import { Module } from "@nestjs/common";
-import { AusPostService } from "src/services/AusPostService";
+import { AusPostService } from "../services/AusPostService";
 import { DatabaseModule } from "../data/database.module";
 import { UserController } from "./user.controller";
 import { userProviders } from "./user.providers";
