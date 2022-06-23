@@ -75,7 +75,7 @@ export class AusPostService implements IAusPostService {
             // }
             return KycResult.Completed; // Hardcoded for now
         } catch (error) {
-            this.logger.error(error);
+            this.logger.error(error.message);
             throw new Error(error);
         }
     }
