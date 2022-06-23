@@ -1,4 +1,10 @@
 import {
+    IAusPostService,
+    IThirdPartyService,
+    KycResponse,
+    KycResult
+} from "./../interfaces";
+import {
     Controller,
     Inject,
     Post,
@@ -18,7 +24,12 @@ import {
 
 @Controller("user")
 export class UserController {
-    constructor(@Inject("IUserService") private userService: IUserService) {}
+    constructor(
+        @Inject("IUserService") private userService: IUserService,
+        @Inject("IAusPostService") private ausPostService: IAusPostService,
+        @Inject("IThirdPartyService")
+        private thirdPartyService: IThirdPartyService
+    ) {}
 
     @Post("verify")
     @ApiOperation({ summary: "Verify user" })
@@ -28,10 +39,21 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async verify(@Body() body: UserVerifyRequestBody): Promise<string> {
+    async verify(@Body() body: UserVerifyRequestBody): Promise<KycResponse> {
         const user = await this.userService.create(body);
+        const result = await this.ausPostService.verify(body);
+        const response: KycResponse = {
+            result: result,
+            userId: user.userId,
+            thirdPartyVerified: false
+        };
+        if (result === KycResult.Completed) {
+            //TODO: Call GPIB to verify user
+            await this.thirdPartyService.verifyGPIB(body);
+            response.thirdPartyVerified = true;
+        }
         //TODO: Implement TPA KYC verification
-        return user.userId;
+        return response;
     }
 
     @Get()

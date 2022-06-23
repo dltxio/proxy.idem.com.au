@@ -13,7 +13,11 @@ export enum EntityNames {
 }
 
 export enum ConfigSettings {
-    EXPO_ACCESS_TOKEN = "EXPO_ACCESS_TOKEN"
+    EXPO_ACCESS_TOKEN = "EXPO_ACCESS_TOKEN",
+    AUS_POST_URL = "AUS_POST_URL",
+    AUS_POST_CLIENT_ID = "AUS_POST_CLIENT_ID",
+    AUS_POST_CLIENT_SECRET = "AUS_POST_CLIENT_SECRET",
+    GPIB_VERIFY_ENDPOINT = "GPIB_VERIFY_ENDPOINT"
 }
 
 //=== Abstract Error classes
@@ -78,10 +82,16 @@ export interface IUserService {
     pushNotification(message: string): Promise<void>;
 }
 
+export interface IThirdPartyService {
+    verifyGPIB(body: UserVerifyRequestBody): Promise<boolean>;
+}
+
 export class UserVerifyRequestBody {
     @ApiProperty()
     @IsNotEmpty()
     firstName: string;
+    @ApiProperty()
+    middleName: string;
     @ApiProperty()
     @IsNotEmpty()
     lastName: string;
@@ -92,8 +102,25 @@ export class UserVerifyRequestBody {
     @IsNotEmpty()
     email: string;
     @ApiProperty()
+    houseNumber: string;
+    @ApiProperty()
     @IsNotEmpty()
-    address: string;
+    street: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    suburb: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    postcode: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    state: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    country: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    userId: string;
 }
 
 export class UserExpoPushTokenRequestBody {
@@ -101,3 +128,64 @@ export class UserExpoPushTokenRequestBody {
     @IsNotEmpty()
     token: string;
 }
+
+export interface IAusPostService {
+    verify(userInfo: UserVerifyRequestBody): Promise<KycResult>;
+}
+
+export type AusPostRequest = {
+    given_name: string;
+    middle_name: string | null;
+    family_name: string;
+    dob: string;
+    address: {
+        unit_number: string | null;
+        street_number: string;
+        street_name: string;
+        street_type: string;
+        locality: string;
+        region: string;
+        postal_code: string;
+        country: string;
+    };
+    consent: string;
+};
+
+//Can have more than below such as "watchlist" and "found_sources" and "sources_category" but will need live account
+export type AusPostResponse = {
+    verification_status: "in_progress" | "completed" | "failed";
+    verification_session_token: string;
+    data_source_events: string[];
+    transaction_id: string;
+    //sources_category: string;
+    //found_sources: {
+    //     name:string;
+    //     category:string;
+    // }[];
+    // watchlist:{
+    //     "check_performed": boolean,
+    //     "check_performed_date": string,
+    //     "found": boolean,
+    // }
+};
+
+export type KycResponse = {
+    result: KycResult;
+    userId: string;
+    thirdPartyVerified: boolean;
+};
+
+export enum KycResult {
+    InProgress = "in_progress",
+    Completed = "completed",
+    Failed = "failed"
+}
+
+export type GPIBVerifyRequest = {
+    phoneNumber: string;
+    email: string;
+    userID: string;
+    phoneNumberVerified: boolean;
+    emailVerified: boolean;
+    idVerified: boolean;
+};
