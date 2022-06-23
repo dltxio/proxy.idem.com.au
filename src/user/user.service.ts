@@ -51,7 +51,7 @@ export class UserService {
         return this.userRepository.save(user);
     }
 
-    public async pushNotifications(message: string): Promise<void> {
+    public async pushNotification(message: string): Promise<void> {
         //TODO: Implement push notification
         const messages = [];
 
@@ -86,7 +86,7 @@ export class UserService {
                 this.logger.verbose(ticketChunk);
                 tickets.push(...ticketChunk);
             } catch (error) {
-                this.logger.error(error);
+                this.logger.error(error.message);
             }
         }
 
@@ -122,7 +122,7 @@ export class UserService {
                     }
                 }
             } catch (error) {
-                this.logger.error(error);
+                this.logger.error(error.message);
             }
         }
     }

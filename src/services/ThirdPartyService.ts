@@ -27,7 +27,6 @@ export class ThirdPartyService implements IThirdPartyService {
             const endPoint = this.config.get(
                 ConfigSettings.GPIB_VERIFY_ENDPOINT
             );
-            console.log(endPoint);
             await axios.post(endPoint, requestBody, {
                 headers: {
                     "Content-Type": "application/json"
@@ -37,7 +36,7 @@ export class ThirdPartyService implements IThirdPartyService {
             this.logger.verbose(`Verified GPIB for user ${userInfo.userId}`);
             return true;
         } catch (error) {
-            this.logger.error(error);
+            this.logger.error(error.message);
             throw new Error(error);
         }
     }
