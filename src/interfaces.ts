@@ -12,12 +12,31 @@ export enum EntityNames {
     Account = "Account"
 }
 
+export enum KycResult {
+    InProgress = "in_progress",
+    Completed = "completed",
+    Failed = "failed"
+}
+
+export enum RequestType {
+    Signup = "Signup",
+    Verify = "Verify"
+}
+
+//Add more venders
+export enum VenderEnum {
+    GPIB = "GPIB",
+    CoinStash = "CoinStash",
+    EasyCrypto = "EasyCrypto"
+}
+
 export enum ConfigSettings {
     EXPO_ACCESS_TOKEN = "EXPO_ACCESS_TOKEN",
     AUS_POST_URL = "AUS_POST_URL",
     AUS_POST_CLIENT_ID = "AUS_POST_CLIENT_ID",
     AUS_POST_CLIENT_SECRET = "AUS_POST_CLIENT_SECRET",
-    GPIB_VERIFY_ENDPOINT = "GPIB_VERIFY_ENDPOINT"
+    GPIB_VERIFY_ENDPOINT = "GPIB_VERIFY_ENDPOINT",
+    GPIB_SIGNUP_ENDPOINT = "GPIB_SIGNUP_ENDPOINT"
 }
 
 //=== Abstract Error classes
@@ -70,6 +89,10 @@ export class AccountMissingIdError extends EntityMissingIdError {
     }
 }
 
+export interface IAusPostService {
+    verify(userInfo: UserVerifyRequestBody): Promise<KycResult>;
+}
+
 export interface IUserService {
     verify(body: UserVerifyRequestBody): Promise<string>;
     findOne(email: string): Promise<User>;
@@ -89,6 +112,7 @@ export interface IUserService {
 
 export interface IThirdPartyService {
     verifyGPIB(body: UserVerifyRequestBody): Promise<boolean>;
+    signup(signupInfo: UserSignupRequest): Promise<string>;
 }
 
 export class NewUser {
@@ -140,10 +164,6 @@ export class UserExpoPushTokenRequestBody {
     token: string;
 }
 
-export interface IAusPostService {
-    verify(userInfo: UserVerifyRequestBody): Promise<KycResult>;
-}
-
 export type AusPostRequest = {
     given_name: string;
     middle_name: string | null;
@@ -190,12 +210,6 @@ export type KycResponse = {
     thirdPartyVerified: boolean;
 };
 
-export enum KycResult {
-    InProgress = "in_progress",
-    Completed = "completed",
-    Failed = "failed"
-}
-
 export type GPIBVerifyRequest = {
     phoneNumber: string;
     email: string;
@@ -204,13 +218,6 @@ export type GPIBVerifyRequest = {
     emailVerified: boolean;
     idVerified: boolean;
 };
-
-//Add more venders
-export enum VenderEnum {
-    GPIB = "GPIB",
-    CoinStash = "CoinStash",
-    EasyCrypto = "EasyCrypto"
-}
 
 export class SignupNotificationRequest {
     @ApiProperty()
@@ -228,7 +235,20 @@ export class SignupNotificationRequest {
     email: string; //need to passing hashed email address
 }
 
-export enum RequestType {
-    Signup = "Signup",
-    Verify = "Verify"
+export class UserSignupRequest {
+    @ApiProperty()
+    @IsNotEmpty()
+    source: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    firstName: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    lastName: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    password: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    email: string; //need to passing hashed email address
 }

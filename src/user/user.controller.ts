@@ -5,6 +5,7 @@ import {
     KycResult,
     NewUser,
     SignupNotificationRequest,
+    UserSignupRequest,
     UsersResponse
 } from "./../interfaces";
 import {
@@ -16,7 +17,8 @@ import {
     Get,
     Param,
     Put,
-    Ip
+    Ip,
+    UseGuards
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { User } from "../data/entities/user.entity";
@@ -25,6 +27,7 @@ import {
     UserExpoPushTokenRequestBody,
     UserVerifyRequestBody
 } from "../interfaces";
+import { AuthGuard } from "@nestjs/passport";
 
 @Controller("user")
 export class UserController {
@@ -48,6 +51,7 @@ export class UserController {
     }
 
     @Post("verify")
+    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Verify user" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -73,6 +77,7 @@ export class UserController {
     }
 
     @Get()
+    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Get users" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -85,6 +90,7 @@ export class UserController {
     }
 
     @Put(":userId/token")
+    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Put user token" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -100,6 +106,7 @@ export class UserController {
     }
 
     @Post("notification/:message")
+    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Push notification" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -112,6 +119,7 @@ export class UserController {
     }
 
     @Post("signup/notification")
+    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Push signup notification" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -124,5 +132,18 @@ export class UserController {
         @Body() signupRequest: SignupNotificationRequest
     ): Promise<void> {
         return this.userService.pushSignupNotification(signupRequest, ip);
+    }
+
+    @Post("signup")
+    @UseGuards(AuthGuard("basic"))
+    @ApiOperation({ summary: "User signup" })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async signup(@Body() body: UserSignupRequest): Promise<string> {
+        return this.thirdPartyService.signup(body);
     }
 }

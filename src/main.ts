@@ -19,6 +19,7 @@ async function bootstrap() {
         .setTitle("Idem Proxy API")
         .setDescription("Proxy requests to exchanges")
         .setVersion("1.0")
+        .addBasicAuth()
         .build();
     const document = SwaggerModule.createDocument(app, options);
 
