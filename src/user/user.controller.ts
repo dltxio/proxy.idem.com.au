@@ -60,7 +60,13 @@ export class UserController {
         status: HttpStatus.BAD_REQUEST
     })
     async verify(@Body() body: UserVerifyRequestBody): Promise<KycResponse> {
-        const user = await this.userService.findOne(body.email);
+        let user: User;
+        const findUser = await this.userService.findOne(body.email);
+        if (!findUser) {
+            user = await this.userService.create({ email: body.email });
+        } else {
+            user = findUser;
+        }
         const result = await this.ausPostService.verify(body);
         const response: KycResponse = {
             result: result,
