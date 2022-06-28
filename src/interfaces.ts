@@ -72,18 +72,29 @@ export class AccountMissingIdError extends EntityMissingIdError {
 
 export interface IUserService {
     verify(body: UserVerifyRequestBody): Promise<string>;
-    findAll(): Promise<User[]>;
-    create(newUser: UserVerifyRequestBody): Promise<User>;
+    findOne(email: string): Promise<User>;
+    findAll(): Promise<UsersResponse[]>;
+    create(newUser: NewUser): Promise<User>;
     putToken(
         userId: string,
         token: UserExpoPushTokenRequestBody
     ): Promise<User>;
 
-    pushNotification(message: string): Promise<void>;
+    pushNotifications(message: string): Promise<void>;
+    pushSignupNotification(
+        signupRequest: SignupNotificationRequest,
+        ip: string
+    ): Promise<void>;
 }
 
 export interface IThirdPartyService {
     verifyGPIB(body: UserVerifyRequestBody): Promise<boolean>;
+}
+
+export class NewUser {
+    @ApiProperty()
+    @IsNotEmpty()
+    email: string;
 }
 
 export class UserVerifyRequestBody {
@@ -169,6 +180,10 @@ export type AusPostResponse = {
     // }
 };
 
+export type UsersResponse = {
+    userId: string;
+    email: string;
+};
 export type KycResponse = {
     result: KycResult;
     userId: string;
@@ -189,3 +204,31 @@ export type GPIBVerifyRequest = {
     emailVerified: boolean;
     idVerified: boolean;
 };
+
+//Add more venders
+export enum VenderEnum {
+    GPIB = "GPIB",
+    CoinStash = "CoinStash",
+    EasyCrypto = "EasyCrypto"
+}
+
+export class SignupNotificationRequest {
+    @ApiProperty()
+    @IsNotEmpty()
+    source: string;
+    @ApiProperty({
+        example: "message with deep link"
+    })
+    @IsNotEmpty()
+    message: string;
+    @ApiProperty({
+        example: "hashed email address"
+    })
+    @IsNotEmpty()
+    email: string; //need to passing hashed email address
+}
+
+export enum RequestType {
+    Signup = "Signup",
+    Verify = "Verify"
+}

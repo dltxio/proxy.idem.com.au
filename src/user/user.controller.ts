@@ -2,7 +2,10 @@ import {
     IAusPostService,
     IThirdPartyService,
     KycResponse,
-    KycResult
+    KycResult,
+    NewUser,
+    SignupNotificationRequest,
+    UsersResponse
 } from "./../interfaces";
 import {
     Controller,
@@ -12,7 +15,8 @@ import {
     Body,
     Get,
     Param,
-    Put
+    Put,
+    Ip
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { User } from "../data/entities/user.entity";
@@ -31,6 +35,18 @@ export class UserController {
         private thirdPartyService: IThirdPartyService
     ) {}
 
+    @Post("")
+    @ApiOperation({ summary: "Create user" })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async create(@Body() body: NewUser): Promise<User> {
+        return this.userService.create(body);
+    }
+
     @Post("verify")
     @ApiOperation({ summary: "Verify user" })
     @ApiResponse({
@@ -40,7 +56,7 @@ export class UserController {
         status: HttpStatus.BAD_REQUEST
     })
     async verify(@Body() body: UserVerifyRequestBody): Promise<KycResponse> {
-        const user = await this.userService.create(body);
+        const user = await this.userService.findOne(body.email);
         const result = await this.ausPostService.verify(body);
         const response: KycResponse = {
             result: result,
@@ -64,7 +80,7 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async getAll(): Promise<User[]> {
+    async getAll(): Promise<UsersResponse[]> {
         return this.userService.findAll();
     }
 
@@ -91,7 +107,22 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async PushNotification(@Param("message") message: string): Promise<void> {
-        return this.userService.pushNotification(message);
+    async pushNotifications(@Param("message") message: string): Promise<void> {
+        return this.userService.pushNotifications(message);
+    }
+
+    @Post("signup/notification")
+    @ApiOperation({ summary: "Push signup notification" })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async pushSignupNotification(
+        @Ip() ip: string,
+        @Body() signupRequest: SignupNotificationRequest
+    ): Promise<void> {
+        return this.userService.pushSignupNotification(signupRequest, ip);
     }
 }

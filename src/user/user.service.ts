@@ -1,10 +1,14 @@
+import { NewUser } from "./../interfaces";
 import { Injectable, Inject, Logger } from "@nestjs/common";
 import { User } from "../data/entities/user.entity";
+import { Request } from "../data/entities/request.entity";
 import { Repository } from "typeorm";
 import {
     ConfigSettings,
+    RequestType,
+    SignupNotificationRequest,
     UserExpoPushTokenRequestBody,
-    UserVerifyRequestBody
+    UsersResponse
 } from "../interfaces";
 import Expo from "expo-server-sdk";
 import { ConfigService } from "@nestjs/config";
@@ -16,6 +20,8 @@ export class UserService {
     constructor(
         @Inject("USER_REPOSITORY")
         private userRepository: Repository<User>,
+        @Inject("REQUEST_REPOSITORY")
+        private requestRepository: Repository<Request>,
         private config: ConfigService
     ) {
         this.expo = new Expo({
@@ -23,13 +29,28 @@ export class UserService {
         });
     }
 
-    public async findAll(): Promise<User[]> {
-        return this.userRepository.find();
+    public async findOne(email: string): Promise<User> {
+        return this.userRepository.findOneBy({
+            email: email
+        });
+    }
+    public async findAll(): Promise<UsersResponse[]> {
+        const usersResponse = [];
+        const users = await this.userRepository.find();
+
+        for (const user of users) {
+            usersResponse.push({
+                userId: user.userId,
+                email: user.email
+            });
+        }
+
+        return usersResponse;
     }
 
-    public async create(newUser: UserVerifyRequestBody): Promise<User> {
+    public async create(newUser: NewUser): Promise<User> {
         const user = await this.userRepository.findOneBy({
-            email: newUser.email
+            email: newUser.email.toLowerCase()
         });
         if (!user) {
             this.logger.verbose(`New user ${newUser.email} created`);
@@ -47,11 +68,15 @@ export class UserService {
             this.logger.verbose(`User ${userId} not found`);
             throw new Error("User not found");
         }
-        user.expoPushToken = token.token;
-        return this.userRepository.save(user);
+        if (user.expoPushToken && user.expoPushToken != token.token) {
+            user.expoPushToken = token.token;
+            return this.userRepository.save(user);
+        }
+
+        return user;
     }
 
-    public async pushNotification(message: string): Promise<void> {
+    public async pushNotifications(message: string): Promise<void> {
         //TODO: Implement push notification
         const messages = [];
 
@@ -71,7 +96,7 @@ export class UserService {
                     to: user.expoPushToken,
                     sound: "default",
                     body: message,
-                    data: { withSome: "test notification" }
+                    data: { withSome: "Idem notification" }
                 });
             }
         }
@@ -121,6 +146,59 @@ export class UserService {
                         }
                     }
                 }
+            } catch (error) {
+                this.logger.error(error.message);
+            }
+        }
+    }
+
+    public async pushSignupNotification(
+        signupRequest: SignupNotificationRequest,
+        ip: string
+    ): Promise<void> {
+        const user = await this.userRepository.findOneBy({
+            email: signupRequest.email.toLowerCase()
+        });
+
+        //Check to see if user exist
+        if (!user) {
+            this.logger.verbose(`User: ${signupRequest.email} not found`);
+            throw new Error(`User: ${signupRequest.email} not found`);
+        }
+
+        if (!user.expoPushToken || !Expo.isExpoPushToken(user.expoPushToken)) {
+            this.logger.verbose(
+                `User: ${signupRequest.email} notification token not found or invalided token`
+            );
+            throw new Error("Notification token not found or invalided token");
+        }
+
+        //Save the signup request
+        await this.requestRepository.save({
+            from: signupRequest.source,
+            to: "IDEM",
+            ipAddress: ip,
+            requestType: RequestType.Signup
+        });
+
+        const messages = [];
+
+        messages.push({
+            to: user.expoPushToken,
+            sound: "default",
+            body: signupRequest.message,
+            data: { withSome: "Idem notification" }
+        });
+
+        const chunks = this.expo.chunkPushNotifications(messages);
+        const tickets = [];
+        for (const chunk of chunks) {
+            try {
+                const ticketChunk = await this.expo.sendPushNotificationsAsync(
+                    chunk
+                );
+                this.logger.verbose(ticketChunk);
+                tickets.push(...ticketChunk);
             } catch (error) {
                 this.logger.error(error.message);
             }
