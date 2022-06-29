@@ -36,7 +36,9 @@ export enum ConfigSettings {
     AUS_POST_CLIENT_ID = "AUS_POST_CLIENT_ID",
     AUS_POST_CLIENT_SECRET = "AUS_POST_CLIENT_SECRET",
     GPIB_VERIFY_ENDPOINT = "GPIB_VERIFY_ENDPOINT",
-    GPIB_SIGNUP_ENDPOINT = "GPIB_SIGNUP_ENDPOINT"
+    GPIB_SIGNUP_ENDPOINT = "GPIB_SIGNUP_ENDPOINT",
+    COINSTASH_SIGNUP_ENDPOINT = "COINSTASH_SIGNUP_ENDPOINT",
+    COINSTASH_TOKEN = "COINSTASH_TOKEN"
 }
 
 //=== Abstract Error classes
@@ -112,7 +114,7 @@ export interface IUserService {
 
 export interface IThirdPartyService {
     verifyGPIB(body: UserVerifyRequestBody): Promise<boolean>;
-    signup(signupInfo: UserSignupRequest): Promise<string>;
+    signup(signupInfo: UserSignupRequest, ip: string): Promise<string>;
 }
 
 export class NewUser {
@@ -236,7 +238,9 @@ export class SignupNotificationRequest {
 }
 
 export class UserSignupRequest {
-    @ApiProperty()
+    @ApiProperty({
+        example: ["GPIB", "CoinStash"]
+    })
     @IsNotEmpty()
     source: string;
     @ApiProperty()

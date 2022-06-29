@@ -1,6 +1,6 @@
-import { UserSignupRequest, VenderEnum } from "./../interfaces";
+import { RequestType, UserSignupRequest, VenderEnum } from "./../interfaces";
 import { ConfigService } from "@nestjs/config";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import axios from "axios";
 import {
     ConfigSettings,
@@ -8,12 +8,18 @@ import {
     UserVerifyRequestBody,
     IThirdPartyService
 } from "../interfaces";
+import { Repository } from "typeorm";
+import { Request } from "../data/entities/request.entity";
 
 @Injectable()
 export class ThirdPartyService implements IThirdPartyService {
     private readonly logger = new Logger("ThirdPartyService");
 
-    constructor(private config: ConfigService) {}
+    constructor(
+        private config: ConfigService,
+        @Inject("REQUEST_REPOSITORY")
+        private requestRepository: Repository<Request>
+    ) {}
 
     public async verifyGPIB(userInfo: UserVerifyRequestBody): Promise<boolean> {
         try {
@@ -42,31 +48,58 @@ export class ThirdPartyService implements IThirdPartyService {
         }
     }
 
-    public async signup(signupInfo: UserSignupRequest): Promise<string> {
-        const requestBody = JSON.stringify({
-            firstName: signupInfo?.firstName,
-            lastName: signupInfo?.lastName,
-            email: signupInfo.email,
-            password: signupInfo.password,
-            referralCode: "",
-            trackAddress: true,
-            CreateAddress: true
-        });
-
+    public async signup(
+        signupInfo: UserSignupRequest,
+        ip: string
+    ): Promise<string> {
+        let requestBody = {};
         let endPoint: string;
+
         if (signupInfo.source === VenderEnum.GPIB) {
             endPoint = this.config.get(ConfigSettings.GPIB_SIGNUP_ENDPOINT);
+            requestBody = {
+                firstName: signupInfo?.firstName,
+                lastName: signupInfo?.lastName,
+                email: signupInfo.email,
+                password: signupInfo.password,
+                referralCode: "",
+                trackAddress: true,
+                createAddress: true
+            };
+        } else if (signupInfo.source === VenderEnum.CoinStash) {
+            endPoint = this.config.get(
+                ConfigSettings.COINSTASH_SIGNUP_ENDPOINT
+            );
+            requestBody = {
+                email: signupInfo.email,
+                password: signupInfo.password,
+                displayName: `${signupInfo?.firstName} ${signupInfo?.lastName}`,
+                country: "Australia",
+                token: this.config.get(ConfigSettings.COINSTASH_TOKEN),
+                acceptMarketing: true
+            };
         }
 
         try {
-            const response = await axios.post(endPoint, requestBody, {
-                headers: {
-                    "Content-Type": "application/json"
+            const response = await axios.post(
+                endPoint,
+                JSON.stringify(requestBody),
+                {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
                 }
-            });
+            );
             this.logger.verbose(
                 `New user signup for ${signupInfo.source}, userId: ${response.data}`
             );
+            //Save the signup request
+            await this.requestRepository.save({
+                from: "IDEM",
+                to: signupInfo.source,
+                ipAddress: ip,
+                requestType: RequestType.Signup
+            });
             return response.data;
         } catch (error) {
             this.logger.error(error.response.data);

@@ -149,7 +149,10 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async signup(@Body() body: UserSignupRequest): Promise<string> {
-        return this.thirdPartyService.signup(body);
+    async signup(
+        @Ip() ip: string,
+        @Body() body: UserSignupRequest
+    ): Promise<string> {
+        return this.thirdPartyService.signup(body, ip);
     }
 }
