@@ -123,6 +123,9 @@ export class UserVerifyRequestBody {
     userId: string;
 }
 
+export type GetUserResponse = Omit<User, "expoPushToken">[]
+
+
 export class UserExpoPushTokenRequestBody {
     @ApiProperty()
     @IsNotEmpty()
