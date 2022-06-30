@@ -21,7 +21,10 @@ export class ThirdPartyService implements IThirdPartyService {
         private requestRepository: Repository<Request>
     ) {}
 
-    public async verifyGPIB(userInfo: UserVerifyRequestBody): Promise<boolean> {
+    public async verifyGPIB(
+        userInfo: UserVerifyRequestBody,
+        ip: string
+    ): Promise<boolean> {
         try {
             const requestBody: GPIBVerifyRequest = {
                 userID: userInfo.userId,
@@ -41,6 +44,14 @@ export class ThirdPartyService implements IThirdPartyService {
             });
 
             this.logger.verbose(`Verified GPIB for user ${userInfo.userId}`);
+
+            //Save the verify request
+            await this.requestRepository.save({
+                from: "IDEM",
+                to: VenderEnum.GPIB,
+                ipAddress: ip,
+                requestType: RequestType.Verify
+            });
             return true;
         } catch (error) {
             this.logger.error(error.message);

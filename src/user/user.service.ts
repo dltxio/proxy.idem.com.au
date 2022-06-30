@@ -68,7 +68,7 @@ export class UserService {
             this.logger.verbose(`User ${userId} not found`);
             throw new Error("User not found");
         }
-        if (user.expoPushToken && user.expoPushToken != token.token) {
+        if (!user.expoPushToken || user.expoPushToken != token.token) {
             user.expoPushToken = token.token;
             return this.userRepository.save(user);
         }
@@ -183,11 +183,13 @@ export class UserService {
 
         const messages = [];
 
+        const url = this.config.get(ConfigSettings.APP_DEEPLINK_URL);
+
         messages.push({
             to: user.expoPushToken,
             sound: "default",
             body: signupRequest.message,
-            data: { withSome: "Idem notification" }
+            data: { url: url }
         });
 
         const chunks = this.expo.chunkPushNotifications(messages);

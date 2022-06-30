@@ -59,7 +59,10 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async verify(@Body() body: UserVerifyRequestBody): Promise<KycResponse> {
+    async verify(
+        @Ip() ip: string,
+        @Body() body: UserVerifyRequestBody
+    ): Promise<KycResponse> {
         let user: User;
         const findUser = await this.userService.findOne(body.email);
         if (!findUser) {
@@ -75,7 +78,7 @@ export class UserController {
         };
         if (result === KycResult.Completed) {
             //TODO: Call GPIB to verify user
-            await this.thirdPartyService.verifyGPIB(body);
+            await this.thirdPartyService.verifyGPIB(body, ip);
             response.thirdPartyVerified = true;
         }
         //TODO: Implement TPA KYC verification
