@@ -39,7 +39,7 @@ envs:
       value: ${db-postgresql-sgp1-16621.CA_CERT}
     - key: EXPO_ACCESS_TOKEN
       scope: RUN_AND_BUILD_TIME
-      value: 4E2JahEB44aRTG31CwVmQFnXpxYvFhyl1eMci8TF
+      value: EV[1:2KVdwYgCEzhpQxPtM86A4wk0lPLAqvfp:3vY6ooOynGbF688tg3P2N9Z7cFrPqC1spDebVzCE/MdCprddrHgNnEDEfBfRQhI3ay9KBzs/3Rk=]
     - key: AUS_POST_URL
       scope: RUN_AND_BUILD_TIME
       value: https://api.digitalid-sandbox.com/products/kyc/1/
