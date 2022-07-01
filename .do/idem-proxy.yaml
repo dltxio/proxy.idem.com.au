@@ -57,10 +57,6 @@ region: sgp
 services:
     - build_command: yarn build
       environment_slug: node-js
-      envs:
-          - key: DATABASE_URL
-            scope: RUN_TIME
-            value: ${db-postgresql-sgp1-16621.DATABASE_URL}
       github:
           branch: main
           deploy_on_push: true
