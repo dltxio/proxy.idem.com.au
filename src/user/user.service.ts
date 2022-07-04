@@ -41,7 +41,8 @@ export class UserService {
         for (const user of users) {
             usersResponse.push({
                 userId: user.userId,
-                email: user.email
+                email: user.email,
+                createdAt: user.createdAt
             });
         }
 

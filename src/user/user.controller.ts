@@ -1,5 +1,4 @@
 import {
-    GetUserResponse,
     IAusPostService,
     IThirdPartyService,
     KycResponse,
@@ -95,12 +94,8 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async getAll(): Promise<GetUserResponse> {
-        const users = await this.userService.findAll();
-        const usersWithoutToken = users.map(
-            ({ expoPushToken, ...rest }) => rest
-        );
-        return usersWithoutToken;
+    async getAll(): Promise<UsersResponse[]> {
+        return this.userService.findAll();
     }
 
     @Put(":userId/token")

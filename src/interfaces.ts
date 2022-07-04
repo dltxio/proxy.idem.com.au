@@ -161,9 +161,6 @@ export class UserVerifyRequestBody {
     userId: string;
 }
 
-export type GetUserResponse = Omit<User, "expoPushToken">[]
-
-
 export class UserExpoPushTokenRequestBody {
     @ApiProperty()
     @IsNotEmpty()
@@ -209,6 +206,7 @@ export type AusPostResponse = {
 export type UsersResponse = {
     userId: string;
     email: string;
+    createdAt: string;
 };
 export type KycResponse = {
     result: KycResult;
