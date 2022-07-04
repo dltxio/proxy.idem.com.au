@@ -206,7 +206,7 @@ export type AusPostResponse = {
 export type UsersResponse = {
     userId: string;
     email: string;
-    createdAt: string;
+    createdAt: Date;
 };
 export type KycResponse = {
     result: KycResult;
