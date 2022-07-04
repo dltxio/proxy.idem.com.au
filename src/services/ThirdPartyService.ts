@@ -77,7 +77,8 @@ export class ThirdPartyService implements IThirdPartyService {
                 trackAddress: true,
                 createAddress: true
             };
-        } else if (signupInfo.source === VendorEnum.CoinStash) {
+        }
+        if (signupInfo.source === VendorEnum.CoinStash) {
             endPoint = this.config.get(
                 ConfigSettings.COINSTASH_SIGNUP_ENDPOINT
             );
@@ -87,7 +88,7 @@ export class ThirdPartyService implements IThirdPartyService {
                 displayName: `${signupInfo?.firstName} ${signupInfo?.lastName}`,
                 country: "Australia",
                 token: this.config.get(ConfigSettings.COINSTASH_TOKEN),
-                acceptMarketing: true
+                acceptMarketing: false
             };
         }
 
