@@ -24,7 +24,7 @@ export enum RequestType {
 }
 
 //Add more venders
-export enum VenderEnum {
+export enum VendorEnum {
     GPIB = "GPIB",
     CoinStash = "CoinStash",
     EasyCrypto = "EasyCrypto"

@@ -1,4 +1,4 @@
-import { RequestType, UserSignupRequest, VenderEnum } from "./../interfaces";
+import { RequestType, UserSignupRequest, VendorEnum } from "./../interfaces";
 import { ConfigService } from "@nestjs/config";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import axios from "axios";
@@ -48,7 +48,7 @@ export class ThirdPartyService implements IThirdPartyService {
             //Save the verify request
             await this.requestRepository.save({
                 from: "IDEM",
-                to: VenderEnum.GPIB,
+                to: VendorEnum.GPIB,
                 ipAddress: ip,
                 requestType: RequestType.Verify
             });
@@ -66,7 +66,7 @@ export class ThirdPartyService implements IThirdPartyService {
         let requestBody = {};
         let endPoint: string;
 
-        if (signupInfo.source === VenderEnum.GPIB) {
+        if (signupInfo.source === VendorEnum.GPIB) {
             endPoint = this.config.get(ConfigSettings.GPIB_SIGNUP_ENDPOINT);
             requestBody = {
                 firstName: signupInfo?.firstName,
@@ -77,7 +77,7 @@ export class ThirdPartyService implements IThirdPartyService {
                 trackAddress: true,
                 createAddress: true
             };
-        } else if (signupInfo.source === VenderEnum.CoinStash) {
+        } else if (signupInfo.source === VendorEnum.CoinStash) {
             endPoint = this.config.get(
                 ConfigSettings.COINSTASH_SIGNUP_ENDPOINT
             );
