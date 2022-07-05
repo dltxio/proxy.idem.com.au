@@ -39,7 +39,8 @@ export enum ConfigSettings {
     GPIB_SIGNUP_ENDPOINT = "GPIB_SIGNUP_ENDPOINT",
     COINSTASH_SIGNUP_ENDPOINT = "COINSTASH_SIGNUP_ENDPOINT",
     COINSTASH_TOKEN = "COINSTASH_TOKEN",
-    APP_DEEPLINK_URL = "APP_DEEPLINK_URL"
+    APP_DEEPLINK_URL = "APP_DEEPLINK_URL",
+    EC_SIGNUP_ENDPOINT = "EC_SIGNUP_ENDPOINT"
 }
 
 //=== Abstract Error classes
@@ -241,7 +242,7 @@ export class SignupNotificationRequest {
 
 export class UserSignupRequest {
     @ApiProperty({
-        example: ["GPIB", "CoinStash"]
+        example: ["1", "2"]
     })
     @IsNotEmpty()
     source: number;
