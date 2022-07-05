@@ -25,9 +25,9 @@ export enum RequestType {
 
 //Add more venders
 export enum VendorEnum {
-    GPIB = "GPIB",
-    CoinStash = "CoinStash",
-    EasyCrypto = "EasyCrypto"
+    GPIB = 1,
+    CoinStash = 2,
+    EasyCrypto = 6
 }
 
 export enum ConfigSettings {
@@ -244,7 +244,7 @@ export class UserSignupRequest {
         example: ["GPIB", "CoinStash"]
     })
     @IsNotEmpty()
-    source: string;
+    source: number;
     @ApiProperty()
     @IsNotEmpty()
     firstName: string;

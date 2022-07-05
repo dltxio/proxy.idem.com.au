@@ -10,6 +10,7 @@ import {
 } from "../interfaces";
 import { Repository } from "typeorm";
 import { Request } from "../data/entities/request.entity";
+import { getVendorName } from "src/utils/vendor";
 
 @Injectable()
 export class ThirdPartyService implements IThirdPartyService {
@@ -48,7 +49,7 @@ export class ThirdPartyService implements IThirdPartyService {
             //Save the verify request
             await this.requestRepository.save({
                 from: "IDEM",
-                to: VendorEnum.GPIB,
+                to: getVendorName(VendorEnum.GPIB),
                 ipAddress: ip,
                 requestType: RequestType.Verify
             });
@@ -108,7 +109,7 @@ export class ThirdPartyService implements IThirdPartyService {
             //Save the signup request
             await this.requestRepository.save({
                 from: "IDEM",
-                to: signupInfo.source,
+                to: getVendorName(signupInfo.source),
                 ipAddress: ip,
                 requestType: RequestType.Signup
             });

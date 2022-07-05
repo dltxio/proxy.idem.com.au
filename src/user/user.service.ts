@@ -12,6 +12,7 @@ import {
 } from "../interfaces";
 import Expo from "expo-server-sdk";
 import { ConfigService } from "@nestjs/config";
+import { getVendorName } from "src/utils/vendor";
 
 @Injectable()
 export class UserService {
@@ -183,8 +184,9 @@ export class UserService {
         });
 
         const messages = [];
-
-        const url = this.config.get(ConfigSettings.APP_DEEPLINK_URL);
+        const url = `${this.config.get(ConfigSettings.APP_DEEPLINK_URL)}?id=${
+            signupRequest.source
+        }`;
 
         messages.push({
             to: user.expoPushToken,
