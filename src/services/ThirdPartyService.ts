@@ -10,7 +10,7 @@ import {
 } from "../interfaces";
 import { Repository } from "typeorm";
 import { Request } from "../data/entities/request.entity";
-import { getVendorName } from "src/utils/vendor";
+import { getVendorName } from "../utils/vendor";
 
 @Injectable()
 export class ThirdPartyService implements IThirdPartyService {

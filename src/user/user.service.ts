@@ -12,7 +12,6 @@ import {
 } from "../interfaces";
 import Expo from "expo-server-sdk";
 import { ConfigService } from "@nestjs/config";
-import { getVendorName } from "src/utils/vendor";
 
 @Injectable()
 export class UserService {
