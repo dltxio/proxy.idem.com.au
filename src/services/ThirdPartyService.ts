@@ -67,7 +67,7 @@ export class ThirdPartyService implements IThirdPartyService {
         let requestBody = {};
         let endPoint: string;
 
-        if (signupInfo.source == VendorEnum.GPIB) {
+        if (signupInfo.source === VendorEnum.GPIB) {
             endPoint = this.config.get(ConfigSettings.GPIB_SIGNUP_ENDPOINT);
             requestBody = {
                 firstName: signupInfo?.firstName,
@@ -79,7 +79,7 @@ export class ThirdPartyService implements IThirdPartyService {
                 createAddress: true
             };
         }
-        if (signupInfo.source == VendorEnum.CoinStash) {
+        if (signupInfo.source === VendorEnum.CoinStash) {
             endPoint = this.config.get(
                 ConfigSettings.COINSTASH_SIGNUP_ENDPOINT
             );
@@ -93,7 +93,7 @@ export class ThirdPartyService implements IThirdPartyService {
             };
         }
 
-        if (signupInfo.source == VendorEnum.EasyCrypto) {
+        if (signupInfo.source === VendorEnum.EasyCrypto) {
             endPoint = this.config.get(ConfigSettings.EC_SIGNUP_ENDPOINT);
             requestBody = {
                 email: signupInfo.email,
