@@ -40,7 +40,8 @@ export enum ConfigSettings {
     COINSTASH_SIGNUP_ENDPOINT = "COINSTASH_SIGNUP_ENDPOINT",
     COINSTASH_TOKEN = "COINSTASH_TOKEN",
     APP_DEEPLINK_URL = "APP_DEEPLINK_URL",
-    EC_SIGNUP_ENDPOINT = "EC_SIGNUP_ENDPOINT"
+    EC_SIGNUP_ENDPOINT = "EC_SIGNUP_ENDPOINT",
+    WALLET_PRIVATE_KEY = "WALLET_PRIVATE_KEY"
 }
 
 //=== Abstract Error classes
@@ -91,6 +92,10 @@ export class AccountMissingIdError extends EntityMissingIdError {
     constructor() {
         super(EntityNames.Account);
     }
+}
+
+export interface IWalletService {
+    signMessage(message: string): Promise<string>;
 }
 
 export interface IAusPostService {
