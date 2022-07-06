@@ -1,4 +1,9 @@
-import { RequestType, UserSignupRequest, VendorEnum } from "./../interfaces";
+import {
+    RequestType,
+    UserDetailRequest,
+    UserSignupRequest,
+    VendorEnum
+} from "./../interfaces";
 import { ConfigService } from "@nestjs/config";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import axios from "axios";
@@ -11,6 +16,7 @@ import {
 import { Repository } from "typeorm";
 import { Request } from "../data/entities/request.entity";
 import { getVendorName } from "../utils/vendor";
+import moment from "moment";
 
 @Injectable()
 export class ThirdPartyService implements IThirdPartyService {
@@ -35,10 +41,8 @@ export class ThirdPartyService implements IThirdPartyService {
                 emailVerified: true, //Hardcoded for now
                 idVerified: true //Hardcoded for now
             };
-            const endPoint = this.config.get(
-                ConfigSettings.GPIB_VERIFY_ENDPOINT
-            );
-            await axios.post(endPoint, requestBody, {
+            const endPoint = this.config.get(ConfigSettings.GPIB_API_ENDPOINT);
+            await axios.post(`${endPoint}/user/idem/verify`, requestBody, {
                 headers: {
                     "Content-Type": "application/json"
                 }
@@ -68,7 +72,9 @@ export class ThirdPartyService implements IThirdPartyService {
         let endPoint: string;
 
         if (signupInfo.source === VendorEnum.GPIB) {
-            endPoint = this.config.get(ConfigSettings.GPIB_SIGNUP_ENDPOINT);
+            endPoint = `${this.config.get(
+                ConfigSettings.GPIB_API_ENDPOINT
+            )}/user`;
             requestBody = {
                 firstName: signupInfo?.firstName,
                 lastName: signupInfo?.lastName,
@@ -125,6 +131,44 @@ export class ThirdPartyService implements IThirdPartyService {
         } catch (error) {
             this.logger.error(error.response.data);
             throw new Error(error.response.data);
+        }
+    }
+
+    public async syncDetail(userDetail: UserDetailRequest): Promise<void> {
+        let endPoint: string;
+        if (userDetail.source === VendorEnum.GPIB) {
+            endPoint = this.config.get(ConfigSettings.GPIB_API_ENDPOINT);
+
+            const authentication = await axios.post(
+                `${endPoint}/user/authenticate`,
+                JSON.stringify({
+                    username: userDetail.email,
+                    password: userDetail.password
+                }),
+                {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
+            if (authentication.status === 200) {
+                const token = authentication.data.token;
+
+                await axios.put(
+                    `${endPoint}/accountInfoes`,
+                    JSON.stringify({
+                        firstName: userDetail.firstName,
+                        lastName: userDetail.lastName,
+                        yob: moment(userDetail.dob, "DD/MM/YYYY").year()
+                    }),
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`
+                        }
+                    }
+                );
+            }
         }
     }
 }

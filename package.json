@@ -41,6 +41,7 @@
         "ethers": "^5.5.4",
         "expo-server-sdk": "^3.6.0",
         "lint-staged": "^12.3.7",
+        "moment": "^2.29.3",
         "nyc": "^15.1.0",
         "passport": "^0.6.0",
         "passport-http": "^0.3.0",
