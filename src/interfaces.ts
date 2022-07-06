@@ -12,12 +12,35 @@ export enum EntityNames {
     Account = "Account"
 }
 
+export enum KycResult {
+    InProgress = "in_progress",
+    Completed = "completed",
+    Failed = "failed"
+}
+
+export enum RequestType {
+    Signup = "Signup",
+    Verify = "Verify"
+}
+
+//Add more venders
+export enum VendorEnum {
+    GPIB = 1,
+    CoinStash = 2,
+    EasyCrypto = 6
+}
+
 export enum ConfigSettings {
     EXPO_ACCESS_TOKEN = "EXPO_ACCESS_TOKEN",
     AUS_POST_URL = "AUS_POST_URL",
     AUS_POST_CLIENT_ID = "AUS_POST_CLIENT_ID",
     AUS_POST_CLIENT_SECRET = "AUS_POST_CLIENT_SECRET",
-    GPIB_VERIFY_ENDPOINT = "GPIB_VERIFY_ENDPOINT"
+    GPIB_VERIFY_ENDPOINT = "GPIB_VERIFY_ENDPOINT",
+    GPIB_SIGNUP_ENDPOINT = "GPIB_SIGNUP_ENDPOINT",
+    COINSTASH_SIGNUP_ENDPOINT = "COINSTASH_SIGNUP_ENDPOINT",
+    COINSTASH_TOKEN = "COINSTASH_TOKEN",
+    APP_DEEPLINK_URL = "APP_DEEPLINK_URL",
+    EC_SIGNUP_ENDPOINT = "EC_SIGNUP_ENDPOINT"
 }
 
 //=== Abstract Error classes
@@ -70,20 +93,36 @@ export class AccountMissingIdError extends EntityMissingIdError {
     }
 }
 
+export interface IAusPostService {
+    verify(userInfo: UserVerifyRequestBody): Promise<KycResult>;
+}
+
 export interface IUserService {
     verify(body: UserVerifyRequestBody): Promise<string>;
-    findAll(): Promise<User[]>;
-    create(newUser: UserVerifyRequestBody): Promise<User>;
+    findOne(email: string): Promise<User>;
+    findAll(): Promise<UsersResponse[]>;
+    create(newUser: NewUser): Promise<User>;
     putToken(
         userId: string,
         token: UserExpoPushTokenRequestBody
     ): Promise<User>;
 
-    pushNotification(message: string): Promise<void>;
+    pushNotifications(message: string): Promise<void>;
+    pushSignupNotification(
+        signupRequest: SignupNotificationRequest,
+        ip: string
+    ): Promise<void>;
 }
 
 export interface IThirdPartyService {
-    verifyGPIB(body: UserVerifyRequestBody): Promise<boolean>;
+    verifyGPIB(body: UserVerifyRequestBody, ip: string): Promise<boolean>;
+    signup(signupInfo: UserSignupRequest, ip: string): Promise<string>;
+}
+
+export class NewUser {
+    @ApiProperty()
+    @IsNotEmpty()
+    email: string;
 }
 
 export class UserVerifyRequestBody {
@@ -123,17 +162,10 @@ export class UserVerifyRequestBody {
     userId: string;
 }
 
-export type GetUserResponse = Omit<User, "expoPushToken">[]
-
-
 export class UserExpoPushTokenRequestBody {
     @ApiProperty()
     @IsNotEmpty()
     token: string;
-}
-
-export interface IAusPostService {
-    verify(userInfo: UserVerifyRequestBody): Promise<KycResult>;
 }
 
 export type AusPostRequest = {
@@ -172,17 +204,17 @@ export type AusPostResponse = {
     // }
 };
 
+export type UsersResponse = {
+    userId: string;
+    email: string;
+    createdAt: Date;
+};
+
 export type KycResponse = {
     result: KycResult;
     userId: string;
     thirdPartyVerified: boolean;
 };
-
-export enum KycResult {
-    InProgress = "in_progress",
-    Completed = "completed",
-    Failed = "failed"
-}
 
 export type GPIBVerifyRequest = {
     phoneNumber: string;
@@ -192,3 +224,39 @@ export type GPIBVerifyRequest = {
     emailVerified: boolean;
     idVerified: boolean;
 };
+
+export class SignupNotificationRequest {
+    @ApiProperty()
+    @IsNotEmpty()
+    source: string;
+    @ApiProperty({
+        example: "message with deep link"
+    })
+    @IsNotEmpty()
+    message: string;
+    @ApiProperty({
+        example: "hashed email address"
+    })
+    @IsNotEmpty()
+    email: string; //need to passing hashed email address
+}
+
+export class UserSignupRequest {
+    @ApiProperty({
+        example: ["1", "2"]
+    })
+    @IsNotEmpty()
+    source: number;
+    @ApiProperty()
+    @IsNotEmpty()
+    firstName: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    lastName: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    password: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    email: string; //need to passing hashed email address
+}

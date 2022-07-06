@@ -1,3 +1,4 @@
+import { getVendorName } from "../utils/vendor";
 import { validate, Validate, ValidationError } from "class-validator";
 import { IsUnsignedBigNumberString } from "./constraints";
 import { expect } from "chai";
@@ -32,4 +33,12 @@ describe("Custom constraints", () => {
             });
         }
     );
+});
+
+describe("Vendor unit test", () => {
+    it("Should get correct vendor name", async () => {
+        expect(getVendorName(1)).to.equal("Get Paid In Bitcoin");
+        expect(getVendorName(2)).to.equal("Coin Stash");
+        expect(getVendorName(6)).to.equal("Easy Crypto");
+    });
 });

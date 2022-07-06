@@ -1,9 +1,12 @@
 import {
-    GetUserResponse,
     IAusPostService,
     IThirdPartyService,
     KycResponse,
-    KycResult
+    KycResult,
+    NewUser,
+    SignupNotificationRequest,
+    UserSignupRequest,
+    UsersResponse
 } from "./../interfaces";
 import {
     Controller,
@@ -13,7 +16,9 @@ import {
     Body,
     Get,
     Param,
-    Put
+    Put,
+    Ip,
+    UseGuards
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { User } from "../data/entities/user.entity";
@@ -22,6 +27,7 @@ import {
     UserExpoPushTokenRequestBody,
     UserVerifyRequestBody
 } from "../interfaces";
+import { AuthGuard } from "@nestjs/passport";
 
 @Controller("user")
 export class UserController {
@@ -32,7 +38,20 @@ export class UserController {
         private thirdPartyService: IThirdPartyService
     ) {}
 
+    @Post("")
+    @ApiOperation({ summary: "Create user" })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async create(@Body() body: NewUser): Promise<User> {
+        return this.userService.create(body);
+    }
+
     @Post("verify")
+    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Verify user" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -40,8 +59,17 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async verify(@Body() body: UserVerifyRequestBody): Promise<KycResponse> {
-        const user = await this.userService.create(body);
+    async verify(
+        @Ip() ip: string,
+        @Body() body: UserVerifyRequestBody
+    ): Promise<KycResponse> {
+        let user: User;
+        const findUser = await this.userService.findOne(body.email);
+        if (!findUser) {
+            user = await this.userService.create({ email: body.email });
+        } else {
+            user = findUser;
+        }
         const result = await this.ausPostService.verify(body);
         const response: KycResponse = {
             result: result,
@@ -50,7 +78,7 @@ export class UserController {
         };
         if (result === KycResult.Completed) {
             //TODO: Call GPIB to verify user
-            await this.thirdPartyService.verifyGPIB(body);
+            await this.thirdPartyService.verifyGPIB(body, ip);
             response.thirdPartyVerified = true;
         }
         //TODO: Implement TPA KYC verification
@@ -58,6 +86,7 @@ export class UserController {
     }
 
     @Get()
+    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Get users" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -65,13 +94,12 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async getAll(): Promise<GetUserResponse> {
-        const users = await this.userService.findAll();
-        const usersWithoutToken = users.map(({expoPushToken, ...rest}) => rest)
-        return usersWithoutToken
+    async getAll(): Promise<UsersResponse[]> {
+        return this.userService.findAll();
     }
 
     @Put(":userId/token")
+    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Put user token" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -87,6 +115,7 @@ export class UserController {
     }
 
     @Post("notification/:message")
+    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Push notification" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -94,7 +123,39 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async PushNotification(@Param("message") message: string): Promise<void> {
-        return this.userService.pushNotification(message);
+    async pushNotifications(@Param("message") message: string): Promise<void> {
+        return this.userService.pushNotifications(message);
+    }
+
+    @Post("signup/notification")
+    @UseGuards(AuthGuard("basic"))
+    @ApiOperation({ summary: "Push signup notification" })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async pushSignupNotification(
+        @Ip() ip: string,
+        @Body() signupRequest: SignupNotificationRequest
+    ): Promise<void> {
+        return this.userService.pushSignupNotification(signupRequest, ip);
+    }
+
+    @Post("signup")
+    @UseGuards(AuthGuard("basic"))
+    @ApiOperation({ summary: "User signup" })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async signup(
+        @Ip() ip: string,
+        @Body() body: UserSignupRequest
+    ): Promise<string> {
+        return this.thirdPartyService.signup(body, ip);
     }
 }
