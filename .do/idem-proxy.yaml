@@ -16,13 +16,10 @@ domains:
       type: PRIMARY
       zone: idem.com.au
 envs:
-    - key: DATABASE_URL
-      scope: RUN_AND_BUILD_TIME
-      value: ${db-postgresql-sgp1-16621.DATABASE_URL}
     - key: POSTGRES_HOST
       scope: RUN_AND_BUILD_TIME
       value: ${db-postgresql-sgp1-16621.HOSTNAME}
-    - key: DATABASE
+    - key: POSTGRES_DB_NAME
       scope: RUN_AND_BUILD_TIME
       value: ${db-postgresql-sgp1-16621.DATABASE}
     - key: POSTGRES_PORT
@@ -39,6 +36,7 @@ envs:
       value: ${db-postgresql-sgp1-16621.CA_CERT}
     - key: EXPO_ACCESS_TOKEN
       scope: RUN_AND_BUILD_TIME
+      type: SECRET
       value: EV[1:2KVdwYgCEzhpQxPtM86A4wk0lPLAqvfp:3vY6ooOynGbF688tg3P2N9Z7cFrPqC1spDebVzCE/MdCprddrHgNnEDEfBfRQhI3ay9KBzs/3Rk=]
     - key: AUS_POST_URL
       scope: RUN_AND_BUILD_TIME
@@ -51,12 +49,44 @@ envs:
       value: fc21b9c14a2556bf700b4f7bf899952a
     - key: GPIB_VERIFY_ENDPOINT
       scope: RUN_AND_BUILD_TIME
-      value: i.getpaidinbitcoin.com.au/user/idem/verify
+      value: https://testapi.getpaidinbitcoin.com.au/user/idem/verify
+    - key: GPIB_SIGNUP_ENDPOINT
+      scope: RUN_AND_BUILD_TIME
+      value: https://testapi.getpaidinbitcoin.com.au/user
+    - key: HTTP_BASIC_USER
+      scope: RUN_AND_BUILD_TIME
+      type: SECRET
+      value: EV[1:dxm7LGyQSYHstpZuFntBu5DXKUZViWv3:dwX9UVGjBEXiSfj9xxI4kJ4tGrXu+jBdySU=]
+    - key: HTTP_BASIC_PASS
+      scope: RUN_AND_BUILD_TIME
+      type: SECRET
+      value: EV[1:5MNy4cqIk8ipe/87ZgwIbbfC9FRf5YaM:h+25HfGMd4Sj6BiNzbGcRggH+BtONYYaEyBq]
+    - key: COINSTASH_SIGNUP_ENDPOINT
+      scope: RUN_AND_BUILD_TIME
+      value: https://coinstash.com.au/api/auth/signup
+    - key: COINSTASH_TOKEN
+      scope: RUN_AND_BUILD_TIME
+      type: SECRET
+      value: EV[1:cciUDJt3rnA765ls8sWef2nspcnbIzaI:qpA17xGeg/8ZPBdgdWJ3mhBBkr0/bOiX6L5ieoAGTCfD3yW99qE4H4UShkUvKNPAxHxzrfARuxsyBwKwfoWrd1nCIubFN1IllBISrBnLYsrdUNuKB5E/5eZa1wc8Ynso5Tpu3LfrJKgV+NuGYEkJ+B4a3p+fnq5NwfgjMHRx+gntktVHuFpmwW0CXrFAzoI/uNTGrghpM7cfI9tzBtP3FqCI/PD+QSjhv2fdtKUb+kaDoVmARpz4aQpy8HgsCe00xP2xpYjD3BuG6B8ZrPA1hjDQ9W1ivccVWEqGven7FsDV1fkmo1FuiNpgnAWfNAl0ArHiWCJSy6DIZyiLc30vuoyR3uBM/bKLE8g53Kh8VFOPnbEsOZ8JrTaSAKU2SeGOMcgSTPpKAV/lhGsKSeY6IKBMW1BLswHwb2HJpMUM9fDbDA21qYi87EdSm4Y+bGFnFJpOlJzXe6p6rHS05oDBMctIqT3oxLPsjeIGz3bWAG4vmwRju8t7+ryRxiWWjAtieO+p6O1niaHOG4Ya9diw1RlamdBWEGUm4d6usVPQhxeBEm2xQnOLtVvprSQauNah9vwflK3aQZugrR6hqWEDat4KzBE4o41aoCxTV1ShjKhMgqMWw7fRDs0Ss131cQ==]
+    - key: EC_SIGNUP_ENDPOINT
+      scope: RUN_AND_BUILD_TIME
+      value: https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyDxg6aMoyxoB8fnQTwr9bY3S1TXE6ymUfY
+    - key: EC_VERIFY_ENDPOINT
+      scope: RUN_AND_BUILD_TIME
+      value: https://api.easycrypto.com.au/apiv2/verify.php
+    - key: WALLET_PRIVATE_KEY
+      scope: RUN_AND_BUILD_TIME
+      type: SECRET
+      value: EV[1:f/6iB39ZfTA9JzPev8Ffr+bpEJ7LEkI2:L9N8l89HvAMe398cwWEGuL7cCwPh6guv7g/jtNkT32+xLis5q6dRSbz57eTwoBEdMI6h8pEoqpA/Rney3vDRg/Fuy+p+ibSNE9rKl6OuTxE=]
 name: idem-proxy
 region: sgp
 services:
     - build_command: yarn build
       environment_slug: node-js
+      envs:
+          - key: DATABASE_URL
+            scope: RUN_TIME
+            value: ${db-postgresql-sgp1-16621.DATABASE_URL}
       github:
           branch: main
           deploy_on_push: true
