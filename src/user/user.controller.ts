@@ -5,6 +5,7 @@ import {
     KycResult,
     NewUser,
     SignupNotificationRequest,
+    UserDetailRequest,
     UserSignupRequest,
     UsersResponse
 } from "./../interfaces";
@@ -157,5 +158,18 @@ export class UserController {
         @Body() body: UserSignupRequest
     ): Promise<string> {
         return this.thirdPartyService.signup(body, ip);
+    }
+
+    @Post("syncDetail")
+    @UseGuards(AuthGuard("basic"))
+    @ApiOperation({ summary: "Sync user detail" })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async syncDetail(@Body() body: UserDetailRequest): Promise<void> {
+        return this.thirdPartyService.syncDetail(body);
     }
 }
