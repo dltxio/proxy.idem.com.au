@@ -35,8 +35,7 @@ export enum ConfigSettings {
     KYC_URL = "KYC_URL",
     KYC_CLIENT_ID = "KYC_CLIENT_ID",
     KYC_CLIENT_SECRET = "KYC_CLIENT_SECRET",
-    GPIB_VERIFY_ENDPOINT = "GPIB_VERIFY_ENDPOINT",
-    GPIB_SIGNUP_ENDPOINT = "GPIB_SIGNUP_ENDPOINT",
+    GPIB_API_ENDPOINT = "GPIB_API_ENDPOINT",
     COINSTASH_SIGNUP_ENDPOINT = "COINSTASH_SIGNUP_ENDPOINT",
     COINSTASH_TOKEN = "COINSTASH_TOKEN",
     APP_DEEPLINK_URL = "APP_DEEPLINK_URL",
@@ -119,6 +118,7 @@ export interface IUserService {
 export interface IThirdPartyService {
     verifyGPIB(body: UserVerifyRequestBody, ip: string): Promise<boolean>;
     signup(signupInfo: UserSignupRequest, ip: string): Promise<string>;
+    syncDetail(userDetail: UserDetailRequest): Promise<void>;
 }
 
 export class NewUser {
@@ -262,4 +262,25 @@ export class UserSignupRequest {
     @ApiProperty()
     @IsNotEmpty()
     email: string; //need to passing hashed email address
+}
+
+export class UserDetailRequest {
+    @ApiProperty()
+    @IsNotEmpty()
+    source: number;
+    @ApiProperty()
+    @IsNotEmpty()
+    email: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    password: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    firstName: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    lastName: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    dob: string;
 }
