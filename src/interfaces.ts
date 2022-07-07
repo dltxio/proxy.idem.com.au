@@ -214,6 +214,7 @@ export type UsersResponse = {
     email: string;
     createdAt: Date;
 };
+
 export type KycResponse = {
     result: KycResult;
     userId: string;

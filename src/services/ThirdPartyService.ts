@@ -67,7 +67,7 @@ export class ThirdPartyService implements IThirdPartyService {
         let requestBody = {};
         let endPoint: string;
 
-        if (signupInfo.source == VendorEnum.GPIB) {
+        if (signupInfo.source === VendorEnum.GPIB) {
             endPoint = this.config.get(ConfigSettings.GPIB_SIGNUP_ENDPOINT);
             requestBody = {
                 firstName: signupInfo?.firstName,

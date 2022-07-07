@@ -15,33 +15,48 @@ domains:
     - domain: proxy.idem.com.au
       type: PRIMARY
       zone: idem.com.au
+envs:
+    - key: DATABASE_URL
+      scope: RUN_AND_BUILD_TIME
+      value: ${db-postgresql-sgp1-16621.DATABASE_URL}
+    - key: POSTGRES_HOST
+      scope: RUN_AND_BUILD_TIME
+      value: ${db-postgresql-sgp1-16621.HOSTNAME}
+    - key: DATABASE
+      scope: RUN_AND_BUILD_TIME
+      value: ${db-postgresql-sgp1-16621.DATABASE}
+    - key: POSTGRES_PORT
+      scope: RUN_AND_BUILD_TIME
+      value: ${db-postgresql-sgp1-16621.PORT}
+    - key: POSTGRES_USER
+      scope: RUN_AND_BUILD_TIME
+      value: ${db-postgresql-sgp1-16621.USERNAME}
+    - key: POSTGRES_PASSWORD
+      scope: RUN_AND_BUILD_TIME
+      value: ${db-postgresql-sgp1-16621.PASSWORD}
+    - key: CA_CERT
+      scope: RUN_AND_BUILD_TIME
+      value: ${db-postgresql-sgp1-16621.CA_CERT}
+    - key: EXPO_ACCESS_TOKEN
+      scope: RUN_AND_BUILD_TIME
+      value: EV[1:2KVdwYgCEzhpQxPtM86A4wk0lPLAqvfp:3vY6ooOynGbF688tg3P2N9Z7cFrPqC1spDebVzCE/MdCprddrHgNnEDEfBfRQhI3ay9KBzs/3Rk=]
+    - key: AUS_POST_URL
+      scope: RUN_AND_BUILD_TIME
+      value: https://api.digitalid-sandbox.com/products/kyc/1/
+    - key: AUS_POST_CLIENT_ID
+      scope: RUN_AND_BUILD_TIME
+      value: ctid2K1MO89S52Dkl2cMZSCW80
+    - key: AUS_POST_CLIENT_SECRET
+      scope: RUN_AND_BUILD_TIME
+      value: fc21b9c14a2556bf700b4f7bf899952a
+    - key: GPIB_VERIFY_ENDPOINT
+      scope: RUN_AND_BUILD_TIME
+      value: i.getpaidinbitcoin.com.au/user/idem/verify
 name: idem-proxy
 region: sgp
 services:
     - build_command: yarn build
       environment_slug: node-js
-      envs:
-          - key: DATABASE_URL
-            scope: RUN_TIME
-            value: ${db-postgresql-sgp1-16621.DATABASE_URL}
-          - key: POSTGRES_HOST
-            scope: RUN_AND_BUILD_TIME
-            value: ${db-postgresql-sgp1-16621.HOSTNAME}
-          - key: POSTGRES_DB_NAME
-            scope: RUN_AND_BUILD_TIME
-            value: ${db-postgresql-sgp1-16621.DATABASE}
-          - key: POSTGRES_PORT
-            scope: RUN_AND_BUILD_TIME
-            value: ${db-postgresql-sgp1-16621.PORT}
-          - key: POSTGRES_USER
-            scope: RUN_AND_BUILD_TIME
-            value: ${db-postgresql-sgp1-16621.USERNAME}
-          - key: POSTGRES_PASSWORD
-            scope: RUN_AND_BUILD_TIME
-            value: ${db-postgresql-sgp1-16621.PASSWORD}
-          - key: CA_CERT
-            scope: RUN_AND_BUILD_TIME
-            value: ${db-postgresql-sgp1-16621.CA_CERT}
       github:
           branch: main
           deploy_on_push: true
