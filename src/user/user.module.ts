@@ -1,6 +1,6 @@
 import { ThirdPartyService } from "./../services/ThirdPartyService";
 import { Module } from "@nestjs/common";
-import { AusPostService } from "../services/AusPostService";
+import { KycService } from "../services/KycService";
 import { DatabaseModule } from "../data/database.module";
 import { UserController } from "./user.controller";
 import { userProviders } from "./user.providers";
@@ -16,12 +16,12 @@ import { UserService } from "./user.service";
             useClass: UserService
         },
         {
-            provide: "IAusPostService",
-            useClass: AusPostService
-        },
-        {
             provide: "IThirdPartyService",
             useClass: ThirdPartyService
+        },
+        {
+            provide: "IKycService",
+            useClass: KycService
         }
     ]
 })
