@@ -65,7 +65,6 @@ export class UserController {
         @Body() body: UserVerifyRequestBody
     ): Promise<KycResponse> {
         let user: User;
-        console.log(body);
         const findUser = await this.userService.findOne(body.email);
         if (!findUser) {
             user = await this.userService.create({ email: body.email });
@@ -73,7 +72,6 @@ export class UserController {
             user = findUser;
         }
         const response = await this.kycService.verify();
-        console.log(response);
 
         if (response.result === KycResult.Completed) {
             //TODO: Call GPIB to verify user
