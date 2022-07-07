@@ -6,7 +6,7 @@ import {
 } from "./../interfaces";
 import { ConfigService } from "@nestjs/config";
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import {
     ConfigSettings,
     GPIBVerifyRequest,
@@ -139,36 +139,47 @@ export class ThirdPartyService implements IThirdPartyService {
         if (userDetail.source === VendorEnum.GPIB) {
             endPoint = this.config.get(ConfigSettings.GPIB_API_ENDPOINT);
 
-            const authentication = await axios.post(
-                `${endPoint}/user/authenticate`,
-                JSON.stringify({
-                    username: userDetail.email,
-                    password: userDetail.password
-                }),
-                {
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                }
-            );
-            if (authentication.status === 200) {
-                const token = authentication.data.token;
-
-                await axios.put(
-                    `${endPoint}/accountInfoes`,
+            const authentication = await axios
+                .post(
+                    `${endPoint}/user/authenticate`,
                     JSON.stringify({
-                        firstName: userDetail.firstName,
-                        lastName: userDetail.lastName,
-                        yob: moment(userDetail.dob, "DD/MM/YYYY").year()
+                        username: userDetail.email,
+                        password: userDetail.password
                     }),
                     {
                         headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`
+                            "Content-Type": "application/json"
                         }
                     }
-                );
+                )
+                .catch((error: AxiosError) => {
+                    this.logger.error(error);
+                    throw new Error(error.message);
+                });
+            if (authentication.status === 200) {
+                const token = authentication.data.token;
+
+                await axios
+                    .put(
+                        `${endPoint}/accountInfoes`,
+                        JSON.stringify({
+                            firstName: userDetail.firstName,
+                            lastName: userDetail.lastName,
+                            yob: moment(userDetail.dob, "DD/MM/YYYY").year()
+                        }),
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${token}`
+                            }
+                        }
+                    )
+                    .catch((error: AxiosError) => {
+                        this.logger.error(error);
+                        throw new Error(error.message);
+                    });
             }
         }
+        return;
     }
 }
