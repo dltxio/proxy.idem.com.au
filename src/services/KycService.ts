@@ -11,7 +11,7 @@ import {
     KycResponse,
     KycResult
 } from "../interfaces";
-import { signMessage } from "src/utils/wallet";
+import { signMessage } from "../utils/wallet";
 
 @Injectable()
 export class KycService implements IKycService {
