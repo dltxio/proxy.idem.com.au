@@ -39,7 +39,7 @@ export class KycService implements IKycService {
             const credentials = {
                 "@context": ["https://www.w3.org/2018/credentials/v1"],
                 type: ["VerifiableCredential", "BirthCredential"],
-                issuer: "https://idem.com.au/",
+                issuer: this.config.get(ConfigSettings.IDEM_URL),
                 issuanceDate: new Date(),
                 expirationDate: new Date(),
                 credentialSubject: "BirthCredential", // each claim type has it own value type. todo - make generic;
@@ -47,9 +47,9 @@ export class KycService implements IKycService {
                     type: "EcdsaSecp256k1Signature2019",
                     created: new Date(),
                     proofPurpose: "assertionMethod",
-                    verificationMethod: `https://idem.com.au/keys/${this.config.get(
-                        ConfigSettings.WALLET_ADDRESS
-                    )}` //Test ETH address, need to change to IDEM eth address
+                    verificationMethod: `${this.config.get(
+                        ConfigSettings.IDEM_URL
+                    )}keys/${this.config.get(ConfigSettings.WALLET_ADDRESS)}` //Test ETH address, need to change to IDEM eth address
                     // jws: "eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..TCYt5XsITJX1CxPCT8yAV-TVkIEq_PbChOMqsLfRoPsnsgw5WEuts01mq-pQy7UJiN5mgRxD-WUcX16dUEMGlv50aqzpqh4Qktb3rk-BuQy72IFLOqV0G_zS245-kronKb78cPN25DGlcTwLtjPAYuNzVBAh4vGHSrQyHUdBBPM";
                 }
             } as VerifiableCredential;
@@ -68,7 +68,7 @@ export class KycService implements IKycService {
                         ConfigSettings.WALLET_ADDRESS
                     )}`,
                     //challenge: "8b5c66c0-bceb-40b4-b099-d31b127bf7b3";
-                    domain: "https://demo.idem.com.au"
+                    domain: this.config.get(ConfigSettings.IDEM_URL)
                     //jws: "eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..kTCYt5XsITJX1CxPCT8yAV-TVIw5WEuts01mq-pQy7UJiN5mgREEMGlv50aqzpqh4Qq_PbChOMqsLfRoPsnsgxD-WUcX16dUOqV0G_zS245-kronKb78cPktb3rk-BuQy72IFLN25DYuNzVBAh4vGHSrQyHUGlcTwLtjPAnKb78";
                 },
                 verifiableCredential: [credentials]
