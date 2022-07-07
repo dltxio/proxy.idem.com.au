@@ -65,7 +65,6 @@ export class UserController {
         @Body() body: UserVerifyRequestBody
     ): Promise<KycResponse> {
         let user: User;
-        console.log(body);
         const findUser = await this.userService.findOne(body.email);
         if (!findUser) {
             user = await this.userService.create({ email: body.email });
