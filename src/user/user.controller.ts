@@ -1,5 +1,5 @@
 import {
-    IAusPostService,
+    IKycService,
     IThirdPartyService,
     KycResponse,
     KycResult,
@@ -34,7 +34,7 @@ import { AuthGuard } from "@nestjs/passport";
 export class UserController {
     constructor(
         @Inject("IUserService") private userService: IUserService,
-        @Inject("IAusPostService") private ausPostService: IAusPostService,
+        @Inject("IKycService") private kycService: IKycService,
         @Inject("IThirdPartyService")
         private thirdPartyService: IThirdPartyService
     ) {}
@@ -71,16 +71,13 @@ export class UserController {
         } else {
             user = findUser;
         }
-        const result = await this.ausPostService.verify(body);
-        const response: KycResponse = {
-            result: result,
-            userId: user.userId,
-            thirdPartyVerified: false
-        };
-        if (result === KycResult.Completed) {
+        const response = await this.kycService.verify();
+
+        if (response.result === KycResult.Completed) {
             //TODO: Call GPIB to verify user
             await this.thirdPartyService.verifyGPIB(body, ip);
             response.thirdPartyVerified = true;
+            response.userId = user.userId;
         }
         //TODO: Implement TPA KYC verification
         return response;

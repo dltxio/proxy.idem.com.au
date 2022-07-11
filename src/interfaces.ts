@@ -32,14 +32,17 @@ export enum VendorEnum {
 
 export enum ConfigSettings {
     EXPO_ACCESS_TOKEN = "EXPO_ACCESS_TOKEN",
-    AUS_POST_URL = "AUS_POST_URL",
-    AUS_POST_CLIENT_ID = "AUS_POST_CLIENT_ID",
-    AUS_POST_CLIENT_SECRET = "AUS_POST_CLIENT_SECRET",
+    KYC_URL = "KYC_URL",
+    KYC_CLIENT_ID = "KYC_CLIENT_ID",
+    KYC_CLIENT_SECRET = "KYC_CLIENT_SECRET",
     GPIB_API_ENDPOINT = "GPIB_API_ENDPOINT",
     COINSTASH_SIGNUP_ENDPOINT = "COINSTASH_SIGNUP_ENDPOINT",
     COINSTASH_TOKEN = "COINSTASH_TOKEN",
     APP_DEEPLINK_URL = "APP_DEEPLINK_URL",
-    EC_SIGNUP_ENDPOINT = "EC_SIGNUP_ENDPOINT"
+    EC_SIGNUP_ENDPOINT = "EC_SIGNUP_ENDPOINT",
+    WALLET_PRIVATE_KEY = "WALLET_PRIVATE_KEY",
+    WALLET_ADDRESS = "WALLET_ADDRESS",
+    IDEM_URL = "IDEM_URL"
 }
 
 //=== Abstract Error classes
@@ -92,8 +95,8 @@ export class AccountMissingIdError extends EntityMissingIdError {
     }
 }
 
-export interface IAusPostService {
-    verify(userInfo: UserVerifyRequestBody): Promise<KycResult>;
+export interface IKycService {
+    verify(): Promise<KycResponse>;
 }
 
 export interface IUserService {
@@ -211,6 +214,7 @@ export type UsersResponse = {
 };
 
 export type KycResponse = {
+    message: string; //signed claim response
     result: KycResult;
     userId: string;
     thirdPartyVerified: boolean;
