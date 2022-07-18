@@ -12,7 +12,7 @@ import {
 } from "../interfaces";
 import Expo from "expo-server-sdk";
 import { ConfigService } from "@nestjs/config";
-import { Tester } from "src/data/entities/tester.entity";
+import { Tester } from "../data/entities/tester.entity";
 
 @Injectable()
 export class UserService {

@@ -1,7 +1,7 @@
 import { DataSource } from "typeorm";
 import { User } from "../data/entities/user.entity";
 import { Request } from "../data/entities/request.entity";
-import { Tester } from "src/data/entities/tester.entity";
+import { Tester } from "../data/entities/tester.entity";
 
 export const userProviders = [
     {

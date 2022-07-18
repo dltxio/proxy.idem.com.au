@@ -30,7 +30,7 @@ import {
     UserVerifyRequestBody
 } from "../interfaces";
 import { AuthGuard } from "@nestjs/passport";
-import { Tester } from "src/data/entities/tester.entity";
+import { Tester } from "../data/entities/tester.entity";
 
 @Controller("user")
 export class UserController {
