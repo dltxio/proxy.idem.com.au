@@ -63,17 +63,19 @@ export class UserService {
         return user;
     }
 
-    public async testflightTester(
+    public async requestToBeTester(
         testFlightRequest: TestFlightRequest
     ): Promise<Tester> {
-        const tester = await this.testerRepository.findOneBy({
+        const requestTest = await this.testerRepository.findOneBy({
             email: testFlightRequest.email.toLowerCase()
         });
-        if (!tester) {
-            this.logger.verbose(`New user ${testFlightRequest.email} created`);
+        if (!requestTest) {
+            this.logger.verbose(
+                `New tester ${testFlightRequest.email} created`
+            );
             return this.testerRepository.save(testFlightRequest);
         }
-        return tester;
+        return requestTest;
     }
 
     public async putToken(

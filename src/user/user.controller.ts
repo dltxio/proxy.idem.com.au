@@ -180,7 +180,7 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async tester(@Body() body: TestFlightRequest): Promise<Tester> {
-        return this.userService.testflightTester(body);
+    async requestTest(@Body() body: TestFlightRequest): Promise<Tester> {
+        return this.userService.requestToBeTester(body);
     }
 }
