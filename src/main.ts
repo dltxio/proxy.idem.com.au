@@ -7,7 +7,7 @@ import tracer from "dd-trace";
 
 async function bootstrap() {
     tracer.init();
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, { cors: true });
     app.useGlobalPipes(
         new ValidationPipe({
             whitelist: true
