@@ -13,10 +13,10 @@ export class Tester {
     @Column({ unique: true })
     email: string;
 
-    @Column({ unique: false })
+    @Column()
     firstName: string;
 
-    @Column({ unique: false })
+    @Column()
     lastName: string;
 
     @Column({ type: "timestamptz" })
