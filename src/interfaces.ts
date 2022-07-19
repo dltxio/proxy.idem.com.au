@@ -104,7 +104,6 @@ export interface IUserService {
     requestToBeTester(body: TestFlightRequest): PromiseLike<Tester>;
     verify(body: UserVerifyRequestBody): Promise<string>;
     findOne(email: string): Promise<User>;
-    testflightTester(body: TestFlightRequest): Promise<Tester>;
     findAll(): Promise<UsersResponse[]>;
     create(newUser: NewUser): Promise<User>;
     putToken(
