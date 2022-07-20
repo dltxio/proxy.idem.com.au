@@ -1,4 +1,4 @@
-import { NewUser } from "./../interfaces";
+import { NewUser, TestFlightRequest } from "./../interfaces";
 import { Injectable, Inject, Logger } from "@nestjs/common";
 import { User } from "../data/entities/user.entity";
 import { Request } from "../data/entities/request.entity";
@@ -12,6 +12,7 @@ import {
 } from "../interfaces";
 import Expo from "expo-server-sdk";
 import { ConfigService } from "@nestjs/config";
+import { Tester } from "../data/entities/tester.entity";
 
 @Injectable()
 export class UserService {
@@ -22,7 +23,9 @@ export class UserService {
         private userRepository: Repository<User>,
         @Inject("REQUEST_REPOSITORY")
         private requestRepository: Repository<Request>,
-        private config: ConfigService
+        private config: ConfigService,
+        @Inject("TESTER_REPOSITORY")
+        private testerRepository: Repository<Tester>
     ) {
         this.expo = new Expo({
             accessToken: this.config.get(ConfigSettings.EXPO_ACCESS_TOKEN)
@@ -58,6 +61,19 @@ export class UserService {
             return this.userRepository.save(newUser);
         }
         return user;
+    }
+
+    public async requestToBeTester(
+        testFlightRequest: TestFlightRequest
+    ): Promise<Tester> {
+        const requestTest = await this.testerRepository.findOneBy({
+            email: testFlightRequest.email.toLowerCase()
+        });
+        if (requestTest) return requestTest;
+
+        const result = await this.testerRepository.save(testFlightRequest);
+        this.logger.verbose(`New tester ${testFlightRequest.email} created`);
+        return result;
     }
 
     public async putToken(

@@ -5,6 +5,7 @@ import {
     KycResult,
     NewUser,
     SignupNotificationRequest,
+    TestFlightRequest,
     UserDetailRequest,
     UserSignupRequest,
     UsersResponse
@@ -29,6 +30,7 @@ import {
     UserVerifyRequestBody
 } from "../interfaces";
 import { AuthGuard } from "@nestjs/passport";
+import { Tester } from "../data/entities/tester.entity";
 
 @Controller("user")
 export class UserController {
@@ -168,5 +170,17 @@ export class UserController {
     })
     async syncDetail(@Body() body: UserDetailRequest): Promise<void> {
         return this.thirdPartyService.syncDetail(body);
+    }
+
+    @Post("tester")
+    @ApiOperation({ summary: "request testflight tester" })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async requestTest(@Body() body: TestFlightRequest): Promise<Tester> {
+        return this.userService.requestToBeTester(body);
     }
 }

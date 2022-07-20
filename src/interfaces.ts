@@ -1,6 +1,7 @@
 import { IsNotEmpty } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { User } from "./data/entities/user.entity";
+import { Tester } from "./data/entities/tester.entity";
 
 export interface IExampleService {
     getById(id: string): string;
@@ -100,6 +101,7 @@ export interface IKycService {
 }
 
 export interface IUserService {
+    requestToBeTester(body: TestFlightRequest): Promise<Tester>;
     verify(body: UserVerifyRequestBody): Promise<string>;
     findOne(email: string): Promise<User>;
     findAll(): Promise<UsersResponse[]>;
@@ -284,4 +286,16 @@ export class UserDetailRequest {
     @ApiProperty()
     @IsNotEmpty()
     dob: string;
+}
+
+export class TestFlightRequest {
+    @ApiProperty()
+    @IsNotEmpty()
+    email: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    firstName: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    lastName: string;
 }
