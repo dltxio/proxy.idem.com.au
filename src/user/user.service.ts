@@ -69,13 +69,11 @@ export class UserService {
         const requestTest = await this.testerRepository.findOneBy({
             email: testFlightRequest.email.toLowerCase()
         });
-        if (!requestTest) {
-            this.logger.verbose(
-                `New tester ${testFlightRequest.email} created`
-            );
-            return this.testerRepository.save(testFlightRequest);
-        }
-        return requestTest;
+        if (requestTest) return requestTest;
+
+        const result = await this.testerRepository.save(testFlightRequest);
+        this.logger.verbose(`New tester ${testFlightRequest.email} created`);
+        return result;
     }
 
     public async putToken(
