@@ -101,7 +101,7 @@ export interface IKycService {
 }
 
 export interface IUserService {
-    requestToBeTester(body: TestFlightRequest): PromiseLike<Tester>;
+    requestToBeTester(body: TestFlightRequest): Promise<Tester>;
     verify(body: UserVerifyRequestBody): Promise<string>;
     findOne(email: string): Promise<User>;
     findAll(): Promise<UsersResponse[]>;
