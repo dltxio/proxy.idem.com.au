@@ -73,15 +73,14 @@ export class UserController {
         } else {
             user = findUser;
         }
+
+        //TODO: Implement Green ID KYC verification
         const response = await this.kycService.verify();
 
-        if (response.result === KycResult.Completed) {
-            //TODO: Call GPIB to verify user
-            await this.thirdPartyService.verifyGPIB(body, ip);
-            response.thirdPartyVerified = true;
-            response.userId = user.userId;
-        }
-        //TODO: Implement TPA KYC verification
+        //mock response
+        response.thirdPartyVerified = true;
+        response.userId = user.userId;
+
         return response;
     }
 
