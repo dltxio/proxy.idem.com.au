@@ -1,5 +1,11 @@
-import { NewUser, TestFlightRequest } from "./../interfaces";
+import {
+    NewUser,
+    RequestOtpRequest,
+    RequestOtpResponse,
+    TestFlightRequest
+} from "./../interfaces";
 import { Injectable, Inject, Logger } from "@nestjs/common";
+
 import { User } from "../data/entities/user.entity";
 import { Request } from "../data/entities/request.entity";
 import { Repository } from "typeorm";
@@ -13,6 +19,8 @@ import {
 import Expo from "expo-server-sdk";
 import { ConfigService } from "@nestjs/config";
 import { Tester } from "../data/entities/tester.entity";
+
+import crypto from "crypto";
 
 @Injectable()
 export class UserService {
@@ -223,5 +231,30 @@ export class UserService {
                 this.logger.error(error.message);
             }
         }
+    }
+
+    public async requestOtp(
+        body: RequestOtpRequest
+    ): Promise<RequestOtpResponse> {
+        const { mobileNumber } = body;
+        const otp = Math.floor(Math.random() * 900000) + 100000;
+        const expiryTimestamp =
+            new Date().getTime() +
+            (parseInt(ConfigSettings.OTP_EXPIRY_TIME) || 60000);
+        const salt =
+            ConfigSettings.OTP_HASHING_SALT ||
+            "Hi i'm default salt from idem proxy :)";
+        const messageForHash = mobileNumber + otp + expiryTimestamp + salt;
+        const hash = crypto
+            .createHmac(
+                "sha256",
+                this.config.get(ConfigSettings.OTP_HASHING_SECRET)
+            )
+            .update(messageForHash)
+            .digest("hex");
+        return {
+            hash,
+            expiryTimestamp
+        };
     }
 }

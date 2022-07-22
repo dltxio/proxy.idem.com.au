@@ -43,7 +43,10 @@ export enum ConfigSettings {
     EC_SIGNUP_ENDPOINT = "EC_SIGNUP_ENDPOINT",
     WALLET_PRIVATE_KEY = "WALLET_PRIVATE_KEY",
     WALLET_ADDRESS = "WALLET_ADDRESS",
-    IDEM_URL = "IDEM_URL"
+    IDEM_URL = "IDEM_URL",
+    OTP_HASHING_SECRET = "OTP_HASHING_SECRET",
+    OTP_HASHING_SALT = "OTP_HASHING_SALT",
+    OTP_EXPIRY_TIME = "OTP_EXPIRY_TIME"
 }
 
 //=== Abstract Error classes
@@ -116,6 +119,7 @@ export interface IUserService {
         signupRequest: SignupNotificationRequest,
         ip: string
     ): Promise<void>;
+    requestOtp(body: RequestOtpRequest): Promise<RequestOtpResponse>;
 }
 
 export interface IThirdPartyService {
@@ -231,6 +235,11 @@ export type GPIBVerifyRequest = {
     idVerified: boolean;
 };
 
+export type RequestOtpResponse = {
+    hash: string;
+    expiryTimestamp: number;
+};
+
 export class SignupNotificationRequest {
     @ApiProperty()
     @IsNotEmpty()
@@ -298,4 +307,10 @@ export class TestFlightRequest {
     @ApiProperty()
     @IsNotEmpty()
     lastName: string;
+}
+
+export class RequestOtpRequest {
+    @ApiProperty()
+    @IsNotEmpty()
+    mobileNumber: string;
 }

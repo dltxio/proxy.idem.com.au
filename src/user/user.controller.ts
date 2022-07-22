@@ -4,6 +4,8 @@ import {
     KycResponse,
     KycResult,
     NewUser,
+    RequestOtpRequest,
+    RequestOtpResponse,
     SignupNotificationRequest,
     TestFlightRequest,
     UserDetailRequest,
@@ -181,5 +183,22 @@ export class UserController {
     })
     async requestTest(@Body() body: TestFlightRequest): Promise<Tester> {
         return this.userService.requestToBeTester(body);
+    }
+
+    @Post("requestOtp")
+    @ApiOperation({
+        summary:
+            "User request otp to be sent via SMS to verify their phone number"
+    })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async requestOtp(
+        @Body() body: RequestOtpRequest
+    ): Promise<RequestOtpResponse> {
+        return this.userService.requestOtp(body);
     }
 }
