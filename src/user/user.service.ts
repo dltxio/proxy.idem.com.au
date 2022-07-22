@@ -252,6 +252,8 @@ export class UserService {
             )
             .update(messageForHash)
             .digest("hex");
+
+        //TODO: Send otp via messagebird API
         return {
             hash,
             expiryTimestamp
