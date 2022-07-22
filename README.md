@@ -76,8 +76,8 @@ This project contains a single external service `EventStore` for demo purposes a
 
 ### Dependency Management
 
--   Dependencies vs dev-dependencies - if it's not used at run-time then add as a dev-dependency
--   Major vs minor version upgrades - don't upgrade major versions unless you know what you're doing. There are often breaking changes
+-   Dependencies vs dev-dependencies - if it's not used at run-time then add as a dev-dependency.
+-   Major vs minor version upgrades - don't upgrade major versions unless you know what you're doing. There are often breaking changes.
 
 ## Commands
 
