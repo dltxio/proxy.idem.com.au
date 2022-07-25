@@ -242,12 +242,11 @@ export class UserService {
         const otp = Math.floor(Math.random() * 900000) + 100000;
         const expiryTimestamp =
             new Date().getTime() +
-            parseInt(
-                this.config.get(ConfigSettings.OTP_EXPIRY_TIME) || "60000"
-            );
-        const salt =
-            this.config.get(ConfigSettings.OTP_HASHING_SALT) ||
-            "Hi i'm default salt from idem proxy :)";
+            parseInt(this.config.get(ConfigSettings.OTP_EXPIRY_TIME, "60000"));
+        const salt = this.config.get(
+            ConfigSettings.OTP_HASHING_SALT,
+            "Hi i'm default salt from idem proxy :)"
+        );
         const messageForHash = mobileNumber + otp + expiryTimestamp + salt;
         const hash = crypto
             .createHmac(
