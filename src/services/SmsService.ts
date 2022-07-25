@@ -13,10 +13,14 @@ export class SmsService implements ISmsService {
         );
     }
     public async send(phoneNumber: string, message: string) {
+        if (phoneNumber.startsWith("0")) {
+            const [, ...rest] = phoneNumber.split("");
+            phoneNumber = "+61" + rest.join("");
+        }
         return new Promise<void>((resolve, reject) => {
             this.client.messages.create(
                 {
-                    originator: "+61456619631", //TODO: IDEM number
+                    originator: "IDEM",
                     recipients: [phoneNumber],
                     body: message
                 },
