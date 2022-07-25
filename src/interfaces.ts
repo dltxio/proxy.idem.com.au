@@ -46,7 +46,8 @@ export enum ConfigSettings {
     IDEM_URL = "IDEM_URL",
     OTP_HASHING_SECRET = "OTP_HASHING_SECRET",
     OTP_HASHING_SALT = "OTP_HASHING_SALT",
-    OTP_EXPIRY_TIME = "OTP_EXPIRY_TIME"
+    OTP_EXPIRY_TIME = "OTP_EXPIRY_TIME",
+    MESSAGEBIRD_API_KEY = "MESSAGEBIRD_API_KEY"
 }
 
 //=== Abstract Error classes
@@ -101,6 +102,10 @@ export class AccountMissingIdError extends EntityMissingIdError {
 
 export interface IKycService {
     verify(): Promise<KycResponse>;
+}
+
+export interface ISmsService {
+    send(phoneNumber: string, message: string): Promise<void>;
 }
 
 export interface IUserService {

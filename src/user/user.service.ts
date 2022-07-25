@@ -1,4 +1,5 @@
 import {
+    ISmsService,
     NewUser,
     RequestOtpRequest,
     RequestOtpResponse,
@@ -33,7 +34,8 @@ export class UserService {
         private requestRepository: Repository<Request>,
         private config: ConfigService,
         @Inject("TESTER_REPOSITORY")
-        private testerRepository: Repository<Tester>
+        private testerRepository: Repository<Tester>,
+        @Inject("ISmsService") private smsService: ISmsService
     ) {
         this.expo = new Expo({
             accessToken: this.config.get(ConfigSettings.EXPO_ACCESS_TOKEN)
@@ -253,7 +255,9 @@ export class UserService {
             .update(messageForHash)
             .digest("hex");
 
-        //TODO: Send otp via messagebird API
+        const smsMessage = "Your OTP code for IDEM is " + otp;
+        await this.smsService.send(mobileNumber, smsMessage);
+
         return {
             hash,
             expiryTimestamp
