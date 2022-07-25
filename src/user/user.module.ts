@@ -5,7 +5,7 @@ import { DatabaseModule } from "../data/database.module";
 import { UserController } from "./user.controller";
 import { userProviders } from "./user.providers";
 import { UserService } from "./user.service";
-import { SmsService } from "src/services/SmsService";
+import { SmsService } from "../services/SmsService";
 
 @Module({
     imports: [DatabaseModule],
