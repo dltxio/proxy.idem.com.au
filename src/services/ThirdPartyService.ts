@@ -7,12 +7,7 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import axios, { AxiosError } from "axios";
-import {
-    ConfigSettings,
-    GPIBVerifyRequest,
-    UserVerifyRequestBody,
-    IThirdPartyService
-} from "../interfaces";
+import { ConfigSettings, IThirdPartyService } from "../interfaces";
 import { Repository } from "typeorm";
 import { Request } from "../data/entities/request.entity";
 import { getVendorName } from "../utils/vendor";
@@ -27,42 +22,6 @@ export class ThirdPartyService implements IThirdPartyService {
         @Inject("REQUEST_REPOSITORY")
         private requestRepository: Repository<Request>
     ) {}
-
-    public async verifyGPIB(
-        userInfo: UserVerifyRequestBody,
-        ip: string
-    ): Promise<boolean> {
-        try {
-            const requestBody: GPIBVerifyRequest = {
-                userID: userInfo.userId,
-                phoneNumber: "0420552255", //TODO: get phone number from user
-                email: userInfo.email,
-                phoneNumberVerified: true, //Hardcoded for now
-                emailVerified: true, //Hardcoded for now
-                idVerified: true //Hardcoded for now
-            };
-            const endPoint = this.config.get(ConfigSettings.GPIB_API_ENDPOINT);
-            await axios.post(`${endPoint}/user/idem/verify`, requestBody, {
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-
-            this.logger.verbose(`Verified GPIB for user ${userInfo.userId}`);
-
-            //Save the verify request
-            await this.requestRepository.save({
-                from: "IDEM",
-                to: getVendorName(VendorEnum.GPIB),
-                ipAddress: ip,
-                requestType: RequestType.Verify
-            });
-            return true;
-        } catch (error) {
-            this.logger.error(error.message);
-            throw new Error(error);
-        }
-    }
 
     public async signup(
         signupInfo: UserSignupRequest,

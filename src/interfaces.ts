@@ -119,7 +119,6 @@ export interface IUserService {
 }
 
 export interface IThirdPartyService {
-    verifyGPIB(body: UserVerifyRequestBody, ip: string): Promise<boolean>;
     signup(signupInfo: UserSignupRequest, ip: string): Promise<string>;
     syncDetail(userDetail: UserDetailRequest): Promise<void>;
 }
@@ -162,9 +161,6 @@ export class UserVerifyRequestBody {
     @ApiProperty()
     @IsNotEmpty()
     country: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    userId: string;
 }
 
 export class UserExpoPushTokenRequestBody {

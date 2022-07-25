@@ -73,7 +73,6 @@ export class UserController {
         } else {
             user = findUser;
         }
-
         //TODO: Implement Green ID KYC verification
         const response = await this.kycService.verify();
 
