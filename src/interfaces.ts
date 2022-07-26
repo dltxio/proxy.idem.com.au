@@ -125,6 +125,7 @@ export interface IUserService {
         ip: string
     ): Promise<void>;
     requestOtp(body: RequestOtpRequest): Promise<RequestOtpResponse>;
+    verifyOtp(body: VerifyOtpRequest): Promise<boolean>;
 }
 
 export interface IThirdPartyService {
@@ -318,4 +319,19 @@ export class RequestOtpRequest {
     @ApiProperty()
     @IsNotEmpty()
     mobileNumber: string;
+}
+
+export class VerifyOtpRequest {
+    @ApiProperty()
+    @IsNotEmpty()
+    code: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    expiryTimestamp: number;
+    @ApiProperty()
+    @IsNotEmpty()
+    mobileNumber: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    hash: string;
 }
