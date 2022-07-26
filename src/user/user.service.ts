@@ -256,8 +256,8 @@ export class UserService {
             .update(messageForHash)
             .digest("hex");
 
-        const smsMessage = "Your OTP code for IDEM is " + otp;
-        await this.smsService.send(mobileNumber, smsMessage);
+        const message = `Your OTP code for IDEM is ${otp}`;
+        await this.smsService.send(mobileNumber, message);
 
         return {
             hash,
