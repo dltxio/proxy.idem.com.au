@@ -1,5 +1,12 @@
-import { NewUser, TestFlightRequest } from "./../interfaces";
+import {
+    ISmsService,
+    NewUser,
+    RequestOtpRequest,
+    RequestOtpResponse,
+    TestFlightRequest
+} from "./../interfaces";
 import { Injectable, Inject, Logger } from "@nestjs/common";
+
 import { User } from "../data/entities/user.entity";
 import { Request } from "../data/entities/request.entity";
 import { Repository } from "typeorm";
@@ -14,6 +21,8 @@ import Expo from "expo-server-sdk";
 import { ConfigService } from "@nestjs/config";
 import { Tester } from "../data/entities/tester.entity";
 
+import crypto from "crypto";
+
 @Injectable()
 export class UserService {
     private expo: Expo;
@@ -25,7 +34,8 @@ export class UserService {
         private requestRepository: Repository<Request>,
         private config: ConfigService,
         @Inject("TESTER_REPOSITORY")
-        private testerRepository: Repository<Tester>
+        private testerRepository: Repository<Tester>,
+        @Inject("ISmsService") private smsService: ISmsService
     ) {
         this.expo = new Expo({
             accessToken: this.config.get(ConfigSettings.EXPO_ACCESS_TOKEN)
@@ -223,5 +233,35 @@ export class UserService {
                 this.logger.error(error.message);
             }
         }
+    }
+
+    public async requestOtp(
+        body: RequestOtpRequest
+    ): Promise<RequestOtpResponse> {
+        const { mobileNumber } = body;
+        const otp = Math.floor(Math.random() * 900000) + 100000;
+        const expiryTimestamp =
+            new Date().getTime() +
+            parseInt(this.config.get(ConfigSettings.OTP_EXPIRY_TIME, "60000"));
+        const salt = this.config.get(
+            ConfigSettings.OTP_HASHING_SALT,
+            "Hi i'm default salt from idem proxy :)"
+        );
+        const messageForHash = mobileNumber + otp + expiryTimestamp + salt;
+        const hash = crypto
+            .createHmac(
+                "sha256",
+                this.config.get(ConfigSettings.OTP_HASHING_SECRET)
+            )
+            .update(messageForHash)
+            .digest("hex");
+
+        const message = `Your OTP code for IDEM is ${otp}`;
+        await this.smsService.send(mobileNumber, message);
+
+        return {
+            hash,
+            expiryTimestamp
+        };
     }
 }

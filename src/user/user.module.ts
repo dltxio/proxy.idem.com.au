@@ -5,6 +5,7 @@ import { DatabaseModule } from "../data/database.module";
 import { UserController } from "./user.controller";
 import { userProviders } from "./user.providers";
 import { UserService } from "./user.service";
+import { SmsService } from "../services/SmsService";
 
 @Module({
     imports: [DatabaseModule],
@@ -22,6 +23,10 @@ import { UserService } from "./user.service";
         {
             provide: "IKycService",
             useClass: KycService
+        },
+        {
+            provide: "ISmsService",
+            useClass: SmsService
         }
     ]
 })

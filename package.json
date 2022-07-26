@@ -41,6 +41,7 @@
         "ethers": "^5.6.9",
         "expo-server-sdk": "^3.6.0",
         "lint-staged": "^13.0.3",
+        "messagebird": "^3.8.1",
         "moment": "^2.29.4",
         "nyc": "^15.1.0",
         "passport": "^0.6.0",

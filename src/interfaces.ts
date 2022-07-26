@@ -43,7 +43,11 @@ export enum ConfigSettings {
     EC_SIGNUP_ENDPOINT = "EC_SIGNUP_ENDPOINT",
     WALLET_PRIVATE_KEY = "WALLET_PRIVATE_KEY",
     WALLET_ADDRESS = "WALLET_ADDRESS",
-    IDEM_URL = "IDEM_URL"
+    IDEM_URL = "IDEM_URL",
+    OTP_HASHING_SECRET = "OTP_HASHING_SECRET",
+    OTP_HASHING_SALT = "OTP_HASHING_SALT",
+    OTP_EXPIRY_TIME = "OTP_EXPIRY_TIME",
+    MESSAGEBIRD_API_KEY = "MESSAGEBIRD_API_KEY"
 }
 
 //=== Abstract Error classes
@@ -100,6 +104,10 @@ export interface IKycService {
     verify(): Promise<KycResponse>;
 }
 
+export interface ISmsService {
+    send(phoneNumber: string, message: string): Promise<void>;
+}
+
 export interface IUserService {
     requestToBeTester(body: TestFlightRequest): Promise<Tester>;
     verify(body: UserVerifyRequestBody): Promise<string>;
@@ -116,6 +124,7 @@ export interface IUserService {
         signupRequest: SignupNotificationRequest,
         ip: string
     ): Promise<void>;
+    requestOtp(body: RequestOtpRequest): Promise<RequestOtpResponse>;
 }
 
 export interface IThirdPartyService {
@@ -227,6 +236,11 @@ export type GPIBVerifyRequest = {
     idVerified: boolean;
 };
 
+export type RequestOtpResponse = {
+    hash: string;
+    expiryTimestamp: number;
+};
+
 export class SignupNotificationRequest {
     @ApiProperty()
     @IsNotEmpty()
@@ -294,4 +308,10 @@ export class TestFlightRequest {
     @ApiProperty()
     @IsNotEmpty()
     lastName: string;
+}
+
+export class RequestOtpRequest {
+    @ApiProperty()
+    @IsNotEmpty()
+    mobileNumber: string;
 }
