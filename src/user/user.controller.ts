@@ -186,6 +186,7 @@ export class UserController {
     }
 
     @Post("requestOtp")
+    @UseGuards(AuthGuard("basic"))
     @ApiOperation({
         summary:
             "User request otp to be sent via SMS to verify their phone number"
