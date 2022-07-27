@@ -2,6 +2,7 @@ import { IsNotEmpty } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { User } from "./data/entities/user.entity";
 import { Tester } from "./data/entities/tester.entity";
+import { ClaimResponsePayload } from "./types/verification";
 
 export interface IExampleService {
     getById(id: string): string;
@@ -223,6 +224,7 @@ export type UsersResponse = {
 
 export type KycResponse = {
     message: string; //signed claim response
+    claimPayload: ClaimResponsePayload;
     result: KycResult;
     userId: string;
     thirdPartyVerified: boolean;
