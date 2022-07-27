@@ -10,7 +10,8 @@ import {
     TestFlightRequest,
     UserDetailRequest,
     UserSignupRequest,
-    UsersResponse
+    UsersResponse,
+    VerifyOtpRequest
 } from "./../interfaces";
 import {
     Controller,
@@ -200,5 +201,21 @@ export class UserController {
         @Body() body: RequestOtpRequest
     ): Promise<RequestOtpResponse> {
         return this.userService.requestOtp(body);
+    }
+
+    @Post("verifyOtp")
+    @UseGuards(AuthGuard("basic"))
+    @ApiOperation({
+        summary:
+            "User verify otp to be sent via SMS to verify their phone number"
+    })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async verifyOtp(@Body() body: VerifyOtpRequest): Promise<boolean> {
+        return this.userService.verifyOtp(body);
     }
 }

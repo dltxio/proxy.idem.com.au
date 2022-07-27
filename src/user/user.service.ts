@@ -3,7 +3,8 @@ import {
     NewUser,
     RequestOtpRequest,
     RequestOtpResponse,
-    TestFlightRequest
+    TestFlightRequest,
+    VerifyOtpRequest
 } from "./../interfaces";
 import { Injectable, Inject, Logger } from "@nestjs/common";
 
@@ -263,5 +264,24 @@ export class UserService {
             hash,
             expiryTimestamp
         };
+    }
+
+    public async verifyOtp(body: VerifyOtpRequest): Promise<boolean> {
+        const { mobileNumber, code, hash, expiryTimestamp } = body;
+        const currentTimestamp = new Date().getTime();
+        if (currentTimestamp > expiryTimestamp) throw new Error("Code expired");
+        const salt = this.config.get(
+            ConfigSettings.OTP_HASHING_SALT,
+            "Hi i'm default salt from idem proxy :)"
+        );
+        const hashedMessage = crypto
+            .createHmac(
+                "sha256",
+                this.config.get(ConfigSettings.OTP_HASHING_SECRET)
+            )
+            .update(mobileNumber + code + expiryTimestamp + salt)
+            .digest("hex");
+
+        return hashedMessage === hash;
     }
 }
