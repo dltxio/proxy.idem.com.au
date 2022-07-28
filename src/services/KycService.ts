@@ -4,7 +4,7 @@ import axios, { AxiosInstance } from "axios";
 import {
     ClaimResponsePayload,
     VerifiableCredential
-} from "../types/vilification";
+} from "../types/verification";
 import {
     ConfigSettings,
     IKycService,
@@ -81,7 +81,8 @@ export class KycService implements IKycService {
                     this.logger
                 ),
                 thirdPartyVerified: false,
-                userId: ""
+                userId: "",
+                claimPayload
             };
         } catch (error) {
             this.logger.error(error.message);
