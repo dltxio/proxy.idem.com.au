@@ -75,14 +75,15 @@ export class KycService implements IKycService {
             } as ClaimResponsePayload;
             return {
                 result: KycResult.Completed,
-                message: await signMessage(
+
+                thirdPartyVerified: false,
+                userId: "",
+                signature: await signMessage(
                     JSON.stringify(claimPayload),
                     this.config,
                     this.logger
                 ),
-                thirdPartyVerified: false,
-                userId: "",
-                claimPayload
+                message: claimPayload
             };
         } catch (error) {
             this.logger.error(error.message);

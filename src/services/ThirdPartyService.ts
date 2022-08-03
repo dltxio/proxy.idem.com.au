@@ -12,6 +12,7 @@ import { Repository } from "typeorm";
 import { Request } from "../data/entities/request.entity";
 import { getVendorName } from "../utils/vendor";
 import moment from "moment";
+import { verifyMessage } from "../utils/wallet";
 
 @Injectable()
 export class ThirdPartyService implements IThirdPartyService {
@@ -33,7 +34,18 @@ export class ThirdPartyService implements IThirdPartyService {
         const { source, firstName, lastName, email, password, verification } =
             signupInfo;
 
-        console.log({ verification });
+        const { message, signature } = verification;
+
+        const isVerified = verifyMessage(
+            JSON.stringify(message),
+            signature,
+            this.config,
+            this.logger
+        );
+
+        if (!isVerified) {
+            throw new Error("Verification signature is not valid");
+        }
 
         if (source === VendorEnum.GPIB) {
             endPoint = `${this.config.get(

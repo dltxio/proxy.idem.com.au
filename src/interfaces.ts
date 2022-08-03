@@ -231,11 +231,11 @@ export type UsersResponse = {
 };
 
 export type KycResponse = {
-    message: string; //signed claim response
-    claimPayload: ClaimResponsePayload;
     result: KycResult;
     userId: string;
     thirdPartyVerified: boolean;
+    signature: string; //signed claim response
+    message: ClaimResponsePayload;
 };
 
 export type GPIBVerifyRequest = {
@@ -272,11 +272,11 @@ class Verification implements KycResponse {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    message: string; //signed claim response
+    signature: string; //signed claim response
     @ApiProperty()
     @IsNotEmpty()
     @IsObject()
-    claimPayload: ClaimResponsePayload;
+    message: ClaimResponsePayload;
     @ApiProperty()
     @IsNotEmpty()
     @IsEnum(KycResult)
