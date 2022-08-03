@@ -30,39 +30,44 @@ export class ThirdPartyService implements IThirdPartyService {
         let requestBody = {};
         let endPoint: string;
 
-        if (signupInfo.source === VendorEnum.GPIB) {
+        const { source, firstName, lastName, email, password, verification } =
+            signupInfo;
+
+        console.log({ verification });
+
+        if (source === VendorEnum.GPIB) {
             endPoint = `${this.config.get(
                 ConfigSettings.GPIB_API_ENDPOINT
             )}/user`;
             requestBody = {
-                firstName: signupInfo?.firstName,
-                lastName: signupInfo?.lastName,
-                email: signupInfo.email,
-                password: signupInfo.password,
+                firstName,
+                lastName,
+                email,
+                password,
                 referralCode: "",
                 trackAddress: true,
                 createAddress: true
             };
         }
-        if (signupInfo.source === VendorEnum.CoinStash) {
+        if (source === VendorEnum.CoinStash) {
             endPoint = this.config.get(
                 ConfigSettings.COINSTASH_SIGNUP_ENDPOINT
             );
             requestBody = {
-                email: signupInfo.email,
-                password: signupInfo.password,
-                displayName: `${signupInfo?.firstName} ${signupInfo?.lastName}`,
+                email,
+                password,
+                displayName: `${firstName} ${lastName}`,
                 country: "Australia",
                 token: this.config.get(ConfigSettings.COINSTASH_TOKEN),
                 acceptMarketing: false
             };
         }
 
-        if (signupInfo.source === VendorEnum.EasyCrypto) {
+        if (source === VendorEnum.EasyCrypto) {
             endPoint = this.config.get(ConfigSettings.EC_SIGNUP_ENDPOINT);
             requestBody = {
-                email: signupInfo.email,
-                password: signupInfo.password,
+                email,
+                password,
                 returnSecureToken: true
             };
         }
@@ -77,12 +82,12 @@ export class ThirdPartyService implements IThirdPartyService {
                 }
             );
             this.logger.verbose(
-                `New user signup for ${signupInfo.source}, userId: ${response.data}`
+                `New user signup for ${source}, userId: ${response.data}`
             );
             //Save the signup request
             await this.requestRepository.save({
                 from: "IDEM",
-                to: getVendorName(signupInfo.source),
+                to: getVendorName(source),
                 ipAddress: ip,
                 requestType: RequestType.Signup
             });
