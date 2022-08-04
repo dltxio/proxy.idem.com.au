@@ -2,6 +2,10 @@
 
 Web service for proxying requests to exchange services.
 
+## Architecture
+
+![Diagram](/images/architecture.png)
+
 ## Technology
 
 -   [NodeJs](https://nodejs.org/en/) -\
