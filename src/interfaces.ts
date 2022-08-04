@@ -1,8 +1,16 @@
-import { IsNotEmpty } from "class-validator";
+import {
+    IsBoolean,
+    IsEnum,
+    IsNotEmpty,
+    IsObject,
+    IsString,
+    ValidateNested
+} from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { User } from "./data/entities/user.entity";
 import { Tester } from "./data/entities/tester.entity";
 import { ClaimResponsePayload } from "./types/verification";
+import { Type } from "class-transformer";
 
 export interface IExampleService {
     getById(id: string): string;
@@ -223,11 +231,11 @@ export type UsersResponse = {
 };
 
 export type KycResponse = {
-    message: string; //signed claim response
-    claimPayload: ClaimResponsePayload;
     result: KycResult;
     userId: string;
     thirdPartyVerified: boolean;
+    signature: string; //signed claim response
+    message: ClaimResponsePayload;
 };
 
 export type GPIBVerifyRequest = {
@@ -260,6 +268,27 @@ export class SignupNotificationRequest {
     email: string; //need to passing hashed email address
 }
 
+class Verification implements KycResponse {
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    signature: string; //signed claim response
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsObject()
+    message: ClaimResponsePayload;
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsEnum(KycResult)
+    result: KycResult;
+    @ApiProperty()
+    @IsString()
+    userId: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsBoolean()
+    thirdPartyVerified: boolean;
+}
 export class UserSignupRequest {
     @ApiProperty({
         example: ["1", "2"]
@@ -278,6 +307,12 @@ export class UserSignupRequest {
     @ApiProperty()
     @IsNotEmpty()
     email: string; //need to passing hashed email address
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @ValidateNested()
+    @Type(() => Verification)
+    verification: Verification;
 }
 
 export class UserDetailRequest {
