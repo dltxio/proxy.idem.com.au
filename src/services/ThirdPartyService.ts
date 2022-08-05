@@ -24,16 +24,63 @@ export class ThirdPartyService implements IThirdPartyService {
         private requestRepository: Repository<Request>
     ) {}
 
+    private getSignupRequestBodyAndEndPoint(signupInfo: UserSignupRequest): {
+        requestBody: any;
+        endPoint: string;
+    } {
+        const { source, firstName, lastName, email, password } = signupInfo;
+
+        switch (source) {
+            case VendorEnum.GPIB:
+                return {
+                    endPoint: `${this.config.get(
+                        ConfigSettings.GPIB_API_ENDPOINT
+                    )}/user`,
+                    requestBody: {
+                        firstName,
+                        lastName,
+                        email,
+                        password,
+                        referralCode: "",
+                        trackAddress: true,
+                        createAddress: true
+                    }
+                };
+            case VendorEnum.CoinStash:
+                return {
+                    endPoint: this.config.get(
+                        ConfigSettings.COINSTASH_SIGNUP_ENDPOINT
+                    ),
+                    requestBody: {
+                        email,
+                        password,
+                        displayName: `${firstName} ${lastName}`,
+                        country: "Australia",
+                        token: this.config.get(ConfigSettings.COINSTASH_TOKEN),
+                        acceptMarketing: false
+                    }
+                };
+            case VendorEnum.EasyCrypto:
+                return {
+                    endPoint: this.config.get(
+                        ConfigSettings.EC_SIGNUP_ENDPOINT
+                    ),
+                    requestBody: {
+                        email,
+                        password,
+                        returnSecureToken: true
+                    }
+                };
+            default:
+                throw new Error("Invalid vendor id");
+        }
+    }
+
     public async signup(
         signupInfo: UserSignupRequest,
         ip: string
     ): Promise<string> {
-        let requestBody = {};
-        let endPoint: string;
-
-        const { source, firstName, lastName, email, password, verification } =
-            signupInfo;
-
+        const { verification, source } = signupInfo;
         const { message, signature } = verification;
 
         const isVerified = verifyMessage(
@@ -42,47 +89,12 @@ export class ThirdPartyService implements IThirdPartyService {
             this.config,
             this.logger
         );
-
         if (!isVerified) {
             throw new Error("Verification signature is not valid");
         }
 
-        if (source === VendorEnum.GPIB) {
-            endPoint = `${this.config.get(
-                ConfigSettings.GPIB_API_ENDPOINT
-            )}/user`;
-            requestBody = {
-                firstName,
-                lastName,
-                email,
-                password,
-                referralCode: "",
-                trackAddress: true,
-                createAddress: true
-            };
-        }
-        if (source === VendorEnum.CoinStash) {
-            endPoint = this.config.get(
-                ConfigSettings.COINSTASH_SIGNUP_ENDPOINT
-            );
-            requestBody = {
-                email,
-                password,
-                displayName: `${firstName} ${lastName}`,
-                country: "Australia",
-                token: this.config.get(ConfigSettings.COINSTASH_TOKEN),
-                acceptMarketing: false
-            };
-        }
-
-        if (source === VendorEnum.EasyCrypto) {
-            endPoint = this.config.get(ConfigSettings.EC_SIGNUP_ENDPOINT);
-            requestBody = {
-                email,
-                password,
-                returnSecureToken: true
-            };
-        }
+        const { requestBody, endPoint } =
+            this.getSignupRequestBodyAndEndPoint(signupInfo);
         try {
             const response = await axios.post(
                 endPoint,
