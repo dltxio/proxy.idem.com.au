@@ -28,7 +28,8 @@ export class ThirdPartyService implements IThirdPartyService {
         requestBody: any;
         endPoint: string;
     } {
-        const { source, firstName, lastName, email, password } = signupInfo;
+        const { source, firstName, lastName, email, password, phoneNumber } =
+            signupInfo;
 
         switch (source) {
             case VendorEnum.GPIB:
@@ -69,6 +70,18 @@ export class ThirdPartyService implements IThirdPartyService {
                         email,
                         password,
                         returnSecureToken: true
+                    }
+                };
+            case VendorEnum.DigitalSurge:
+                return {
+                    endPoint: this.config.get(
+                        ConfigSettings.DIGITALSURGE_SIGNUP_ENDPOINT
+                    ),
+                    requestBody: {
+                        first_name: firstName,
+                        last_name: lastName,
+                        email: email,
+                        phone_number: phoneNumber
                     }
                 };
             default:

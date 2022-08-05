@@ -37,6 +37,7 @@ export enum RequestType {
 export enum VendorEnum {
     GPIB = 1,
     CoinStash = 2,
+    DigitalSurge = 5,
     EasyCrypto = 6
 }
 
@@ -50,6 +51,7 @@ export enum ConfigSettings {
     COINSTASH_TOKEN = "COINSTASH_TOKEN",
     APP_DEEPLINK_URL = "APP_DEEPLINK_URL",
     EC_SIGNUP_ENDPOINT = "EC_SIGNUP_ENDPOINT",
+    DIGITALSURGE_SIGNUP_ENDPOINT = "DIGITALSURGE_SIGNUP_ENDPOINT",
     WALLET_PRIVATE_KEY = "WALLET_PRIVATE_KEY",
     WALLET_ADDRESS = "WALLET_ADDRESS",
     IDEM_URL = "IDEM_URL",
@@ -307,6 +309,9 @@ export class UserSignupRequest {
     @ApiProperty()
     @IsNotEmpty()
     email: string; //need to passing hashed email address
+
+    @ApiProperty()
+    phoneNumber?: string;
 
     @ApiProperty()
     @IsNotEmpty()
