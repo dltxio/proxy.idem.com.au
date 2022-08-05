@@ -6,7 +6,7 @@ import {
 } from "./../interfaces";
 import { ConfigService } from "@nestjs/config";
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, AxiosInstance } from "axios";
 import { ConfigSettings, IThirdPartyService } from "../interfaces";
 import { Repository } from "typeorm";
 import { Request } from "../data/entities/request.entity";
@@ -17,12 +17,29 @@ import { verifyMessage } from "../utils/wallet";
 @Injectable()
 export class ThirdPartyService implements IThirdPartyService {
     private readonly logger = new Logger("ThirdPartyService");
+    private axiosWithProxy: AxiosInstance;
 
     constructor(
         private config: ConfigService,
         @Inject("REQUEST_REPOSITORY")
         private requestRepository: Repository<Request>
-    ) {}
+    ) {
+        this.axiosWithProxy = axios.create({
+            proxy: {
+                protocol: "https",
+                host: this.config.get(ConfigSettings.HTTPS_PROXY_HOST),
+                port: this.config.get(ConfigSettings.HTTPS_PROXY_PORT),
+                auth: {
+                    username: this.config.get(
+                        ConfigSettings.HTTPS_PROXY_USERNAME
+                    ),
+                    password: this.config.get(
+                        ConfigSettings.HTTPS_PROXY_PASSWORD
+                    )
+                }
+            }
+        });
+    }
 
     private getSignupRequestBodyAndEndPoint(signupInfo: UserSignupRequest): {
         requestBody: any;
@@ -109,7 +126,7 @@ export class ThirdPartyService implements IThirdPartyService {
         const { requestBody, endPoint } =
             this.getSignupRequestBodyAndEndPoint(signupInfo);
         try {
-            const response = await axios.post(
+            const response = await this.axiosWithProxy.post(
                 endPoint,
                 JSON.stringify(requestBody),
                 {
@@ -140,7 +157,7 @@ export class ThirdPartyService implements IThirdPartyService {
         if (userDetail.source === VendorEnum.GPIB) {
             endPoint = this.config.get(ConfigSettings.GPIB_API_ENDPOINT);
 
-            const authentication = await axios
+            const authentication = await this.axiosWithProxy
                 .post(
                     `${endPoint}/user/authenticate`,
                     JSON.stringify({
@@ -160,7 +177,7 @@ export class ThirdPartyService implements IThirdPartyService {
             if (authentication.status === 200) {
                 const token = authentication.data.token;
 
-                await axios
+                await this.axiosWithProxy
                     .put(
                         `${endPoint}/accountInfoes`,
                         JSON.stringify({
