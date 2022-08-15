@@ -316,7 +316,7 @@ export class UserSignupRequest {
     email: string; //need to passing hashed email address
 
     @ApiProperty()
-    phoneNumber?: string;
+    mobile?: string;
 
     @ApiProperty()
     @IsNotEmpty()
