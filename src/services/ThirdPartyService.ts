@@ -48,7 +48,7 @@ export class ThirdPartyService implements IThirdPartyService {
         endPoint: string;
         headers?: any;
     } {
-        const { source, firstName, lastName, email, password, phoneNumber } =
+        const { source, firstName, lastName, email, password, mobile } =
             signupInfo;
 
         switch (source) {
@@ -101,7 +101,7 @@ export class ThirdPartyService implements IThirdPartyService {
                         first_name: firstName,
                         last_name: lastName,
                         email: email,
-                        phone_number: phoneNumber
+                        phone_number: mobile
                     },
                     headers: {
                         "Content-Type": "application/json",
