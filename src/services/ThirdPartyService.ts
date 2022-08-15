@@ -7,6 +7,7 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import axios, { AxiosError, AxiosInstance } from "axios";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import { ConfigSettings, IThirdPartyService } from "../interfaces";
 import { Repository } from "typeorm";
 import { Request } from "../data/entities/request.entity";
@@ -24,23 +25,21 @@ export class ThirdPartyService implements IThirdPartyService {
         @Inject("REQUEST_REPOSITORY")
         private requestRepository: Repository<Request>
     ) {
+        const proxyUsername = this.config.get(
+            ConfigSettings.HTTPS_PROXY_USERNAME
+        );
+        const proxyPassword = this.config.get(
+            ConfigSettings.HTTPS_PROXY_PASSWORD
+        );
         this.axiosWithProxy = axios.create({
             headers: {
                 "Content-Type": "application/json"
             },
-            proxy: {
-                protocol: "https",
+            httpsAgent: new HttpsProxyAgent({
                 host: this.config.get(ConfigSettings.HTTPS_PROXY_HOST),
                 port: this.config.get(ConfigSettings.HTTPS_PROXY_PORT),
-                auth: {
-                    username: this.config.get(
-                        ConfigSettings.HTTPS_PROXY_USERNAME
-                    ),
-                    password: this.config.get(
-                        ConfigSettings.HTTPS_PROXY_PASSWORD
-                    )
-                }
-            }
+                auth: `${proxyUsername}:${proxyPassword}`
+            })
         });
     }
 
