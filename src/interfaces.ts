@@ -3,6 +3,7 @@ import {
     IsEnum,
     IsNotEmpty,
     IsObject,
+    IsOptional,
     IsString,
     ValidateNested
 } from "class-validator";
@@ -313,11 +314,10 @@ export class UserSignupRequest {
     password: string;
     @ApiProperty()
     @IsNotEmpty()
-    email: string; //need to passing hashed email address
-
+    email: string;
     @ApiProperty()
-    mobile?: string;
-
+    @IsOptional()
+    mobile: string;
     @ApiProperty()
     @IsNotEmpty()
     @ValidateNested()
