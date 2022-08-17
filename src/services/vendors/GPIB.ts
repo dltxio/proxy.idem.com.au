@@ -4,6 +4,7 @@ import { AxiosInstance } from "axios";
 import { ConfigSettings, IVendor, UserSignupRequest } from "../../interfaces";
 
 export class GPIBVendor implements IVendor {
+    name = "GPIB";
     private readonly logger = new Logger("GPIBVendor");
     private baseUrl: string;
 

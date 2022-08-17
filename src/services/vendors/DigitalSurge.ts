@@ -4,6 +4,7 @@ import { AxiosInstance } from "axios";
 import { ConfigSettings, IVendor, UserSignupRequest } from "../../interfaces";
 
 export class DigitalSurgeVendor implements IVendor {
+    name: "DigitalSurge";
     private readonly logger = new Logger("DigitalSurgeVendor");
     private signUpEndpoint: string;
 

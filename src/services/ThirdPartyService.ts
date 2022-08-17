@@ -84,7 +84,7 @@ export class ThirdPartyService implements IThirdPartyService {
         try {
             const { userId } = await vendor.signUp(signupInfo);
             this.logger.verbose(
-                `New user signup for ${source}, userId: ${userId}`
+                `New user signup for ${vendor.name}, userId: ${userId}`
             );
             //Save the signup request
             await this.requestRepository.save({
