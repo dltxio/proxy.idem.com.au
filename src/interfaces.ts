@@ -146,8 +146,14 @@ export interface IUserService {
 }
 
 export interface IThirdPartyService {
-    signup(signupInfo: UserSignupRequest, ip: string): Promise<string>;
+    signUp(signupInfo: UserSignupRequest, ip: string): Promise<string>;
     syncDetail(userDetail: UserDetailRequest): Promise<void>;
+}
+
+export interface Vendor {
+    signUp(signupInfo: UserSignupRequest): Promise<{
+        userId: string;
+    }>;
 }
 
 export class NewUser {
