@@ -1,7 +1,7 @@
 import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AxiosInstance } from "axios";
-import { ConfigSettings, UserSignupRequest, Vendor } from "src/interfaces";
+import { ConfigSettings, UserSignupRequest, Vendor } from "../../interfaces";
 
 export class DigitalSurgeVendor implements Vendor {
     private readonly logger = new Logger("DigitalSurgeVendor");
