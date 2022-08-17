@@ -157,7 +157,7 @@ export class UserController {
         @Ip() ip: string,
         @Body() body: UserSignupRequest
     ): Promise<string> {
-        return this.thirdPartyService.signup(body, ip);
+        return this.thirdPartyService.signUp(body, ip);
     }
 
     @Post("syncDetail")

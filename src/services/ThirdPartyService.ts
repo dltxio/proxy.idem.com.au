@@ -1,4 +1,5 @@
 import {
+    IVendor,
     RequestType,
     UserDetailRequest,
     UserSignupRequest,
@@ -14,6 +15,10 @@ import { Request } from "../data/entities/request.entity";
 import { getVendorName } from "../utils/vendor";
 import moment from "moment";
 import { verifyMessage } from "../utils/wallet";
+import { GPIBVendor } from "./vendors/GPIB";
+import { CoinStashVendor } from "./vendors/CoinStash";
+import { EasyCryptoVendor } from "./vendors/EasyCrypto";
+import { DigitalSurgeVendor } from "./vendors/DigitalSurge";
 
 @Injectable()
 export class ThirdPartyService implements IThirdPartyService {
@@ -43,79 +48,22 @@ export class ThirdPartyService implements IThirdPartyService {
         });
     }
 
-    private getSignupRequestParams(signupInfo: UserSignupRequest): {
-        requestBody: any;
-        endPoint: string;
-        headers?: any;
-    } {
-        const { source, firstName, lastName, email, password, mobile } =
-            signupInfo;
-
-        switch (source) {
+    private getVendor(vendorId: number): IVendor {
+        switch (vendorId) {
             case VendorEnum.GPIB:
-                return {
-                    endPoint: `${this.config.get(
-                        ConfigSettings.GPIB_API_ENDPOINT
-                    )}/user`,
-                    requestBody: {
-                        firstName,
-                        lastName,
-                        email,
-                        password,
-                        referralCode: "",
-                        trackAddress: true,
-                        createAddress: true
-                    }
-                };
+                return new GPIBVendor(this.config, this.axiosWithProxy);
             case VendorEnum.CoinStash:
-                return {
-                    endPoint: this.config.get(
-                        ConfigSettings.COINSTASH_SIGNUP_ENDPOINT
-                    ),
-                    requestBody: {
-                        email,
-                        password,
-                        displayName: `${firstName} ${lastName}`,
-                        country: "Australia",
-                        token: this.config.get(ConfigSettings.COINSTASH_TOKEN),
-                        acceptMarketing: false
-                    }
-                };
+                return new CoinStashVendor(this.config, this.axiosWithProxy);
             case VendorEnum.EasyCrypto:
-                return {
-                    endPoint: this.config.get(
-                        ConfigSettings.EC_SIGNUP_ENDPOINT
-                    ),
-                    requestBody: {
-                        email,
-                        password,
-                        returnSecureToken: true
-                    }
-                };
+                return new EasyCryptoVendor(this.config, this.axiosWithProxy);
             case VendorEnum.DigitalSurge:
-                return {
-                    endPoint: this.config.get(
-                        ConfigSettings.DIGITALSURGE_SIGNUP_ENDPOINT
-                    ),
-                    requestBody: {
-                        first_name: firstName,
-                        last_name: lastName,
-                        email: email,
-                        phone_number: mobile
-                    },
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${this.config.get(
-                            ConfigSettings.DIGITALSURGE_PARTNER_TOKEN
-                        )}`
-                    }
-                };
+                return new DigitalSurgeVendor(this.config, this.axiosWithProxy);
             default:
                 throw new Error("Invalid vendor id");
         }
     }
 
-    public async signup(
+    public async signUp(
         signupInfo: UserSignupRequest,
         ip: string
     ): Promise<string> {
@@ -132,20 +80,11 @@ export class ThirdPartyService implements IThirdPartyService {
             throw new Error("Verification signature is not valid");
         }
 
-        const { requestBody, endPoint, headers } =
-            this.getSignupRequestParams(signupInfo);
+        const vendor = this.getVendor(source);
         try {
-            const response = await this.axiosWithProxy.post(
-                endPoint,
-                JSON.stringify(requestBody),
-                {
-                    headers: headers ?? {
-                        "Content-Type": "application/json"
-                    }
-                }
-            );
+            const { userId } = await vendor.signUp(signupInfo);
             this.logger.verbose(
-                `New user signup for ${source}, userId: ${response.data}`
+                `New user signup for ${source}, userId: ${userId}`
             );
             //Save the signup request
             await this.requestRepository.save({
@@ -154,10 +93,11 @@ export class ThirdPartyService implements IThirdPartyService {
                 ipAddress: ip,
                 requestType: RequestType.Signup
             });
-            return response.data;
+
+            return userId;
         } catch (error) {
-            this.logger.error(error.response.data);
-            throw new Error(error.response.data);
+            this.logger.error(error.message);
+            throw new Error(error.message);
         }
     }
 
