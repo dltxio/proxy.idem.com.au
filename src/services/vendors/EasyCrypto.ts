@@ -24,8 +24,13 @@ export class EasyCryptoVendor implements IVendor {
         const response = await this.axios
             .post(this.signUpEndpoint, JSON.stringify(requestBody))
             .catch(error => {
-                this.logger.error(error.response.data);
-                throw new Error(error.response.data);
+                if (error.response) {
+                    this.logger.error(error.response.data);
+                    throw new Error(error.response.data);
+                } else {
+                    this.logger.error(error.message);
+                    throw error;
+                }
             });
         const userId = response.data;
         return { userId };
