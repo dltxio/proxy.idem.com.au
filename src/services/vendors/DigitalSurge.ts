@@ -5,14 +5,16 @@ import { ConfigSettings, IVendor, UserSignupRequest } from "../../interfaces";
 
 export class DigitalSurgeVendor implements IVendor {
     private readonly logger = new Logger("DigitalSurgeVendor");
+    private signUpEndpoint: string;
 
-    constructor(private config: ConfigService, private axios: AxiosInstance) {}
+    constructor(private config: ConfigService, private axios: AxiosInstance) {
+        this.signUpEndpoint = this.config.get(
+            ConfigSettings.DIGITALSURGE_SIGNUP_ENDPOINT
+        );
+    }
     async signUp(signupInfo: UserSignupRequest) {
         const { email, firstName, lastName, mobile } = signupInfo;
 
-        const endPoint = this.config.get(
-            ConfigSettings.DIGITALSURGE_SIGNUP_ENDPOINT
-        );
         const requestBody = {
             first_name: firstName,
             last_name: lastName,
@@ -21,7 +23,7 @@ export class DigitalSurgeVendor implements IVendor {
         };
 
         const response = await this.axios
-            .post(endPoint, JSON.stringify(requestBody), {
+            .post(this.signUpEndpoint, JSON.stringify(requestBody), {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${this.config.get(

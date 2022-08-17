@@ -5,14 +5,15 @@ import { ConfigSettings, IVendor, UserSignupRequest } from "../../interfaces";
 
 export class GPIBVendor implements IVendor {
     private readonly logger = new Logger("GPIBVendor");
+    private baseUrl: string;
 
-    constructor(private config: ConfigService, private axios: AxiosInstance) {}
+    constructor(private config: ConfigService, private axios: AxiosInstance) {
+        this.baseUrl = this.config.get(ConfigSettings.GPIB_API_ENDPOINT);
+    }
     async signUp(signupInfo: UserSignupRequest) {
         const { firstName, lastName, email, password } = signupInfo;
 
-        const endPoint = `${this.config.get(
-            ConfigSettings.GPIB_API_ENDPOINT
-        )}/user`;
+        const endPoint = `${this.baseUrl}/user`;
         const requestBody = {
             firstName,
             lastName,

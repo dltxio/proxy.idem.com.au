@@ -5,14 +5,16 @@ import { ConfigSettings, IVendor, UserSignupRequest } from "../../interfaces";
 
 export class CoinStashVendor implements IVendor {
     private readonly logger = new Logger("CoinStashVendor");
+    private signUpEndpoint: string;
 
-    constructor(private config: ConfigService, private axios: AxiosInstance) {}
+    constructor(private config: ConfigService, private axios: AxiosInstance) {
+        this.signUpEndpoint = this.config.get(
+            ConfigSettings.COINSTASH_SIGNUP_ENDPOINT
+        );
+    }
     async signUp(signupInfo: UserSignupRequest) {
         const { firstName, lastName, email, password } = signupInfo;
 
-        const endPoint = this.config.get(
-            ConfigSettings.COINSTASH_SIGNUP_ENDPOINT
-        );
         const requestBody = {
             email,
             password,
@@ -22,7 +24,7 @@ export class CoinStashVendor implements IVendor {
             acceptMarketing: false
         };
         const response = await this.axios
-            .post(endPoint, JSON.stringify(requestBody))
+            .post(this.signUpEndpoint, JSON.stringify(requestBody))
             .catch(error => {
                 this.logger.error(error.response.data);
                 throw new Error(error.response.data);
