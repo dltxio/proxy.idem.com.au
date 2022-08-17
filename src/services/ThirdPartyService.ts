@@ -1,8 +1,8 @@
 import {
+    IVendor,
     RequestType,
     UserDetailRequest,
     UserSignupRequest,
-    Vendor,
     VendorEnum
 } from "./../interfaces";
 import { ConfigService } from "@nestjs/config";
@@ -48,7 +48,7 @@ export class ThirdPartyService implements IThirdPartyService {
         });
     }
 
-    private getVendor(vendorId: number): Vendor {
+    private getVendor(vendorId: number): IVendor {
         switch (vendorId) {
             case VendorEnum.GPIB:
                 return new GPIBVendor(this.config, this.axiosWithProxy);
