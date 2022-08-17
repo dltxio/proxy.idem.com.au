@@ -150,7 +150,7 @@ export interface IThirdPartyService {
     syncDetail(userDetail: UserDetailRequest): Promise<void>;
 }
 
-export interface Vendor {
+export interface IVendor {
     signUp(signupInfo: UserSignupRequest): Promise<{
         userId: string;
     }>;

@@ -1,9 +1,9 @@
 import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AxiosInstance } from "axios";
-import { ConfigSettings, UserSignupRequest, Vendor } from "../../interfaces";
+import { ConfigSettings, IVendor, UserSignupRequest } from "../../interfaces";
 
-export class GPIBVendor implements Vendor {
+export class GPIBVendor implements IVendor {
     private readonly logger = new Logger("GPIBVendor");
 
     constructor(private config: ConfigService, private axios: AxiosInstance) {}
