@@ -31,10 +31,9 @@ export class GPIBVendor implements IVendor {
                 if (error.response) {
                     this.logger.error(error.response.data);
                     throw new Error(error.response.data);
-                } else {
-                    this.logger.error(error.message);
-                    throw error;
                 }
+                this.logger.error(error.message);
+                throw error;
             });
         const userId = response.data;
         return { userId };
