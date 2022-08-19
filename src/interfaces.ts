@@ -151,6 +151,7 @@ export interface IThirdPartyService {
 }
 
 export interface IVendor {
+    name: string;
     signUp(signupInfo: UserSignupRequest): Promise<{
         userId: string;
     }>;

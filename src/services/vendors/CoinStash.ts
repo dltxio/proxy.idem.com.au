@@ -4,6 +4,7 @@ import { AxiosInstance } from "axios";
 import { ConfigSettings, IVendor, UserSignupRequest } from "../../interfaces";
 
 export class CoinStashVendor implements IVendor {
+    name: "CoinStash";
     private readonly logger = new Logger("CoinStashVendor");
     private signUpEndpoint: string;
 
@@ -26,8 +27,12 @@ export class CoinStashVendor implements IVendor {
         const response = await this.axios
             .post(this.signUpEndpoint, JSON.stringify(requestBody))
             .catch(error => {
-                this.logger.error(error.response.data);
-                throw new Error(error.response.data);
+                if (error.response) {
+                    this.logger.error(error.response.data);
+                    throw new Error(error.response.data);
+                }
+                this.logger.error(error.message);
+                throw error;
             });
         const userId = response.data;
         return { userId };
