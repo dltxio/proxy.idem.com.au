@@ -147,7 +147,6 @@ export interface IUserService {
 
 export interface IThirdPartyService {
     signUp(signupInfo: UserSignupRequest, ip: string): Promise<string>;
-    syncDetail(userDetail: UserDetailRequest): Promise<void>;
 }
 
 export interface IVendor {
@@ -251,6 +250,7 @@ export type KycResponse = {
     thirdPartyVerified: boolean;
     signature: string; //signed claim response
     message: ClaimResponsePayload;
+    hashedPayload: string;
 };
 
 export type GPIBVerifyRequest = {
@@ -303,6 +303,9 @@ class Verification implements KycResponse {
     @IsNotEmpty()
     @IsBoolean()
     thirdPartyVerified: boolean;
+    @ApiProperty()
+    @IsNotEmpty()
+    hashedPayload: string;
 }
 export class UserSignupRequest {
     @ApiProperty({
@@ -330,6 +333,9 @@ export class UserSignupRequest {
     @ValidateNested()
     @Type(() => Verification)
     verification: Verification;
+    @ApiProperty()
+    @IsOptional()
+    dob: string;
 }
 
 export class UserDetailRequest {

@@ -1,19 +1,17 @@
 import {
     IVendor,
     RequestType,
-    UserDetailRequest,
     UserSignupRequest,
     VendorEnum
 } from "./../interfaces";
 import { ConfigService } from "@nestjs/config";
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import axios, { AxiosError, AxiosInstance } from "axios";
+import axios, { AxiosInstance } from "axios";
 import { HttpsProxyAgent } from "https-proxy-agent";
 import { ConfigSettings, IThirdPartyService } from "../interfaces";
 import { Repository } from "typeorm";
 import { Request } from "../data/entities/request.entity";
 import { getVendorName } from "../utils/vendor";
-import moment from "moment";
 import { verifyMessage } from "../utils/wallet";
 import { GPIBVendor } from "./vendors/GPIB";
 import { CoinStashVendor } from "./vendors/CoinStash";
@@ -99,49 +97,5 @@ export class ThirdPartyService implements IThirdPartyService {
             this.logger.error(error.message);
             throw new Error(error.message);
         }
-    }
-
-    public async syncDetail(userDetail: UserDetailRequest): Promise<void> {
-        let endPoint: string;
-        if (userDetail.source === VendorEnum.GPIB) {
-            endPoint = this.config.get(ConfigSettings.GPIB_API_ENDPOINT);
-
-            const authentication = await this.axiosWithProxy
-                .post(
-                    `${endPoint}/user/authenticate`,
-                    JSON.stringify({
-                        username: userDetail.email,
-                        password: userDetail.password
-                    })
-                )
-                .catch((error: AxiosError) => {
-                    this.logger.error(error);
-                    throw new Error(error.message);
-                });
-            if (authentication.status === 200) {
-                const token = authentication.data.token;
-
-                await this.axiosWithProxy
-                    .put(
-                        `${endPoint}/accountInfoes`,
-                        JSON.stringify({
-                            firstName: userDetail.firstName,
-                            lastName: userDetail.lastName,
-                            yob: moment(userDetail.dob, "DD/MM/YYYY").year()
-                        }),
-                        {
-                            headers: {
-                                "Content-Type": "application/json",
-                                Authorization: `Bearer ${token}`
-                            }
-                        }
-                    )
-                    .catch((error: AxiosError) => {
-                        this.logger.error(error);
-                        throw new Error(error.message);
-                    });
-            }
-        }
-        return;
     }
 }

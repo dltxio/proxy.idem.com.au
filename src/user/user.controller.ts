@@ -2,7 +2,6 @@ import {
     IKycService,
     IThirdPartyService,
     KycResponse,
-    KycResult,
     NewUser,
     RequestOtpRequest,
     RequestOtpResponse,
@@ -158,19 +157,6 @@ export class UserController {
         @Body() body: UserSignupRequest
     ): Promise<string> {
         return this.thirdPartyService.signUp(body, ip);
-    }
-
-    @Post("syncDetail")
-    @UseGuards(AuthGuard("basic"))
-    @ApiOperation({ summary: "Sync user detail" })
-    @ApiResponse({
-        status: HttpStatus.OK
-    })
-    @ApiResponse({
-        status: HttpStatus.BAD_REQUEST
-    })
-    async syncDetail(@Body() body: UserDetailRequest): Promise<void> {
-        return this.thirdPartyService.syncDetail(body);
     }
 
     @Post("tester")

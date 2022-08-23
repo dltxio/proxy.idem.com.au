@@ -2,6 +2,7 @@ import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AxiosInstance } from "axios";
 import { ConfigSettings, IVendor, UserSignupRequest } from "../../interfaces";
+import moment from "moment";
 
 type SignupResponse = string;
 export class GPIBVendor implements IVendor {
@@ -13,18 +14,24 @@ export class GPIBVendor implements IVendor {
         this.baseUrl = this.config.get(ConfigSettings.GPIB_API_ENDPOINT);
     }
     async signUp(signupInfo: UserSignupRequest) {
-        const { firstName, lastName, email, password } = signupInfo;
+        const { firstName, lastName, email, password, verification, mobile } =
+            signupInfo;
 
-        const endPoint = `${this.baseUrl}/user`;
+        const endPoint = `${this.baseUrl}/user/idem`;
         const requestBody = {
             firstName,
             lastName,
             email,
             password,
             referralCode: "",
+            mobile: mobile.trim(),
+            yob: moment(signupInfo.dob, "DD/MM/YYYY").year(),
             trackAddress: true,
-            createAddress: true
+            createAddress: true,
+            hashedPayload: verification.hashedPayload,
+            signature: verification.signature
         };
+
         const response = await this.axios
             .post<SignupResponse>(endPoint, JSON.stringify(requestBody))
             .catch(error => {
