@@ -32,10 +32,12 @@ import {
     UserExpoPushTokenRequestBody,
     UserVerifyRequestBody
 } from "../interfaces";
-import { AuthGuard } from "@nestjs/passport";
 import { Tester } from "../data/entities/tester.entity";
+import { Public } from "../auth/anonymous";
+import { LocalGuard } from "src/auth/auth-anonymous.guard";
 
 @Controller("user")
+@UseGuards(LocalGuard)
 export class UserController {
     constructor(
         @Inject("IUserService") private userService: IUserService,
@@ -57,7 +59,6 @@ export class UserController {
     }
 
     @Post("verify")
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Verify user" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -87,7 +88,6 @@ export class UserController {
     }
 
     @Get()
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Get users" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -100,7 +100,6 @@ export class UserController {
     }
 
     @Put(":userId/token")
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Put user token" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -116,7 +115,6 @@ export class UserController {
     }
 
     @Post("notification/:message")
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Push notification" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -129,7 +127,6 @@ export class UserController {
     }
 
     @Post("signup/notification")
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Push signup notification" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -145,7 +142,6 @@ export class UserController {
     }
 
     @Post("signup")
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "User signup" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -173,7 +169,6 @@ export class UserController {
     }
 
     @Post("requestOtp")
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({
         summary:
             "User request otp to be sent via SMS to verify their phone number"
@@ -191,7 +186,6 @@ export class UserController {
     }
 
     @Post("verifyOtp")
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({
         summary:
             "User verify otp to be sent via SMS to verify their phone number"
@@ -206,7 +200,6 @@ export class UserController {
         return this.userService.verifyOtp(body);
     }
 
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({
         summary: "User upload PGP public key"
     })
@@ -222,7 +215,6 @@ export class UserController {
         return this.userService.addPublicKey(body);
     }
 
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({
         summary: "Get user detail"
     })
@@ -239,7 +231,7 @@ export class UserController {
         return this.userService.findOne(email);
     }
 
-    @UseGuards(AuthGuard("basic"))
+    @Public()
     @ApiOperation({
         summary: "Verify email"
     })
