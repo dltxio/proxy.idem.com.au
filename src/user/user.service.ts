@@ -309,7 +309,6 @@ export class UserService {
 
             const emailFromPublicKey = publicKey.users[0].userID.email;
 
-            console.log(hashMessage(emailFromPublicKey));
             if (hashMessage(emailFromPublicKey) != body.email)
                 throw new Error("Email not match");
 
