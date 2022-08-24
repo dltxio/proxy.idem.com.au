@@ -150,6 +150,7 @@ export interface IUserService {
     verifyOtp(body: VerifyOtpRequest): Promise<boolean>;
     addPublicKey(body: PublicKeyDto): Promise<boolean>;
     verifyEmail(email: string, token: string): Promise<boolean>;
+    decodeEmailFromToken(token: string): Promise<string>;
 }
 
 export interface IEmailService {
@@ -416,9 +417,6 @@ export class PublicKeyDto {
 export class EmailVerificationDto {
     @ApiProperty()
     @IsNotEmpty()
-    @IsEmail()
-    email: string;
-    @ApiProperty()
-    @IsNotEmpty()
+    @IsString()
     token: string;
 }
