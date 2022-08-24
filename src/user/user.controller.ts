@@ -239,7 +239,6 @@ export class UserController {
         return this.userService.findOne(email);
     }
 
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({
         summary: "Verify email"
     })
@@ -251,6 +250,7 @@ export class UserController {
     })
     @Post("verify-email")
     async verifyEmail(@Body() body: EmailVerificationDto): Promise<boolean> {
-        return this.userService.verifyEmail(body.email, body.token);
+        const email = await this.userService.decodeEmailFromToken(body.token);
+        return this.userService.verifyEmail(email, body.token);
     }
 }
