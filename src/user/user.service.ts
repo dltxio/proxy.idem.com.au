@@ -1,27 +1,4 @@
-import crypto from "crypto";
 import { hashMessage } from "ethers/lib/utils";
-import Expo from "expo-server-sdk";
-import * as openpgp from "openpgp";
-import { Repository } from "typeorm";
-import {
-    Injectable,
-    Inject,
-    Logger,
-    BadRequestException
-} from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { JwtService } from "@nestjs/jwt";
-
-import { User } from "../data/entities/user.entity";
-import { Request } from "../data/entities/request.entity";
-import { Tester } from "../data/entities/tester.entity";
-import {
-    ConfigSettings,
-    RequestType,
-    SignupNotificationRequest,
-    UserExpoPushTokenRequestBody,
-    UsersResponse
-} from "../interfaces";
 import {
     IEmailService,
     ISmsService,
@@ -32,23 +9,39 @@ import {
     TestFlightRequest,
     VerifyOtpRequest
 } from "./../interfaces";
-import { InjectRepository } from "@nestjs/typeorm";
+import { Injectable, Inject, Logger } from "@nestjs/common";
+import * as openpgp from "openpgp";
+
+import { User } from "../data/entities/user.entity";
+import { Request } from "../data/entities/request.entity";
+import { Repository } from "typeorm";
+import {
+    ConfigSettings,
+    RequestType,
+    SignupNotificationRequest,
+    UserExpoPushTokenRequestBody,
+    UsersResponse
+} from "../interfaces";
+import Expo from "expo-server-sdk";
+import { ConfigService } from "@nestjs/config";
+import { Tester } from "../data/entities/tester.entity";
+import crypto from "crypto";
+import * as uuid from "uuid";
 
 @Injectable()
 export class UserService {
     private expo: Expo;
     private readonly logger = new Logger("UserService");
     constructor(
-        @InjectRepository(User)
+        @Inject("USER_REPOSITORY")
         private userRepository: Repository<User>,
-        @InjectRepository(Request)
+        @Inject("REQUEST_REPOSITORY")
         private requestRepository: Repository<Request>,
-        @InjectRepository(Tester)
+        private config: ConfigService,
+        @Inject("TESTER_REPOSITORY")
         private testerRepository: Repository<Tester>,
         @Inject("ISmsService") private smsService: ISmsService,
-        @Inject("IEmailService") private emailService: IEmailService,
-        private readonly config: ConfigService,
-        private readonly jwtService: JwtService
+        @Inject("IEmailService") private emailService: IEmailService
     ) {
         this.expo = new Expo({
             accessToken: this.config.get(ConfigSettings.EXPO_ACCESS_TOKEN)
@@ -318,8 +311,8 @@ export class UserService {
 
             if (hashMessage(emailFromPublicKey) != body.email)
                 throw new Error("Email not match");
-            const payload = { email: emailFromPublicKey };
-            const token = this.jwtService.sign(payload);
+
+            const token = uuid.v4().replace(/-/g, "");
             user = await this.userRepository.findOneBy({ email: body.email });
             if (user) {
                 //Update the public key if user found.
@@ -366,23 +359,6 @@ export class UserService {
         } catch (error) {
             this.logger.error(error);
             return false;
-        }
-    }
-
-    public async decodeEmailFromToken(token: string): Promise<string> {
-        try {
-            const payload = this.jwtService.verify(token);
-            if (typeof payload === "object" && "email" in payload) {
-                return payload.email;
-            }
-            throw new BadRequestException();
-        } catch (error) {
-            if (error?.name === "TokenExpiredError") {
-                throw new BadRequestException(
-                    "Email confirmation token expired"
-                );
-            }
-            throw new BadRequestException("Bad confirmation token");
         }
     }
 }

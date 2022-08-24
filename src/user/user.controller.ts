@@ -243,7 +243,6 @@ export class UserController {
     })
     @Post("verify-email")
     async verifyEmail(@Body() body: EmailVerificationDto): Promise<boolean> {
-        const email = await this.userService.decodeEmailFromToken(body.token);
-        return this.userService.verifyEmail(email, body.token);
+        return this.userService.verifyEmail(body.email, body.token);
     }
 }
