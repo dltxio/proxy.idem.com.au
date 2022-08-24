@@ -6,6 +6,7 @@ import { UserController } from "./user.controller";
 import { userProviders } from "./user.providers";
 import { UserService } from "./user.service";
 import { SmsService } from "../services/SmsService";
+import { EmailService } from "../services/EmailService";
 
 @Module({
     imports: [DatabaseModule],
@@ -27,6 +28,10 @@ import { SmsService } from "../services/SmsService";
         {
             provide: "ISmsService",
             useClass: SmsService
+        },
+        {
+            provide: "IEmailService",
+            useClass: EmailService
         }
     ]
 })

@@ -1,13 +1,14 @@
 import {
+    EmailVerificationDto,
     IKycService,
     IThirdPartyService,
     KycResponse,
     NewUser,
+    PublicKeyDto,
     RequestOtpRequest,
     RequestOtpResponse,
     SignupNotificationRequest,
     TestFlightRequest,
-    UserDetailRequest,
     UserSignupRequest,
     UsersResponse,
     VerifyOtpRequest
@@ -203,5 +204,53 @@ export class UserController {
     })
     async verifyOtp(@Body() body: VerifyOtpRequest): Promise<boolean> {
         return this.userService.verifyOtp(body);
+    }
+
+    @UseGuards(AuthGuard("basic"))
+    @ApiOperation({
+        summary: "User upload PGP public key"
+    })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    @Post("key/add")
+    async addPublicKey(@Body() body: PublicKeyDto): Promise<boolean> {
+        console.log(body);
+        return this.userService.addPublicKey(body);
+    }
+
+    @UseGuards(AuthGuard("basic"))
+    @ApiOperation({
+        summary: "Get user detail"
+    })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    @Get(":email")
+    async getUser(
+        @Param("email") email: string
+    ): Promise<UsersResponse | undefined> {
+        return this.userService.findOne(email);
+    }
+
+    @UseGuards(AuthGuard("basic"))
+    @ApiOperation({
+        summary: "Verify email"
+    })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    @Post("verify-email")
+    async verifyEmail(@Body() body: EmailVerificationDto): Promise<boolean> {
+        return this.userService.verifyEmail(body.email, body.token);
     }
 }

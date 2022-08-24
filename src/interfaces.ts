@@ -1,5 +1,6 @@
 import {
     IsBoolean,
+    IsEmail,
     IsEnum,
     IsNotEmpty,
     IsObject,
@@ -64,7 +65,11 @@ export enum ConfigSettings {
     HTTPS_PROXY_HOST = "HTTPS_PROXY_HOST",
     HTTPS_PROXY_PORT = "HTTPS_PROXY_PORT",
     HTTPS_PROXY_PASSWORD = "HTTPS_PROXY_PASSWORD",
-    HTTPS_PROXY_USERNAME = "HTTPS_PROXY_USERNAME"
+    HTTPS_PROXY_USERNAME = "HTTPS_PROXY_USERNAME",
+    MAILJET_API_KEY = "MAILJET_API_KEY",
+    MAILJET_SECRET = "MAILJET_SECRET",
+    FROM_EMAIL_ADDRESS = "FROM_EMAIL_ADDRESS",
+    PROXY_API_URL = "PROXY_API_URL"
 }
 
 //=== Abstract Error classes
@@ -143,6 +148,12 @@ export interface IUserService {
     ): Promise<void>;
     requestOtp(body: RequestOtpRequest): Promise<RequestOtpResponse>;
     verifyOtp(body: VerifyOtpRequest): Promise<boolean>;
+    addPublicKey(body: PublicKeyDto): Promise<boolean>;
+    verifyEmail(email: string, token: string): Promise<boolean>;
+}
+
+export interface IEmailService {
+    sendEmailVerification(email: string, token: string): Promise<void>;
 }
 
 export interface IThirdPartyService {
@@ -242,6 +253,7 @@ export type UsersResponse = {
     userId: string;
     email: string;
     createdAt: Date;
+    emailVerified: boolean;
 };
 
 export type KycResponse = {
@@ -390,4 +402,23 @@ export class VerifyOtpRequest {
     @ApiProperty()
     @IsNotEmpty()
     hash: string;
+}
+
+export class PublicKeyDto {
+    @ApiProperty()
+    @IsNotEmpty()
+    publicKeyArmored: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    email: string;
+}
+
+export class EmailVerificationDto {
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsEmail()
+    email: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    token: string;
 }
