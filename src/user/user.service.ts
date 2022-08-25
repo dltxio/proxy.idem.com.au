@@ -9,7 +9,12 @@ import {
     TestFlightRequest,
     VerifyOtpRequest
 } from "./../interfaces";
-import { Injectable, Inject, Logger } from "@nestjs/common";
+import {
+    Injectable,
+    Inject,
+    Logger,
+    BadRequestException
+} from "@nestjs/common";
 import * as openpgp from "openpgp";
 
 import { User } from "../data/entities/user.entity";
@@ -26,7 +31,7 @@ import Expo from "expo-server-sdk";
 import { ConfigService } from "@nestjs/config";
 import { Tester } from "../data/entities/tester.entity";
 import crypto from "crypto";
-import * as uuid from "uuid";
+import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
 export class UserService {
@@ -37,11 +42,12 @@ export class UserService {
         private userRepository: Repository<User>,
         @Inject("REQUEST_REPOSITORY")
         private requestRepository: Repository<Request>,
-        private config: ConfigService,
         @Inject("TESTER_REPOSITORY")
         private testerRepository: Repository<Tester>,
         @Inject("ISmsService") private smsService: ISmsService,
-        @Inject("IEmailService") private emailService: IEmailService
+        @Inject("IEmailService") private emailService: IEmailService,
+        private readonly config: ConfigService,
+        private readonly jwtService: JwtService
     ) {
         this.expo = new Expo({
             accessToken: this.config.get(ConfigSettings.EXPO_ACCESS_TOKEN)
@@ -312,7 +318,8 @@ export class UserService {
             if (hashMessage(emailFromPublicKey) != body.email)
                 throw new Error("Email not match");
 
-            const token = uuid.v4().replace(/-/g, "");
+            const payload = { email: emailFromPublicKey };
+            const token = this.jwtService.sign(payload);
             user = await this.userRepository.findOneBy({ email: body.email });
             if (user) {
                 //Update the public key if user found.
@@ -359,6 +366,23 @@ export class UserService {
         } catch (error) {
             this.logger.error(error);
             return false;
+        }
+    }
+
+    public async decodeEmailFromToken(token: string): Promise<string> {
+        try {
+            const payload = this.jwtService.verify(token);
+            if (typeof payload === "object" && "email" in payload) {
+                return payload.email;
+            }
+            throw new BadRequestException();
+        } catch (error) {
+            if (error?.name === "TokenExpiredError") {
+                throw new BadRequestException(
+                    "Email confirmation token expired"
+                );
+            }
+            throw new BadRequestException("Bad confirmation token");
         }
     }
 }

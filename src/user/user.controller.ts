@@ -241,24 +241,9 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    @Get("verify-email")
-    async verifyEmail(
-        @Query("email") email: string,
-        @Query("token") token: string,
-        @Res() res: Response
-    ): Promise<void> {
-        const isSuccess = await this.userService.verifyEmail(email, token);
-        if (!isSuccess) {
-            res.render("verifyEmailResponse", {
-                isSuccess: false,
-                title: "Oops",
-                message: `There was a problem verifying ${email}`
-            });
-        }
-        res.render("verifyEmailResponse", {
-            isSuccess: true,
-            title: "Success",
-            message: `${email} has been verified`
-        });
+    @Post("verify-email")
+    async verifyEmail(@Body("token") token: string): Promise<boolean> {
+        const email = await this.userService.decodeEmailFromToken(token);
+        return this.userService.verifyEmail(email, token);
     }
 }

@@ -69,7 +69,10 @@ export enum ConfigSettings {
     MAILJET_API_KEY = "MAILJET_API_KEY",
     MAILJET_SECRET = "MAILJET_SECRET",
     FROM_EMAIL_ADDRESS = "FROM_EMAIL_ADDRESS",
-    PROXY_API_URL = "PROXY_API_URL"
+    PROXY_API_URL = "PROXY_API_URL",
+    WEBSITE_URL = "WEBSITE_URL",
+    JWT_SECRET = "JWT_SECRET",
+    JWT_EXPIRATION_TIME = "JWT_EXPIRATION_TIME"
 }
 
 //=== Abstract Error classes
@@ -150,6 +153,7 @@ export interface IUserService {
     verifyOtp(body: VerifyOtpRequest): Promise<boolean>;
     addPublicKey(body: PublicKeyDto): Promise<boolean>;
     verifyEmail(email: string, token: string): Promise<boolean>;
+    decodeEmailFromToken(token: string): Promise<string>;
 }
 
 export interface IEmailService {

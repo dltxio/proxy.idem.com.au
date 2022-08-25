@@ -24,8 +24,8 @@ export class EmailService implements IEmailService {
     ): Promise<void> => {
         const subject = `PGP key email verification`;
         const link = `${this.config.get(
-            ConfigSettings.PROXY_API_URL
-        )}/verifyEmail?email=${email}&token=${token}`;
+            ConfigSettings.WEBSITE_URL
+        )}/verifyEmail?token=${token}`;
         this.logger.log(`${email} Verification email sent`);
         const source = await fsPromise.readFile(
             join(__dirname, "../..", "/views/verifyEmailLink.hbs"),
