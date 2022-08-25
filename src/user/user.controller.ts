@@ -35,7 +35,7 @@ import {
 } from "../interfaces";
 import { Tester } from "../data/entities/tester.entity";
 import { Public } from "../auth/anonymous";
-import { LocalGuard } from "../auth/auth-anonymous.guard";
+import { LocalGuard } from "../auth/auth-local.guard";
 import { Response } from "express";
 @Controller("user")
 @UseGuards(LocalGuard)
@@ -249,13 +249,13 @@ export class UserController {
     ): Promise<void> {
         const isSuccess = await this.userService.verifyEmail(email, token);
         if (!isSuccess) {
-            return res.render("verifyEmailResponse", {
+            res.render("verifyEmailResponse", {
                 isSuccess: false,
                 title: "Oops",
                 message: `There was a problem verifying ${email}`
             });
         }
-        return res.render("verifyEmailResponse", {
+        res.render("verifyEmailResponse", {
             isSuccess: true,
             title: "Success",
             message: `${email} has been verified`
