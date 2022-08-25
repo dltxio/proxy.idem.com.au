@@ -72,7 +72,7 @@ export enum ConfigSettings {
     PROXY_API_URL = "PROXY_API_URL",
     WEBSITE_URL = "WEBSITE_URL",
     JWT_SECRET = "JWT_SECRET",
-    JWT_EXPIRATION_TIME = "JWT_EXPIRATION_TIME"
+    JWT_EXPIRATION_SECONDS = "JWT_EXPIRATION_SECONDS"
 }
 
 //=== Abstract Error classes
