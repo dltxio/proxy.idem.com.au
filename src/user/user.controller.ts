@@ -247,11 +247,6 @@ export class UserController {
         @Query("token") token: string,
         @Res() res: Response
     ): Promise<void> {
-        return res.render("verifyEmailResponse", {
-            isSuccess: false,
-            title: "Oops",
-            message: `There was a problem verifying ${email}`
-        });
         const isSuccess = await this.userService.verifyEmail(email, token);
         if (!isSuccess) {
             return res.render("verifyEmailResponse", {
