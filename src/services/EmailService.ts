@@ -60,14 +60,6 @@ export class EmailService implements IEmailService {
     };
 
     private sendRawEmail = async (params: RawEmailParams) => {
-        console.log({
-            messages: [
-                {
-                    ...this.getMailJetBasePayload(params),
-                    HtmlPart: params.html
-                }
-            ]
-        });
         const request = this.emailClient
             .post("send", { version: "v3.1" })
             .request({
