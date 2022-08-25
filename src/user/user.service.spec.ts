@@ -2,6 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { UserService } from "./user.service";
 import { expect } from "chai";
 import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
 
 const repositoryMockFactory = () => ({
     find: () => ({}),
@@ -19,6 +20,7 @@ describe("UserService", () => {
             providers: [
                 UserService,
                 ConfigService,
+                JwtService,
                 {
                     provide: "USER_REPOSITORY",
                     useFactory: repositoryMockFactory
