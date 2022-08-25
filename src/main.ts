@@ -4,16 +4,23 @@ import { AppModule } from "./app.module";
 import { GenericInterceptor } from "./utils/interceptors";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import tracer from "dd-trace";
+import { NestExpressApplication } from "@nestjs/platform-express";
+import { join } from "path";
 
 async function bootstrap() {
     tracer.init();
-    const app = await NestFactory.create(AppModule, { cors: true });
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+        cors: true
+    });
     app.useGlobalPipes(
         new ValidationPipe({
             whitelist: true
         })
     );
     app.useGlobalInterceptors(new GenericInterceptor());
+    app.useStaticAssets(join(__dirname, "..", "public"));
+    app.setBaseViewsDir(join(__dirname, "..", "views"));
+    app.setViewEngine("hbs");
 
     const options = new DocumentBuilder()
         .setTitle("Idem Proxy API")

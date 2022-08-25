@@ -412,13 +412,3 @@ export class PublicKeyDto {
     @IsNotEmpty()
     email: string;
 }
-
-export class EmailVerificationDto {
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsEmail()
-    email: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    token: string;
-}

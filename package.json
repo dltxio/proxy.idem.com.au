@@ -40,6 +40,7 @@
         "dd-trace": "^2.11.0",
         "ethers": "^5.6.9",
         "expo-server-sdk": "^3.6.0",
+        "hbs": "^4.2.0",
         "https-proxy-agent": "^5.0.1",
         "lint-staged": "^13.0.3",
         "messagebird": "^3.8.1",

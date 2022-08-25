@@ -1,5 +1,4 @@
 import {
-    EmailVerificationDto,
     IKycService,
     IThirdPartyService,
     KycResponse,
@@ -23,7 +22,9 @@ import {
     Param,
     Put,
     Ip,
-    UseGuards
+    UseGuards,
+    Res,
+    Query
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { User } from "../data/entities/user.entity";
@@ -35,7 +36,7 @@ import {
 import { Tester } from "../data/entities/tester.entity";
 import { Public } from "../auth/anonymous";
 import { LocalGuard } from "src/auth/auth-anonymous.guard";
-
+import { Response } from "express";
 @Controller("user")
 @UseGuards(LocalGuard)
 export class UserController {
@@ -211,7 +212,6 @@ export class UserController {
     })
     @Post("key/add")
     async addPublicKey(@Body() body: PublicKeyDto): Promise<boolean> {
-        console.log(body);
         return this.userService.addPublicKey(body);
     }
 
@@ -224,7 +224,7 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    @Get(":email")
+    @Get("/email/:email")
     async getUser(
         @Param("email") email: string
     ): Promise<UsersResponse | undefined> {
@@ -241,8 +241,29 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    @Post("verify-email")
-    async verifyEmail(@Body() body: EmailVerificationDto): Promise<boolean> {
-        return this.userService.verifyEmail(body.email, body.token);
+    @Get("verify-email")
+    async verifyEmail(
+        @Query("email") email: string,
+        @Query("token") token: string,
+        @Res() res: Response
+    ): Promise<void> {
+        return res.render("verifyEmailResponse", {
+            isSuccess: false,
+            title: "Oops",
+            message: `There was a problem verifying ${email}`
+        });
+        const isSuccess = await this.userService.verifyEmail(email, token);
+        if (!isSuccess) {
+            return res.render("verifyEmailResponse", {
+                isSuccess: false,
+                title: "Oops",
+                message: `There was a problem verifying ${email}`
+            });
+        }
+        return res.render("verifyEmailResponse", {
+            isSuccess: true,
+            title: "Success",
+            message: `${email} has been verified`
+        });
     }
 }
