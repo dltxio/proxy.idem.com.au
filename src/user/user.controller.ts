@@ -35,7 +35,7 @@ import {
 } from "../interfaces";
 import { Tester } from "../data/entities/tester.entity";
 import { Public } from "../auth/anonymous";
-import { LocalGuard } from "src/auth/auth-anonymous.guard";
+import { LocalGuard } from "../auth/auth-anonymous.guard";
 import { Response } from "express";
 @Controller("user")
 @UseGuards(LocalGuard)
