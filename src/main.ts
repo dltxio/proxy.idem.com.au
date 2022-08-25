@@ -18,9 +18,6 @@ async function bootstrap() {
         })
     );
     app.useGlobalInterceptors(new GenericInterceptor());
-    app.useStaticAssets(join(__dirname, "..", "public"));
-    app.setBaseViewsDir(join(__dirname, "..", "views"));
-    app.setViewEngine("hbs");
 
     const options = new DocumentBuilder()
         .setTitle("Idem Proxy API")

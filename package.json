@@ -42,7 +42,6 @@
         "ethers": "^5.6.9",
         "expo-server-sdk": "^3.6.0",
         "handlebars": "^4.7.7",
-        "hbs": "^4.2.0",
         "https-proxy-agent": "^5.0.1",
         "lint-staged": "^13.0.3",
         "messagebird": "^3.8.1",

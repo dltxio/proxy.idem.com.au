@@ -27,17 +27,12 @@ export class EmailService implements IEmailService {
             ConfigSettings.WEBSITE_URL
         )}/verifyEmail?token=${token}`;
         this.logger.log(`${email} Verification email sent`);
-        const source = await fsPromise.readFile(
-            join(__dirname, "../..", "/views/verifyEmailLink.hbs"),
-            "utf8"
-        );
-        const template = Handlebars.compile(source);
 
         return this.sendRawEmail({
             to: email,
             toName: email,
             subject,
-            html: template({ link })
+            html: `<p>Please <a href="${link}">click here</a> to verify your email.<p>`
         });
     };
 
