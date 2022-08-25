@@ -1,7 +1,10 @@
-import { ConfigSettings, IEmailService } from "./../interfaces";
 import { ConfigService } from "@nestjs/config";
 import { Injectable, Logger } from "@nestjs/common";
+import fsPromise from "fs/promises";
+import Handlebars from "handlebars";
 import mailJet, { Client } from "node-mailjet";
+import { join } from "path";
+import { ConfigSettings, IEmailService } from "./../interfaces";
 
 @Injectable()
 export class EmailService implements IEmailService {
@@ -24,11 +27,17 @@ export class EmailService implements IEmailService {
             ConfigSettings.PROXY_API_URL
         )}/verifyEmail?email=${email}&token=${token}`;
         this.logger.log(`${email} Verification email sent`);
+        const source = await fsPromise.readFile(
+            join(__dirname, "../..", "/views/verifyEmailLink.hbs"),
+            "utf8"
+        );
+        const template = Handlebars.compile(source);
+
         return this.sendRawEmail({
             to: email,
             toName: email,
             subject,
-            html: `<p>Please <a href="${link}">click here</a> to verify your email.<p>`
+            html: template({ link })
         });
     };
 
