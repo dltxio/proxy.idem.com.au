@@ -1,9 +1,6 @@
 import { ConfigService } from "@nestjs/config";
 import { Injectable, Logger } from "@nestjs/common";
-import fsPromise from "fs/promises";
-import Handlebars from "handlebars";
 import mailJet, { Client } from "node-mailjet";
-import { join } from "path";
 import { ConfigSettings, IEmailService } from "./../interfaces";
 
 @Injectable()
