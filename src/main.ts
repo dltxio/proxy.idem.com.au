@@ -5,7 +5,6 @@ import { GenericInterceptor } from "./utils/interceptors";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import tracer from "dd-trace";
 import { NestExpressApplication } from "@nestjs/platform-express";
-import { join } from "path";
 
 async function bootstrap() {
     tracer.init();
