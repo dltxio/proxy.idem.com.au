@@ -24,4 +24,13 @@ export class User {
 
     @Column({ nullable: true })
     expoPushToken: string;
+
+    @Column({ unique: true })
+    publicKey: string;
+
+    @Column({ type: "boolean", default: false })
+    emailVerified: boolean;
+
+    @Column({ nullable: true })
+    emailVerificationCode: string;
 }

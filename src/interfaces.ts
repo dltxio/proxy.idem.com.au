@@ -1,5 +1,6 @@
 import {
     IsBoolean,
+    IsEmail,
     IsEnum,
     IsNotEmpty,
     IsObject,
@@ -64,7 +65,13 @@ export enum ConfigSettings {
     HTTPS_PROXY_HOST = "HTTPS_PROXY_HOST",
     HTTPS_PROXY_PORT = "HTTPS_PROXY_PORT",
     HTTPS_PROXY_PASSWORD = "HTTPS_PROXY_PASSWORD",
-    HTTPS_PROXY_USERNAME = "HTTPS_PROXY_USERNAME"
+    HTTPS_PROXY_USERNAME = "HTTPS_PROXY_USERNAME",
+    MAILJET_API_KEY = "MAILJET_API_KEY",
+    MAILJET_SECRET = "MAILJET_SECRET",
+    FROM_EMAIL_ADDRESS = "FROM_EMAIL_ADDRESS",
+    WEBSITE_URL = "WEBSITE_URL",
+    JWT_SECRET = "JWT_SECRET",
+    JWT_EXPIRATION_SECONDS = "JWT_EXPIRATION_SECONDS"
 }
 
 //=== Abstract Error classes
@@ -143,6 +150,13 @@ export interface IUserService {
     ): Promise<void>;
     requestOtp(body: RequestOtpRequest): Promise<RequestOtpResponse>;
     verifyOtp(body: VerifyOtpRequest): Promise<boolean>;
+    addPublicKey(body: PublicKeyDto): Promise<boolean>;
+    verifyEmail(email: string, token: string): Promise<boolean>;
+    decodeEmailFromToken(token: string): Promise<string>;
+}
+
+export interface IEmailService {
+    sendEmailVerification(email: string, token: string): Promise<void>;
 }
 
 export interface IThirdPartyService {
@@ -176,7 +190,7 @@ export class UserVerifyRequestBody {
     dob: string;
     @ApiProperty()
     @IsNotEmpty()
-    email: string;
+    hashEmail: string;
     @ApiProperty()
     houseNumber: string;
     @ApiProperty()
@@ -242,6 +256,7 @@ export type UsersResponse = {
     userId: string;
     email: string;
     createdAt: Date;
+    emailVerified: boolean;
 };
 
 export type KycResponse = {
@@ -390,4 +405,13 @@ export class VerifyOtpRequest {
     @ApiProperty()
     @IsNotEmpty()
     hash: string;
+}
+
+export class PublicKeyDto {
+    @ApiProperty()
+    @IsNotEmpty()
+    publicKeyArmored: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    hashEmail: string;
 }

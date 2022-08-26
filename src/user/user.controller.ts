@@ -3,11 +3,11 @@ import {
     IThirdPartyService,
     KycResponse,
     NewUser,
+    PublicKeyDto,
     RequestOtpRequest,
     RequestOtpResponse,
     SignupNotificationRequest,
     TestFlightRequest,
-    UserDetailRequest,
     UserSignupRequest,
     UsersResponse,
     VerifyOtpRequest
@@ -31,10 +31,12 @@ import {
     UserExpoPushTokenRequestBody,
     UserVerifyRequestBody
 } from "../interfaces";
-import { AuthGuard } from "@nestjs/passport";
 import { Tester } from "../data/entities/tester.entity";
-
+import { Public } from "../auth/anonymous";
+import { LocalGuard } from "../auth/auth-local.guard";
+import { hashMessage } from "ethers/lib/utils";
 @Controller("user")
+@UseGuards(LocalGuard)
 export class UserController {
     constructor(
         @Inject("IUserService") private userService: IUserService,
@@ -56,7 +58,6 @@ export class UserController {
     }
 
     @Post("verify")
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Verify user" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -64,14 +65,11 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async verify(
-        @Ip() ip: string,
-        @Body() body: UserVerifyRequestBody
-    ): Promise<KycResponse> {
+    async verify(@Body() body: UserVerifyRequestBody): Promise<KycResponse> {
         let user: User;
-        const findUser = await this.userService.findOne(body.email);
+        const findUser = await this.userService.findOne(body.hashEmail);
         if (!findUser) {
-            user = await this.userService.create({ email: body.email });
+            user = await this.userService.create({ email: body.hashEmail });
         } else {
             user = findUser;
         }
@@ -86,7 +84,6 @@ export class UserController {
     }
 
     @Get()
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Get users" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -99,7 +96,6 @@ export class UserController {
     }
 
     @Put(":userId/token")
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Put user token" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -115,7 +111,6 @@ export class UserController {
     }
 
     @Post("notification/:message")
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Push notification" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -128,7 +123,6 @@ export class UserController {
     }
 
     @Post("signup/notification")
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "Push signup notification" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -144,7 +138,6 @@ export class UserController {
     }
 
     @Post("signup")
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({ summary: "User signup" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -172,7 +165,6 @@ export class UserController {
     }
 
     @Post("requestOtp")
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({
         summary:
             "User request otp to be sent via SMS to verify their phone number"
@@ -190,7 +182,6 @@ export class UserController {
     }
 
     @Post("verifyOtp")
-    @UseGuards(AuthGuard("basic"))
     @ApiOperation({
         summary:
             "User verify otp to be sent via SMS to verify their phone number"
@@ -203,5 +194,53 @@ export class UserController {
     })
     async verifyOtp(@Body() body: VerifyOtpRequest): Promise<boolean> {
         return this.userService.verifyOtp(body);
+    }
+
+    @ApiOperation({
+        summary: "User upload PGP public key"
+    })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    @Post("key/add")
+    async addPublicKey(@Body() body: PublicKeyDto): Promise<boolean> {
+        return this.userService.addPublicKey(body);
+    }
+
+    @ApiOperation({
+        summary: "Get user detail"
+    })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    @Get("/email/:email")
+    async getUser(
+        @Param("email") email: string
+    ): Promise<UsersResponse | undefined> {
+        const formattedEmail = email.trim().toLowerCase();
+        const hashEmail = hashMessage(formattedEmail);
+        return this.userService.findOne(hashEmail);
+    }
+
+    @Public()
+    @ApiOperation({
+        summary: "Verify email"
+    })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    @Post("verify-email")
+    async verifyEmail(@Body("token") token: string): Promise<boolean> {
+        const email = await this.userService.decodeEmailFromToken(token);
+        return this.userService.verifyEmail(email, token);
     }
 }

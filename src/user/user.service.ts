@@ -1,12 +1,21 @@
+import { hashMessage } from "ethers/lib/utils";
 import {
+    IEmailService,
     ISmsService,
     NewUser,
+    PublicKeyDto,
     RequestOtpRequest,
     RequestOtpResponse,
     TestFlightRequest,
     VerifyOtpRequest
 } from "./../interfaces";
-import { Injectable, Inject, Logger } from "@nestjs/common";
+import {
+    Injectable,
+    Inject,
+    Logger,
+    BadRequestException
+} from "@nestjs/common";
+import * as openpgp from "openpgp";
 
 import { User } from "../data/entities/user.entity";
 import { Request } from "../data/entities/request.entity";
@@ -21,8 +30,8 @@ import {
 import Expo from "expo-server-sdk";
 import { ConfigService } from "@nestjs/config";
 import { Tester } from "../data/entities/tester.entity";
-
 import crypto from "crypto";
+import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
 export class UserService {
@@ -33,20 +42,33 @@ export class UserService {
         private userRepository: Repository<User>,
         @Inject("REQUEST_REPOSITORY")
         private requestRepository: Repository<Request>,
-        private config: ConfigService,
         @Inject("TESTER_REPOSITORY")
         private testerRepository: Repository<Tester>,
-        @Inject("ISmsService") private smsService: ISmsService
+        @Inject("ISmsService") private smsService: ISmsService,
+        @Inject("IEmailService") private emailService: IEmailService,
+        private readonly config: ConfigService,
+        private readonly jwtService: JwtService
     ) {
         this.expo = new Expo({
             accessToken: this.config.get(ConfigSettings.EXPO_ACCESS_TOKEN)
         });
     }
 
-    public async findOne(email: string): Promise<User> {
-        return this.userRepository.findOneBy({
-            email: email
+    public async findOne(
+        hashEmail: string
+    ): Promise<UsersResponse | undefined> {
+        const user = await this.userRepository.findOneBy({
+            email: hashEmail
         });
+
+        if (!user) return undefined;
+
+        return {
+            userId: user.userId,
+            email: user.email,
+            createdAt: user.createdAt,
+            emailVerified: user.emailVerified
+        };
     }
     public async findAll(): Promise<UsersResponse[]> {
         const usersResponse = [];
@@ -56,7 +78,8 @@ export class UserService {
             usersResponse.push({
                 userId: user.userId,
                 email: user.email,
-                createdAt: user.createdAt
+                createdAt: user.createdAt,
+                emailVerified: user.emailVerified
             });
         }
 
@@ -283,5 +306,88 @@ export class UserService {
             .digest("hex");
 
         return hashedMessage === hash;
+    }
+
+    public async addPublicKey(body: PublicKeyDto): Promise<boolean> {
+        try {
+            const publicKey = await openpgp.readKey({
+                armoredKey: body.publicKeyArmored
+            });
+            let user: User;
+
+            const emailFromPublicKey = publicKey.users[0].userID.email;
+            if (hashMessage(emailFromPublicKey) != body.hashEmail)
+                throw new Error("Email not match");
+
+            const payload = { email: emailFromPublicKey };
+            const token = this.jwtService.sign(payload);
+            user = await this.userRepository.findOneBy({
+                email: body.hashEmail
+            });
+            if (user) {
+                //Update the public key if user found.
+                user.publicKey = body.publicKeyArmored;
+                user.emailVerificationCode = token;
+                await this.userRepository.save(user);
+            } else {
+                //Create new user if no user found.
+                user = await this.userRepository.save({
+                    email: body.hashEmail,
+                    publicKey: body.publicKeyArmored,
+                    emailVerificationCode: token
+                });
+            }
+
+            this.logger.log(`User: ${user.userId} public key added`);
+            //Email service to send verification email
+            await this.emailService.sendEmailVerification(
+                publicKey.users[0].userID.email.trim().toLowerCase(),
+                token
+            );
+            return true;
+        } catch (error) {
+            this.logger.error(error);
+            return false;
+        }
+    }
+
+    public async verifyEmail(email: string, token: string): Promise<boolean> {
+        const formattedEmail = email.trim().toLowerCase();
+        try {
+            const user = await this.userRepository.findOneBy({
+                email: hashMessage(formattedEmail)
+            });
+
+            if (!user) throw new Error("Email not found");
+
+            if (user.emailVerificationCode != token)
+                throw new Error(
+                    "Verification code is wrong, please try resend email"
+                );
+
+            user.emailVerified = true;
+            await this.userRepository.save(user);
+            return true;
+        } catch (error) {
+            this.logger.error(error);
+            return false;
+        }
+    }
+
+    public async decodeEmailFromToken(token: string): Promise<string> {
+        try {
+            const payload = this.jwtService.verify(token);
+            if (typeof payload === "object" && "email" in payload) {
+                return payload.email;
+            }
+            throw new BadRequestException();
+        } catch (error) {
+            if (error?.name === "TokenExpiredError") {
+                throw new BadRequestException(
+                    "Email confirmation token expired"
+                );
+            }
+            throw new BadRequestException("Bad confirmation token");
+        }
     }
 }

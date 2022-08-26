@@ -4,10 +4,13 @@ import { AppModule } from "./app.module";
 import { GenericInterceptor } from "./utils/interceptors";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import tracer from "dd-trace";
+import { NestExpressApplication } from "@nestjs/platform-express";
 
 async function bootstrap() {
     tracer.init();
-    const app = await NestFactory.create(AppModule, { cors: true });
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+        cors: true
+    });
     app.useGlobalPipes(
         new ValidationPipe({
             whitelist: true
