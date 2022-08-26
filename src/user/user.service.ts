@@ -333,14 +333,15 @@ export class UserService {
                 //Create new user if no user found.
                 user = await this.userRepository.save({
                     email: body.hashEmail,
-                    emailFromPublicKey: token
+                    publicKey: body.publicKeyArmored,
+                    emailVerificationCode: token
                 });
             }
 
             this.logger.log(`User: ${user.userId} public key added`);
             //Email service to send verification email
             await this.emailService.sendEmailVerification(
-                publicKey.users[0].userID.email.toLowerCase(),
+                publicKey.users[0].userID.email.trim().toLowerCase(),
                 token
             );
             return true;
