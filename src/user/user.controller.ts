@@ -22,9 +22,7 @@ import {
     Param,
     Put,
     Ip,
-    UseGuards,
-    Res,
-    Query
+    UseGuards
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { User } from "../data/entities/user.entity";
@@ -36,7 +34,7 @@ import {
 import { Tester } from "../data/entities/tester.entity";
 import { Public } from "../auth/anonymous";
 import { LocalGuard } from "../auth/auth-local.guard";
-import { Response } from "express";
+import { hashMessage } from "ethers/lib/utils";
 @Controller("user")
 @UseGuards(LocalGuard)
 export class UserController {
@@ -67,14 +65,11 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async verify(
-        @Ip() ip: string,
-        @Body() body: UserVerifyRequestBody
-    ): Promise<KycResponse> {
+    async verify(@Body() body: UserVerifyRequestBody): Promise<KycResponse> {
         let user: User;
-        const findUser = await this.userService.findOne(body.email);
+        const findUser = await this.userService.findOne(body.hashEmail);
         if (!findUser) {
-            user = await this.userService.create({ email: body.email });
+            user = await this.userService.create({ email: body.hashEmail });
         } else {
             user = findUser;
         }
@@ -228,7 +223,9 @@ export class UserController {
     async getUser(
         @Param("email") email: string
     ): Promise<UsersResponse | undefined> {
-        return this.userService.findOne(email);
+        const formattedEmail = email.trim().toLowerCase();
+        const hashEmail = hashMessage(formattedEmail);
+        return this.userService.findOne(hashEmail);
     }
 
     @Public()

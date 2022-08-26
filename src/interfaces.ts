@@ -190,7 +190,7 @@ export class UserVerifyRequestBody {
     dob: string;
     @ApiProperty()
     @IsNotEmpty()
-    email: string;
+    hashEmail: string;
     @ApiProperty()
     houseNumber: string;
     @ApiProperty()
@@ -413,5 +413,5 @@ export class PublicKeyDto {
     publicKeyArmored: string;
     @ApiProperty()
     @IsNotEmpty()
-    email: string;
+    hashEmail: string;
 }

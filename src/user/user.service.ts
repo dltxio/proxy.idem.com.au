@@ -54,10 +54,11 @@ export class UserService {
         });
     }
 
-    public async findOne(email: string): Promise<UsersResponse | undefined> {
-        const formattedEmail = email.trim().toLowerCase();
+    public async findOne(
+        hashEmail: string
+    ): Promise<UsersResponse | undefined> {
         const user = await this.userRepository.findOneBy({
-            email: hashMessage(formattedEmail)
+            email: hashEmail
         });
 
         if (!user) return undefined;
@@ -315,12 +316,14 @@ export class UserService {
             let user: User;
 
             const emailFromPublicKey = publicKey.users[0].userID.email;
-            if (hashMessage(emailFromPublicKey) != body.email)
+            if (hashMessage(emailFromPublicKey) != body.hashEmail)
                 throw new Error("Email not match");
 
             const payload = { email: emailFromPublicKey };
             const token = this.jwtService.sign(payload);
-            user = await this.userRepository.findOneBy({ email: body.email });
+            user = await this.userRepository.findOneBy({
+                email: body.hashEmail
+            });
             if (user) {
                 //Update the public key if user found.
                 user.publicKey = body.publicKeyArmored;
@@ -329,7 +332,7 @@ export class UserService {
             } else {
                 //Create new user if no user found.
                 user = await this.userRepository.save({
-                    email: body.email,
+                    email: body.hashEmail,
                     emailFromPublicKey: token
                 });
             }
