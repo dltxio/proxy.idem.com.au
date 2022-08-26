@@ -55,8 +55,9 @@ export class UserService {
     }
 
     public async findOne(email: string): Promise<UsersResponse | undefined> {
+        const formattedEmail = email.trim().toLowerCase();
         const user = await this.userRepository.findOneBy({
-            email: hashMessage(email)
+            email: hashMessage(formattedEmail)
         });
 
         if (!user) return undefined;
@@ -314,7 +315,6 @@ export class UserService {
             let user: User;
 
             const emailFromPublicKey = publicKey.users[0].userID.email;
-
             if (hashMessage(emailFromPublicKey) != body.email)
                 throw new Error("Email not match");
 
@@ -337,7 +337,7 @@ export class UserService {
             this.logger.log(`User: ${user.userId} public key added`);
             //Email service to send verification email
             await this.emailService.sendEmailVerification(
-                publicKey.users[0].userID.email,
+                publicKey.users[0].userID.email.toLowerCase(),
                 token
             );
             return true;
@@ -348,9 +348,10 @@ export class UserService {
     }
 
     public async verifyEmail(email: string, token: string): Promise<boolean> {
+        const formattedEmail = email.trim().toLowerCase();
         try {
             const user = await this.userRepository.findOneBy({
-                email: hashMessage(email)
+                email: hashMessage(formattedEmail)
             });
 
             if (!user) throw new Error("Email not found");
