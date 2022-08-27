@@ -62,9 +62,7 @@ export class EmailService implements IEmailService {
             "../../test/test_idem_com_au.asc",
             "utf-8"
         );
-        const passphrase = "Test1234";
-
-        // const publicKey = await openpgp.readKey({ armoredKey: publicKeyArmored });
+        const passphrase = process.env.PGP_PASSPHRASE;
 
         const privateKey = await openpgp.decryptKey({
             privateKey: await openpgp.readPrivateKey({
