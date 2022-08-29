@@ -367,6 +367,7 @@ export class UserService {
 
             user.emailVerified = true;
             await this.userRepository.save(user);
+            this.logger.verbose(`${formattedEmail} email address verified`);
             return true;
         } catch (error) {
             this.logger.error(error);
