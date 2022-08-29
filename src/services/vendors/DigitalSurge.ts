@@ -42,8 +42,8 @@ export class DigitalSurgeVendor implements IVendor {
             )
             .catch(error => {
                 if (error.response) {
-                    this.logger.error(error.response.data);
-                    throw new Error(error.response.data);
+                    this.logger.error(error.response);
+                    throw new Error(error.response);
                 }
                 this.logger.error(error.message);
                 throw error;
