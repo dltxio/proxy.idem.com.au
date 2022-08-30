@@ -4,6 +4,7 @@ import mailJet, { Client } from "node-mailjet";
 import { ConfigSettings, IEmailService } from "./../interfaces";
 import * as openpgp from "openpgp";
 import fs from "fs";
+import path from "path";
 
 @Injectable()
 export class EmailService implements IEmailService {
@@ -59,15 +60,18 @@ export class EmailService implements IEmailService {
         });
 
         const privateKeyArmored = fs.readFileSync(
-            "../../test/test_idem_com_au.asc",
-            "utf-8"
+            path.join(__dirname, "../../") + "/test_idem_com_au.asc",
+            { encoding: "utf8" }
         );
+
+        const privateKeys = await openpgp.readPrivateKeys({
+            armoredKeys: privateKeyArmored
+        });
+
         const passphrase = process.env.PGP_PASSPHRASE;
 
         const privateKey = await openpgp.decryptKey({
-            privateKey: await openpgp.readPrivateKey({
-                armoredKey: privateKeyArmored
-            }),
+            privateKey: privateKeys[0],
             passphrase
         });
 
@@ -102,10 +106,6 @@ type SimpleEmailParams = {
     to: string;
     toName: string;
     subject: string;
-};
-
-type HtmlEmailParams = SimpleEmailParams & {
-    html: string;
 };
 
 type RawEmailParams = SimpleEmailParams & {

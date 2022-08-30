@@ -18,7 +18,7 @@
         "start:dev": "nest start --watch",
         "start:debug": "nest start --debug --watch",
         "start:prod": "node dist/main",
-        "prepare": "cp ./.env.development ./.env && husky install",
+        "prepare": "husky install",
         "test": "nyc --reporter=lcov mocha",
         "test:coverage": "nyc mocha",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/mocha --runInBand",
