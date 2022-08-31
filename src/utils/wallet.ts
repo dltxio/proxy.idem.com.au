@@ -19,8 +19,8 @@ export const signMessage = async (
     }
 };
 
-export const verifyMessage = async (
-    message: string,
+export const verifyMessage = (
+    hashedPayload: string,
     signature: string,
     config: ConfigService,
     logger: Logger
@@ -30,12 +30,11 @@ export const verifyMessage = async (
             config.get(ConfigSettings.WALLET_PRIVATE_KEY)
         );
         const expectedPublicKey = wallet.publicKey;
-
-        const msgHash = ethers.utils.hashMessage(message);
+        const msgHash = ethers.utils.hashMessage(hashedPayload);
         const msgHashBytes = ethers.utils.arrayify(msgHash);
 
         const recoveredPublicKey = ethers.utils.recoverPublicKey(
-            msgHashBytes,
+            ethers.utils.arrayify(msgHashBytes),
             signature
         );
         return expectedPublicKey === recoveredPublicKey;
