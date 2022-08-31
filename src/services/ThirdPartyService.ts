@@ -13,10 +13,12 @@ import { Repository } from "typeorm";
 import { Request } from "../data/entities/request.entity";
 import { getVendorName } from "../utils/vendor";
 import { verifyMessage } from "../utils/wallet";
-import { GPIBVendor } from "./vendors/GPIB";
-import { CoinStashVendor } from "./vendors/CoinStash";
-import { EasyCryptoVendor } from "./vendors/EasyCrypto";
-import { DigitalSurgeVendor } from "./vendors/DigitalSurge";
+import {
+    GPIBVendor,
+    CoinStashVendor,
+    EasyCryptoVendor,
+    DigitalSurgeVendor
+} from "./vendors";
 
 @Injectable()
 export class ThirdPartyService implements IThirdPartyService {
