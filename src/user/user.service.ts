@@ -317,7 +317,7 @@ export class UserService {
 
             const emailFromPublicKey = publicKey.users[0].userID.email;
             if (hashMessage(emailFromPublicKey) != body.hashEmail)
-                throw new Error("Email not match");
+                throw new Error("Email does not match");
 
             const payload = { email: emailFromPublicKey };
             const token = this.jwtService.sign(payload);

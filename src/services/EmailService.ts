@@ -2,6 +2,7 @@ import { ConfigService } from "@nestjs/config";
 import { Injectable, Logger } from "@nestjs/common";
 import mailJet, { Client } from "node-mailjet";
 import { ConfigSettings, IEmailService } from "./../interfaces";
+import * as openpgp from "openpgp";
 
 @Injectable()
 export class EmailService implements IEmailService {
@@ -29,7 +30,7 @@ export class EmailService implements IEmailService {
             to: email,
             toName: email,
             subject,
-            html: `<p>Please <a href="${link}">click here</a> to verify your email.<p>`
+            text: `Please click here ${link} to verify your email.`
         });
     };
 
@@ -52,13 +53,40 @@ export class EmailService implements IEmailService {
     };
 
     private sendRawEmail = async (params: RawEmailParams) => {
+        const unsignedMessage = await openpgp.createCleartextMessage({
+            text: params.text
+        });
+
+        const privateKeyArmored = this.config.get(
+            ConfigSettings.PGP_PRIVATE_KEY
+        );
+        if (!privateKeyArmored) throw new Error("Idem PGP key not found");
+
+        const privateKeys = await openpgp.readPrivateKeys({
+            armoredKeys: privateKeyArmored
+        });
+
+        const passphrase = this.config.get(
+            ConfigSettings.PGP_PASSPHRASE
+        ) as string;
+
+        const privateKey = await openpgp.decryptKey({
+            privateKey: privateKeys[0],
+            passphrase
+        });
+
+        const cleartextMessage = await openpgp.sign({
+            message: unsignedMessage,
+            signingKeys: privateKey
+        });
+
         const request = this.emailClient
             .post("send", { version: "v3.1" })
             .request({
                 messages: [
                     {
                         ...this.getMailJetBasePayload(params),
-                        HtmlPart: params.html
+                        TextPart: cleartextMessage
                     }
                 ]
             });
@@ -79,5 +107,5 @@ type SimpleEmailParams = {
 };
 
 type RawEmailParams = SimpleEmailParams & {
-    html: string;
+    text: string;
 };
