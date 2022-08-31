@@ -1,7 +1,7 @@
 import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AxiosInstance } from "axios";
-import { createRandomPassword } from "src/utils/randomPassword-utils";
+import { createRandomPassword } from "../../utils/randomPassword-utils";
 import { ConfigSettings, IVendor, UserSignupRequest } from "../../interfaces";
 
 export class EasyCryptoVendor implements IVendor {

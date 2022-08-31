@@ -3,7 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { AxiosInstance } from "axios";
 import { ConfigSettings, IVendor, UserSignupRequest } from "../../interfaces";
 import moment from "moment";
-import { createRandomPassword } from "src/utils/randomPassword-utils";
+import { createRandomPassword } from "../../utils/randomPassword-utils";
 
 type SignupResponse = string;
 export class GPIBVendor implements IVendor {
