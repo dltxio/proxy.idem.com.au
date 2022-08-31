@@ -3,8 +3,6 @@ import { Injectable, Logger } from "@nestjs/common";
 import mailJet, { Client } from "node-mailjet";
 import { ConfigSettings, IEmailService } from "./../interfaces";
 import * as openpgp from "openpgp";
-import fs from "fs";
-import path from "path";
 
 @Injectable()
 export class EmailService implements IEmailService {
@@ -59,16 +57,18 @@ export class EmailService implements IEmailService {
             text: params.text
         });
 
-        const privateKeyArmored = fs.readFileSync(
-            path.join(__dirname, "../../") + "/test_idem_com_au.asc",
-            { encoding: "utf8" }
+        const privateKeyArmored = this.config.get(
+            ConfigSettings.PGP_PRIVATE_KEY
         );
+        if (!privateKeyArmored) throw new Error("Idem PGP key not found");
 
         const privateKeys = await openpgp.readPrivateKeys({
             armoredKeys: privateKeyArmored
         });
 
-        const passphrase = process.env.PGP_PASSPHRASE;
+        const passphrase = this.config.get(
+            ConfigSettings.PGP_PASSPHRASE
+        ) as string;
 
         const privateKey = await openpgp.decryptKey({
             privateKey: privateKeys[0],
@@ -79,8 +79,6 @@ export class EmailService implements IEmailService {
             message: unsignedMessage,
             signingKeys: privateKey
         });
-
-        console.log(cleartextMessage);
 
         const request = this.emailClient
             .post("send", { version: "v3.1" })
