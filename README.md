@@ -111,7 +111,21 @@ Review some basic coding styles based on the rules set
 
 An .env file needs to be placed at the root for the app to work. Copy/swap the sibling \_env.example file. Use:
 
-> cp .env.example .env
+> cp .env.local .env
+
+Grab proxy secret from Bitwarden and put in .env
+
+> HTTPS_PROXY_USERNAME="<HTTPS_PROXY_USERNAME>"
+
+> HTTPS_PROXY_PASSWORD="<HTTPS_PROXY_PASSWORD>"
+
+Add your local ip to Squid Proxy droplet whitelist
+
+> ssh into droplet `167.172.6.186`
+
+> sudo nano /etc/squid/squid.conf
+
+> add following config to the config file `acl localnet src <your_ip_address>`
 
 To run the (NestJS) API:
 

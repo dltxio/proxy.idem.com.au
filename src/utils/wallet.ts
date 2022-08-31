@@ -19,7 +19,7 @@ export const signMessage = async (
     }
 };
 
-export const verifyMessage = async (
+export const verifyMessage = (
     message: string,
     signature: string,
     config: ConfigService,
