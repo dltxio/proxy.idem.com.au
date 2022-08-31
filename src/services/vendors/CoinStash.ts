@@ -1,6 +1,7 @@
 import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AxiosInstance } from "axios";
+import { createRandomPassword } from "src/utils/randomPassword-utils";
 import { ConfigSettings, IVendor, UserSignupRequest } from "../../interfaces";
 
 export class CoinStashVendor implements IVendor {
@@ -14,11 +15,12 @@ export class CoinStashVendor implements IVendor {
         );
     }
     async signUp(signupInfo: UserSignupRequest) {
-        const { firstName, lastName, email, password } = signupInfo;
+        const { firstName, lastName, email } = signupInfo;
+        const tempPassword = createRandomPassword();
 
         const requestBody = {
             email,
-            password,
+            password: tempPassword,
             displayName: `${firstName} ${lastName}`,
             country: "Australia",
             token: this.config.get(ConfigSettings.COINSTASH_TOKEN),
@@ -35,6 +37,6 @@ export class CoinStashVendor implements IVendor {
                 throw error;
             });
         const userId = response.data;
-        return { userId };
+        return { userId, tempPassword };
     }
 }

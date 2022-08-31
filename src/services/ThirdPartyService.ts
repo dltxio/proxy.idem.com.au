@@ -2,6 +2,7 @@ import {
     IVendor,
     RequestType,
     UserSignupRequest,
+    UserSignupResponse,
     VendorEnum
 } from "./../interfaces";
 import { ConfigService } from "@nestjs/config";
@@ -66,7 +67,7 @@ export class ThirdPartyService implements IThirdPartyService {
     public async signUp(
         signupInfo: UserSignupRequest,
         ip: string
-    ): Promise<string> {
+    ): Promise<UserSignupResponse> {
         const { verification, source } = signupInfo;
         const { message, signature } = verification;
 
@@ -82,7 +83,7 @@ export class ThirdPartyService implements IThirdPartyService {
 
         const vendor = this.getVendor(source);
         try {
-            const { userId } = await vendor.signUp(signupInfo);
+            const { userId, tempPassword } = await vendor.signUp(signupInfo);
             this.logger.verbose(
                 `New user signup for ${vendor.name}, userId: ${userId}`
             );
@@ -94,7 +95,7 @@ export class ThirdPartyService implements IThirdPartyService {
                 requestType: RequestType.Signup
             });
 
-            return userId;
+            return { userId, tempPassword };
         } catch (error) {
             this.logger.error(error.message);
             throw new Error(error.message);

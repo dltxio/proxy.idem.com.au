@@ -9,6 +9,7 @@ import {
     SignupNotificationRequest,
     TestFlightRequest,
     UserSignupRequest,
+    UserSignupResponse,
     UsersResponse,
     VerifyOtpRequest
 } from "./../interfaces";
@@ -148,7 +149,7 @@ export class UserController {
     async signup(
         @Ip() ip: string,
         @Body() body: UserSignupRequest
-    ): Promise<string> {
+    ): Promise<UserSignupResponse> {
         return this.thirdPartyService.signUp(body, ip);
     }
 

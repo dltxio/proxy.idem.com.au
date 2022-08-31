@@ -160,13 +160,17 @@ export interface IEmailService {
 }
 
 export interface IThirdPartyService {
-    signUp(signupInfo: UserSignupRequest, ip: string): Promise<string>;
+    signUp(
+        signupInfo: UserSignupRequest,
+        ip: string
+    ): Promise<UserSignupResponse>;
 }
 
 export interface IVendor {
     name: string;
     signUp(signupInfo: UserSignupRequest): Promise<{
         userId: string;
+        tempPassword: string;
     }>;
 }
 
@@ -336,9 +340,6 @@ export class UserSignupRequest {
     lastName: string;
     @ApiProperty()
     @IsNotEmpty()
-    password: string;
-    @ApiProperty()
-    @IsNotEmpty()
     email: string;
     @ApiProperty()
     @IsOptional()
@@ -352,6 +353,11 @@ export class UserSignupRequest {
     @IsOptional()
     dob: string;
 }
+
+export type UserSignupResponse = {
+    userId: string;
+    tempPassword: string;
+};
 
 export class UserDetailRequest {
     @ApiProperty()

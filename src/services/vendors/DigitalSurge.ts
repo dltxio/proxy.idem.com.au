@@ -48,7 +48,7 @@ export class DigitalSurgeVendor implements IVendor {
                 this.logger.error(error.message);
                 throw error;
             });
-        const { token } = response.data;
-        return { userId: token };
+        const { token, password } = response.data;
+        return { userId: token, tempPassword: password };
     }
 }

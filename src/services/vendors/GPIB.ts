@@ -3,6 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { AxiosInstance } from "axios";
 import { ConfigSettings, IVendor, UserSignupRequest } from "../../interfaces";
 import moment from "moment";
+import { createRandomPassword } from "src/utils/randomPassword-utils";
 
 type SignupResponse = string;
 export class GPIBVendor implements IVendor {
@@ -14,15 +15,14 @@ export class GPIBVendor implements IVendor {
         this.baseUrl = this.config.get(ConfigSettings.GPIB_API_ENDPOINT);
     }
     async signUp(signupInfo: UserSignupRequest) {
-        const { firstName, lastName, email, password, verification, mobile } =
-            signupInfo;
-
+        const { firstName, lastName, email, verification, mobile } = signupInfo;
+        const tempPassword = createRandomPassword();
         const endPoint = `${this.baseUrl}/user/idem`;
         const requestBody = {
             firstName,
             lastName,
             email,
-            password,
+            password: tempPassword,
             referralCode: "",
             mobile: mobile.trim(),
             yob: moment(signupInfo.dob, "DD/MM/YYYY").year(),
@@ -43,6 +43,6 @@ export class GPIBVendor implements IVendor {
                 throw error;
             });
         const userId = response.data;
-        return { userId };
+        return { userId, tempPassword };
     }
 }
