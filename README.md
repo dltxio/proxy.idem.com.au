@@ -2,9 +2,9 @@
 
 Web service for proxying requests to exchange services.
 
-## Architecture
+## Docs
 
-![Diagram](/docs/architecture.png)
+[Architecture](./docs/ARCHITECTURE.md)
 
 ## Technology
 
