@@ -53,36 +53,36 @@ export class EmailService implements IEmailService {
     };
 
     private sendRawEmail = async (params: RawEmailParams) => {
-        const unsignedMessage = await openpgp.createCleartextMessage({
-            text: params.text
-        });
+        try {
+            const unsignedMessage = await openpgp.createCleartextMessage({
+                text: params.text
+            });
 
-        const privateKeyArmored = this.config.get(
-            ConfigSettings.PGP_PRIVATE_KEY
-        );
-        if (!privateKeyArmored) throw new Error("Idem PGP key not found");
+            const privateKeyArmored = this.config.get(
+                ConfigSettings.PGP_PRIVATE_KEY
+            );
 
-        const privateKeys = await openpgp.readPrivateKeys({
-            armoredKeys: privateKeyArmored
-        });
+            if (!privateKeyArmored) throw new Error("Idem PGP key not found");
 
-        const passphrase = this.config.get(
-            ConfigSettings.PGP_PASSPHRASE
-        ) as string;
+            const privateKeys = await openpgp.readPrivateKeys({
+                armoredKeys: privateKeyArmored
+            });
 
-        const privateKey = await openpgp.decryptKey({
-            privateKey: privateKeys[0],
-            passphrase
-        });
+            const passphrase = this.config.get(
+                ConfigSettings.PGP_PASSPHRASE
+            ) as string;
 
-        const cleartextMessage = await openpgp.sign({
-            message: unsignedMessage,
-            signingKeys: privateKey
-        });
+            const privateKey = await openpgp.decryptKey({
+                privateKey: privateKeys[0],
+                passphrase
+            });
 
-        const request = this.emailClient
-            .post("send", { version: "v3.1" })
-            .request({
+            const cleartextMessage = await openpgp.sign({
+                message: unsignedMessage,
+                signingKeys: privateKey
+            });
+
+            this.emailClient.post("send", { version: "v3.1" }).request({
                 messages: [
                     {
                         ...this.getMailJetBasePayload(params),
@@ -90,13 +90,10 @@ export class EmailService implements IEmailService {
                     }
                 ]
             });
-        request
-            .then(result => {
-                this.logger.log(result);
-            })
-            .catch(error => {
-                this.logger.log(error);
-            });
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(error);
+        }
     };
 }
 
