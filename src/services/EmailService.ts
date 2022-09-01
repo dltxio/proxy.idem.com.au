@@ -62,8 +62,6 @@ export class EmailService implements IEmailService {
                 ConfigSettings.PGP_PRIVATE_KEY
             );
 
-            console.log(privateKeyArmored); // this is for UAT debugging
-
             if (!privateKeyArmored) throw new Error("Idem PGP key not found");
 
             const privateKeys = await openpgp.readPrivateKeys({
@@ -73,8 +71,6 @@ export class EmailService implements IEmailService {
             const passphrase = this.config.get(
                 ConfigSettings.PGP_PASSPHRASE
             ) as string;
-
-            console.log(passphrase); // this is for UAT debugging
 
             const privateKey = await openpgp.decryptKey({
                 privateKey: privateKeys[0],
