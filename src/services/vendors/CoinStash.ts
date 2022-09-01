@@ -4,7 +4,7 @@ import { AxiosInstance } from "axios";
 import { ConfigSettings, IVendor, UserSignupRequest } from "../../interfaces";
 
 export class CoinStashVendor implements IVendor {
-    name: "CoinStash";
+    name = "CoinStash";
     private readonly logger = new Logger("CoinStashVendor");
     private signUpEndpoint: string;
 

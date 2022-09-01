@@ -1,6 +1,8 @@
+import { hashMessage } from "ethers/lib/utils";
 import {
     IVendor,
     RequestType,
+    SignupResponse,
     UserSignupRequest,
     VendorEnum
 } from "./../interfaces";
@@ -64,12 +66,11 @@ export class ThirdPartyService implements IThirdPartyService {
     public async signUp(
         signupInfo: UserSignupRequest,
         ip: string
-    ): Promise<string> {
+    ): Promise<SignupResponse> {
         const { verification, source } = signupInfo;
-        const { message, signature } = verification;
-
+        const { hashedPayload, signature } = verification;
         const isVerified = verifyMessage(
-            JSON.stringify(message),
+            hashedPayload,
             signature,
             this.config,
             this.logger
@@ -80,7 +81,7 @@ export class ThirdPartyService implements IThirdPartyService {
 
         const vendor = this.getVendor(source);
         try {
-            const { userId } = await vendor.signUp(signupInfo);
+            const { userId, password } = await vendor.signUp(signupInfo);
             this.logger.verbose(
                 `New user signup for ${vendor.name}, userId: ${userId}`
             );
@@ -92,7 +93,7 @@ export class ThirdPartyService implements IThirdPartyService {
                 requestType: RequestType.Signup
             });
 
-            return userId;
+            return { userId: userId, password: password };
         } catch (error) {
             this.logger.error(error.message);
             throw new Error(error.message);
