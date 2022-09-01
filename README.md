@@ -4,7 +4,7 @@ Web service for proxying requests to exchange services.
 
 ## Architecture
 
-![Diagram](/images/architecture.png)
+![Diagram](/docs/architecture.png)
 
 ## Technology
 
