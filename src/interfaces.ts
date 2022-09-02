@@ -73,7 +73,10 @@ export enum ConfigSettings {
     JWT_SECRET = "JWT_SECRET",
     JWT_EXPIRATION_SECONDS = "JWT_EXPIRATION_SECONDS",
     PGP_PASSPHRASE = "PGP_PASSPHRASE",
-    PGP_PRIVATE_KEY = "PGP_PRIVATE_KEY"
+    PGP_PRIVATE_KEY = "PGP_PRIVATE_KEY",
+    GREENID_URL = "GREENID_URL",
+    GREENID_ACCOUNT_ID = "GREENID_ACCOUNT_ID",
+    GREENID_PASSWORD = "GREENID_PASSWORD"
 }
 
 //=== Abstract Error classes
@@ -124,6 +127,10 @@ export class AccountMissingIdError extends EntityMissingIdError {
     constructor() {
         super(EntityNames.Account);
     }
+}
+
+export interface IGreenIdService {
+    testSoap(): Promise<void>;
 }
 
 export interface IKycService {
@@ -268,6 +275,10 @@ export type KycResponse = {
     signature: string; //signed claim response
     message: ClaimResponsePayload;
     hashedPayload: string;
+};
+
+export type testSoapResponse = {
+    test: string;
 };
 
 export type GPIBVerifyRequest = {

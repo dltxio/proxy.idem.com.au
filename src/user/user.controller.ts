@@ -1,4 +1,5 @@
 import {
+    IGreenIdService,
     IKycService,
     IThirdPartyService,
     KycResponse,
@@ -41,6 +42,7 @@ export class UserController {
     constructor(
         @Inject("IUserService") private userService: IUserService,
         @Inject("IKycService") private kycService: IKycService,
+        @Inject("IGreenIdService") private greenIdService: IGreenIdService,
         @Inject("IThirdPartyService")
         private thirdPartyService: IThirdPartyService
     ) {}
@@ -242,5 +244,20 @@ export class UserController {
     async verifyEmail(@Body("token") token: string): Promise<boolean> {
         const email = await this.userService.decodeEmailFromToken(token);
         return this.userService.verifyEmail(email, token);
+    }
+
+    @Public()
+    @ApiOperation({
+        summary: "Get valid sources from Green ID"
+    })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    @Get("greenid/sources")
+    async getGreenIdSources(): Promise<void> {
+        this.greenIdService.testSoap();
     }
 }
