@@ -36,6 +36,7 @@ import { Tester } from "../data/entities/tester.entity";
 import { Public } from "../auth/anonymous";
 import { LocalGuard } from "../auth/auth-local.guard";
 import { hashMessage } from "ethers/lib/utils";
+import { Source } from "src/services/GreenIdService";
 @Controller("user")
 @UseGuards(LocalGuard)
 export class UserController {
@@ -256,8 +257,10 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    @Get("greenid/sources")
-    async getGreenIdSources(): Promise<void> {
-        this.greenIdService.testSoap();
+    @Get("greenid/sources/:verificationId")
+    async getGreenIdSources(
+        @Param("verificationId") verificationId: string
+    ): Promise<Source[]> {
+        return this.greenIdService.getSources(verificationId);
     }
 }

@@ -13,6 +13,7 @@ import { User } from "./data/entities/user.entity";
 import { Tester } from "./data/entities/tester.entity";
 import { ClaimResponsePayload } from "./types/verification";
 import { Type } from "class-transformer";
+import { Source } from "./services/GreenIdService";
 
 export interface IExampleService {
     getById(id: string): string;
@@ -130,7 +131,7 @@ export class AccountMissingIdError extends EntityMissingIdError {
 }
 
 export interface IGreenIdService {
-    testSoap(): Promise<void>;
+    getSources(verificationId: string): Promise<Source[]>;
 }
 
 export interface IKycService {
@@ -275,10 +276,6 @@ export type KycResponse = {
     signature: string; //signed claim response
     message: ClaimResponsePayload;
     hashedPayload: string;
-};
-
-export type testSoapResponse = {
-    test: string;
 };
 
 export type GPIBVerifyRequest = {
