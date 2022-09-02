@@ -79,6 +79,7 @@ export class KycService implements IKycService {
             const hashedPayload = ethers.utils.hashMessage(
                 JSON.stringify(claimPayload)
             );
+
             return {
                 result: KycResult.Completed,
 

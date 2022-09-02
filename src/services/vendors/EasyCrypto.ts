@@ -4,7 +4,7 @@ import { AxiosInstance } from "axios";
 import { ConfigSettings, IVendor, UserSignupRequest } from "../../interfaces";
 
 export class EasyCryptoVendor implements IVendor {
-    name: "EasyCrypto";
+    name = "EasyCrypto";
     private readonly logger = new Logger("EasyCryptoVendor");
     private signUpEndpoint: string;
 

@@ -170,13 +170,14 @@ export interface IEmailService {
 }
 
 export interface IThirdPartyService {
-    signUp(signupInfo: UserSignupRequest, ip: string): Promise<string>;
+    signUp(signupInfo: UserSignupRequest, ip: string): Promise<SignupResponse>;
 }
 
 export interface IVendor {
     name: string;
     signUp(signupInfo: UserSignupRequest): Promise<{
         userId: string;
+        password?: string;
     }>;
 }
 
@@ -292,6 +293,10 @@ export type RequestOtpResponse = {
     expiryTimestamp: number;
 };
 
+export type SignupResponse = {
+    userId: string;
+    password?: string;
+};
 export class SignupNotificationRequest {
     @ApiProperty()
     @IsNotEmpty()
