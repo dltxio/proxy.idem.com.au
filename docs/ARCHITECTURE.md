@@ -5,7 +5,7 @@ Drawn in [Excalidraw](https://excalidraw.com/)
 ![Diagram](./architecture.png)
 
 ## AWS
-Architectural roadmap for production infrastructure
+Architectural roadmap for production infrastructure.
 
 Key details
 * AWS reference architecture for multi-az 3-tier webapp
