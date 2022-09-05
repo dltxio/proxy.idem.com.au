@@ -7,6 +7,8 @@ export const getVendorName = (vendor: number) => {
             return VendorName.CoinStash;
         case VendorEnum.EasyCrypto:
             return VendorName.EasyCrypto;
+        case VendorEnum.DigitalSurge:
+            return VendorName.DigitalSurge;
         default:
             return undefined;
     }
@@ -15,5 +17,6 @@ export const getVendorName = (vendor: number) => {
 export enum VendorName {
     GPIB = "Get Paid In Bitcoin",
     CoinStash = "Coin Stash",
-    EasyCrypto = "Easy Crypto"
+    EasyCrypto = "Easy Crypto",
+    DigitalSurge = "Digital Surge"
 }

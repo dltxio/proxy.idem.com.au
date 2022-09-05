@@ -1,3 +1,4 @@
+import { hashMessage } from "ethers/lib/utils";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import axios, { AxiosInstance } from "axios";
@@ -12,6 +13,7 @@ import {
     KycResult
 } from "../interfaces";
 import { signMessage } from "../utils/wallet";
+import { ethers } from "ethers";
 
 @Injectable()
 export class KycService implements IKycService {
@@ -73,16 +75,23 @@ export class KycService implements IKycService {
                 },
                 verifiableCredential: [credentials]
             } as ClaimResponsePayload;
+
+            const hashedPayload = ethers.utils.hashMessage(
+                JSON.stringify(claimPayload)
+            );
+
             return {
                 result: KycResult.Completed,
-                message: await signMessage(
-                    JSON.stringify(claimPayload),
+
+                thirdPartyVerified: false,
+                userId: "",
+                signature: await signMessage(
+                    hashedPayload,
                     this.config,
                     this.logger
                 ),
-                thirdPartyVerified: false,
-                userId: "",
-                claimPayload
+                message: claimPayload,
+                hashedPayload: hashedPayload
             };
         } catch (error) {
             this.logger.error(error.message);
