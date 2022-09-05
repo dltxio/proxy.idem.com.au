@@ -3,6 +3,8 @@ import { ConfigModule } from "@nestjs/config";
 import { ExampleService } from "./services/Example.service";
 import { UserModule } from "./user/user.module";
 import { AuthModule } from "./auth/auth.module";
+import { HealthController } from "./health/health.controller";
+import { HealthModule } from "./health/health.module";
 
 @Module({
     imports: [
@@ -10,8 +12,10 @@ import { AuthModule } from "./auth/auth.module";
             isGlobal: true
         }),
         UserModule,
-        AuthModule
+        AuthModule,
+        HealthModule
     ],
-    providers: [ExampleService]
+    providers: [ExampleService],
+    controllers: [HealthController]
 })
 export class AppModule {}
