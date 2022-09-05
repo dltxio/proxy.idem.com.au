@@ -1,4 +1,3 @@
-import { hashMessage } from "ethers/lib/utils";
 import {
     IVendor,
     RequestType,

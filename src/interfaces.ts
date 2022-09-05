@@ -1,6 +1,5 @@
 import {
     IsBoolean,
-    IsEmail,
     IsEnum,
     IsNotEmpty,
     IsObject,
@@ -10,7 +9,6 @@ import {
 } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { User } from "./data/entities/user.entity";
-import { Tester } from "./data/entities/tester.entity";
 import { ClaimResponsePayload } from "./types/verification";
 import { Type } from "class-transformer";
 
@@ -135,34 +133,35 @@ export interface ISmsService {
 }
 
 export interface IUserService {
-    requestToBeTester(body: TestFlightRequest): Promise<Tester>;
-    verify(body: UserVerifyRequestBody): Promise<string>;
+    verify(body: VerifyUserRequest): Promise<string>;
     findOne(email: string): Promise<User>;
     findAll(): Promise<UsersResponse[]>;
-    create(newUser: NewUser): Promise<User>;
-    putToken(
-        userId: string,
-        token: UserExpoPushTokenRequestBody
-    ): Promise<User>;
+    create(newUser: UserDto): Promise<User>;
+    update(userId: string, requestBody: UserDto): Promise<User>;
 
     pushNotifications(message: string): Promise<void>;
-    pushSignupNotification(
-        signupRequest: SignupNotificationRequest,
-        ip: string
-    ): Promise<void>;
-    requestOtp(body: RequestOtpRequest): Promise<RequestOtpResponse>;
-    verifyOtp(body: VerifyOtpRequest): Promise<boolean>;
-    addPublicKey(body: PublicKeyDto): Promise<boolean>;
-    verifyEmail(email: string, token: string): Promise<boolean>;
+    putPgpPublicKey(body: PgpPublicKeyDto): Promise<boolean>;
+    verifyEmail(token: string): Promise<boolean>;
     decodeEmailFromToken(token: string): Promise<string>;
 }
 
+export interface IOtpService {
+    requestOtp(body: RequestOtp): Promise<RequestOtpResponse>;
+    verifyOtp(body: VerifyOtp): Promise<boolean>;
+}
 export interface IEmailService {
     sendEmailVerification(email: string, token: string): Promise<void>;
 }
 
 export interface IThirdPartyService {
     signUp(signupInfo: UserSignupRequest, ip: string): Promise<SignupResponse>;
+}
+
+export interface IExchangeService {
+    pushSignupNotification(
+        signupRequest: ExchangeSignupCallBack,
+        ip: string
+    ): Promise<void>;
 }
 
 export interface IVendor {
@@ -173,13 +172,19 @@ export interface IVendor {
     }>;
 }
 
-export class NewUser {
+export class UserDto {
     @ApiProperty()
     @IsNotEmpty()
     email: string;
+    @ApiProperty()
+    @IsOptional()
+    expoToken: string;
+    @ApiProperty()
+    @IsOptional()
+    pgpPublicKey: string;
 }
 
-export class UserVerifyRequestBody {
+export class VerifyUserRequest {
     @ApiProperty()
     @IsNotEmpty()
     firstName: string;
@@ -211,12 +216,6 @@ export class UserVerifyRequestBody {
     @ApiProperty()
     @IsNotEmpty()
     country: string;
-}
-
-export class UserExpoPushTokenRequestBody {
-    @ApiProperty()
-    @IsNotEmpty()
-    token: string;
 }
 
 export type AusPostRequest = {
@@ -289,7 +288,7 @@ export type SignupResponse = {
     userId: string;
     password?: string;
 };
-export class SignupNotificationRequest {
+export class ExchangeSignupCallBack {
     @ApiProperty()
     @IsNotEmpty()
     source: string;
@@ -381,25 +380,13 @@ export class UserDetailRequest {
     dob: string;
 }
 
-export class TestFlightRequest {
-    @ApiProperty()
-    @IsNotEmpty()
-    email: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    firstName: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    lastName: string;
-}
-
-export class RequestOtpRequest {
+export class RequestOtp {
     @ApiProperty()
     @IsNotEmpty()
     mobileNumber: string;
 }
 
-export class VerifyOtpRequest {
+export class VerifyOtp {
     @ApiProperty()
     @IsNotEmpty()
     code: string;
@@ -414,11 +401,17 @@ export class VerifyOtpRequest {
     hash: string;
 }
 
-export class PublicKeyDto {
+export class PgpPublicKeyDto {
     @ApiProperty()
     @IsNotEmpty()
     publicKeyArmored: string;
     @ApiProperty()
     @IsNotEmpty()
     hashEmail: string;
+}
+
+export class NotificationRequest {
+    @ApiProperty()
+    @IsNotEmpty()
+    message: string;
 }

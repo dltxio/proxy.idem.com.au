@@ -1,12 +1,7 @@
 import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AxiosInstance } from "axios";
-import {
-    ConfigSettings,
-    IVendor,
-    SignupResponse,
-    UserSignupRequest
-} from "../../interfaces";
+import { ConfigSettings, IVendor, UserSignupRequest } from "../../interfaces";
 
 export class DigitalSurgeVendor implements IVendor {
     name = "DigitalSurge";

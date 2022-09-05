@@ -1,13 +1,10 @@
 import { hashMessage } from "ethers/lib/utils";
 import {
     IEmailService,
-    ISmsService,
-    NewUser,
-    PublicKeyDto,
-    RequestOtpRequest,
-    RequestOtpResponse,
-    TestFlightRequest,
-    VerifyOtpRequest
+    UserDto,
+    PgpPublicKeyDto,
+    ConfigSettings,
+    UsersResponse
 } from "./../interfaces";
 import {
     Injectable,
@@ -16,21 +13,10 @@ import {
     BadRequestException
 } from "@nestjs/common";
 import * as openpgp from "openpgp";
-
 import { User } from "../data/entities/user.entity";
-import { Request } from "../data/entities/request.entity";
 import { Repository } from "typeorm";
-import {
-    ConfigSettings,
-    RequestType,
-    SignupNotificationRequest,
-    UserExpoPushTokenRequestBody,
-    UsersResponse
-} from "../interfaces";
 import Expo from "expo-server-sdk";
 import { ConfigService } from "@nestjs/config";
-import { Tester } from "../data/entities/tester.entity";
-import crypto from "crypto";
 import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
@@ -40,11 +26,6 @@ export class UserService {
     constructor(
         @Inject("USER_REPOSITORY")
         private userRepository: Repository<User>,
-        @Inject("REQUEST_REPOSITORY")
-        private requestRepository: Repository<Request>,
-        @Inject("TESTER_REPOSITORY")
-        private testerRepository: Repository<Tester>,
-        @Inject("ISmsService") private smsService: ISmsService,
         @Inject("IEmailService") private emailService: IEmailService,
         private readonly config: ConfigService,
         private readonly jwtService: JwtService
@@ -86,7 +67,7 @@ export class UserService {
         return usersResponse;
     }
 
-    public async create(newUser: NewUser): Promise<User> {
+    public async create(newUser: UserDto): Promise<User> {
         const user = await this.userRepository.findOneBy({
             email: newUser.email.toLowerCase()
         });
@@ -97,34 +78,22 @@ export class UserService {
         return user;
     }
 
-    public async requestToBeTester(
-        testFlightRequest: TestFlightRequest
-    ): Promise<Tester> {
-        const requestTest = await this.testerRepository.findOneBy({
-            email: testFlightRequest.email.toLowerCase()
-        });
-        if (requestTest) return requestTest;
-
-        const result = await this.testerRepository.save(testFlightRequest);
-        this.logger.verbose(`New tester ${testFlightRequest.email} created`);
-        return result;
-    }
-
-    public async putToken(
-        userId: string,
-        token: UserExpoPushTokenRequestBody
-    ): Promise<User> {
+    public async update(userId: string, request: UserDto): Promise<User> {
         const user = await this.userRepository.findOneBy({ userId: userId });
         if (!user) {
             this.logger.verbose(`User ${userId} not found`);
             throw new Error("User not found");
         }
-        if (!user.expoPushToken || user.expoPushToken != token.token) {
-            user.expoPushToken = token.token;
-            return this.userRepository.save(user);
+
+        if (request.expoToken && request.expoToken != user.expoPushToken) {
+            user.expoPushToken = request.expoToken;
         }
 
-        return user;
+        if (request.pgpPublicKey && request.pgpPublicKey != user.publicKey) {
+            user.publicKey = request.pgpPublicKey;
+        }
+
+        return this.userRepository.save(user);
     }
 
     public async pushNotifications(message: string): Promise<void> {
@@ -203,112 +172,7 @@ export class UserService {
         }
     }
 
-    public async pushSignupNotification(
-        signupRequest: SignupNotificationRequest,
-        ip: string
-    ): Promise<void> {
-        const user = await this.userRepository.findOneBy({
-            email: signupRequest.email.toLowerCase()
-        });
-
-        //Check to see if user exist
-        if (!user) {
-            this.logger.verbose(`User: ${signupRequest.email} not found`);
-            throw new Error(`User: ${signupRequest.email} not found`);
-        }
-
-        if (!user.expoPushToken || !Expo.isExpoPushToken(user.expoPushToken)) {
-            this.logger.verbose(
-                `User: ${signupRequest.email} notification token not found or invalided token`
-            );
-            throw new Error("Notification token not found or invalided token");
-        }
-
-        //Save the signup request
-        await this.requestRepository.save({
-            from: signupRequest.source,
-            to: "IDEM",
-            ipAddress: ip,
-            requestType: RequestType.Signup
-        });
-
-        const messages = [];
-        const url = `${this.config.get(ConfigSettings.APP_DEEPLINK_URL)}?id=${
-            signupRequest.source
-        }`;
-
-        messages.push({
-            to: user.expoPushToken,
-            sound: "default",
-            body: signupRequest.message,
-            data: { url: url }
-        });
-
-        const chunks = this.expo.chunkPushNotifications(messages);
-        const tickets = [];
-        for (const chunk of chunks) {
-            try {
-                const ticketChunk = await this.expo.sendPushNotificationsAsync(
-                    chunk
-                );
-                this.logger.verbose(ticketChunk);
-                tickets.push(...ticketChunk);
-            } catch (error) {
-                this.logger.error(error.message);
-            }
-        }
-    }
-
-    public async requestOtp(
-        body: RequestOtpRequest
-    ): Promise<RequestOtpResponse> {
-        const { mobileNumber } = body;
-        const otp = Math.floor(Math.random() * 900000) + 100000;
-        const expiryTimestamp =
-            new Date().getTime() +
-            parseInt(this.config.get(ConfigSettings.OTP_EXPIRY_TIME, "60000"));
-        const salt = this.config.get(
-            ConfigSettings.OTP_HASHING_SALT,
-            "Hi i'm default salt from idem proxy :)"
-        );
-        const messageForHash = mobileNumber + otp + expiryTimestamp + salt;
-        const hash = crypto
-            .createHmac(
-                "sha256",
-                this.config.get(ConfigSettings.OTP_HASHING_SECRET)
-            )
-            .update(messageForHash)
-            .digest("hex");
-
-        const message = `Your OTP code for IDEM is ${otp}`;
-        await this.smsService.send(mobileNumber, message);
-
-        return {
-            hash,
-            expiryTimestamp
-        };
-    }
-
-    public async verifyOtp(body: VerifyOtpRequest): Promise<boolean> {
-        const { mobileNumber, code, hash, expiryTimestamp } = body;
-        const currentTimestamp = new Date().getTime();
-        if (currentTimestamp > expiryTimestamp) throw new Error("Code expired");
-        const salt = this.config.get(
-            ConfigSettings.OTP_HASHING_SALT,
-            "Hi i'm default salt from idem proxy :)"
-        );
-        const hashedMessage = crypto
-            .createHmac(
-                "sha256",
-                this.config.get(ConfigSettings.OTP_HASHING_SECRET)
-            )
-            .update(mobileNumber + code + expiryTimestamp + salt)
-            .digest("hex");
-
-        return hashedMessage === hash;
-    }
-
-    public async addPublicKey(body: PublicKeyDto): Promise<boolean> {
+    public async putPgpPublicKey(body: PgpPublicKeyDto): Promise<boolean> {
         try {
             const publicKey = await openpgp.readKey({
                 armoredKey: body.publicKeyArmored
@@ -351,7 +215,8 @@ export class UserService {
         }
     }
 
-    public async verifyEmail(email: string, token: string): Promise<boolean> {
+    public async verifyEmail(token: string): Promise<boolean> {
+        const email = await this.decodeEmailFromToken(token);
         const formattedEmail = email.trim().toLowerCase();
         try {
             const user = await this.userRepository.findOneBy({
@@ -375,7 +240,7 @@ export class UserService {
         }
     }
 
-    public async decodeEmailFromToken(token: string): Promise<string> {
+    private async decodeEmailFromToken(token: string): Promise<string> {
         try {
             const payload = this.jwtService.verify(token);
             if (typeof payload === "object" && "email" in payload) {
