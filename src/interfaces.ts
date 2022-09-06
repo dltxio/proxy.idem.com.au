@@ -81,7 +81,7 @@ export enum ConfigSettings {
     XERO_GPIB_ID = "XERO_GPIB_ID"
 }
 
-// XERO enum for contact id's
+// XERO enum for contact names
 export enum XeroClients {
     GPIB_NAME = "Get Paid In Bitcoin"
 }
