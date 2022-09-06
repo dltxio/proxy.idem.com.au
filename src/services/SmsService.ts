@@ -1,7 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import Messagebird, { MessageBird } from "messagebird";
-import { ConfigSettings, ISmsService } from "../interfaces";
+import { ConfigSettings } from "../types";
+import { ISmsService } from "../interfaces";
 
 @Injectable()
 export class SmsService implements ISmsService {

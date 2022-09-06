@@ -1,7 +1,7 @@
-import { ConfigSettings } from "./../interfaces";
 import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { ethers } from "ethers";
+import { ConfigSettings } from "../types";
 
 export const signMessage = async (
     message: string,

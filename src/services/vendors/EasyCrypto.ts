@@ -1,7 +1,8 @@
 import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AxiosInstance } from "axios";
-import { ConfigSettings, IVendor, UserSignupRequest } from "../../interfaces";
+import { IVendor, UserSignupRequest } from "../../interfaces";
+import { ConfigSettings } from "../../types";
 
 export class EasyCryptoVendor implements IVendor {
     name = "EasyCrypto";

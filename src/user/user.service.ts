@@ -1,11 +1,5 @@
 import { hashMessage } from "ethers/lib/utils";
-import {
-    IEmailService,
-    UserDto,
-    PgpPublicKeyDto,
-    ConfigSettings,
-    UsersResponse
-} from "./../interfaces";
+import { IEmailService, UserDto } from "./../interfaces";
 import {
     Injectable,
     Inject,
@@ -18,6 +12,7 @@ import { Repository } from "typeorm";
 import Expo from "expo-server-sdk";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
+import { ConfigSettings, UsersResponse } from "../types";
 
 @Injectable()
 export class UserService {
@@ -67,15 +62,46 @@ export class UserService {
         return usersResponse;
     }
 
-    public async create(newUser: UserDto): Promise<User> {
-        const user = await this.userRepository.findOneBy({
-            email: newUser.email.toLowerCase()
-        });
-        if (!user) {
-            this.logger.verbose(`New user ${newUser.email} created`);
-            return this.userRepository.save(newUser);
+    public async create(newUser: UserDto): Promise<void> {
+        let user: User;
+        try {
+            const publicKey = await openpgp.readKey({
+                armoredKey: newUser.pgpPublicKey
+            });
+
+            const emailFromPublicKey = publicKey.users[0].userID.email;
+            // Should not create user if email from token is different from email from public key
+            if (hashMessage(emailFromPublicKey) != newUser.email)
+                throw new Error("Email does not match");
+
+            user = await this.userRepository.findOneBy({
+                email: newUser.email
+            });
+
+            // Do nothing if user already exists and email is verified
+            if (user && user.emailVerified) return;
+
+            const payload = { email: emailFromPublicKey };
+            const token = this.jwtService.sign(payload);
+
+            if (user && !user.emailVerified) {
+                user.emailVerificationCode = token;
+            } else {
+                user = new User();
+                user.email = newUser.email;
+                user.publicKey = newUser.pgpPublicKey;
+                user.emailVerificationCode = token;
+                this.logger.verbose(`New user ${newUser.email} created`);
+            }
+            await this.userRepository.save(user);
+            await this.emailService.sendEmailVerification(
+                publicKey.users[0].userID.email.trim().toLowerCase(),
+                token
+            );
+        } catch (error) {
+            this.logger.error(error.message);
+            throw new Error(error.message);
         }
-        return user;
     }
 
     public async update(email: string, request: UserDto): Promise<User> {
@@ -169,49 +195,6 @@ export class UserService {
             } catch (error) {
                 this.logger.error(error.message);
             }
-        }
-    }
-
-    public async putPgpPublicKey(body: PgpPublicKeyDto): Promise<boolean> {
-        try {
-            const publicKey = await openpgp.readKey({
-                armoredKey: body.publicKeyArmored
-            });
-            let user: User;
-
-            const emailFromPublicKey = publicKey.users[0].userID.email;
-            if (hashMessage(emailFromPublicKey) != body.hashEmail)
-                throw new Error("Email does not match");
-
-            const payload = { email: emailFromPublicKey };
-            const token = this.jwtService.sign(payload);
-            user = await this.userRepository.findOneBy({
-                email: body.hashEmail
-            });
-            if (user) {
-                //Update the public key if user found.
-                user.publicKey = body.publicKeyArmored;
-                user.emailVerificationCode = token;
-                await this.userRepository.save(user);
-            } else {
-                //Create new user if no user found.
-                user = await this.userRepository.save({
-                    email: body.hashEmail,
-                    publicKey: body.publicKeyArmored,
-                    emailVerificationCode: token
-                });
-            }
-
-            this.logger.log(`User: ${user.userId} public key added`);
-            //Email service to send verification email
-            await this.emailService.sendEmailVerification(
-                publicKey.users[0].userID.email.trim().toLowerCase(),
-                token
-            );
-            return true;
-        } catch (error) {
-            this.logger.error(error);
-            return false;
         }
     }
 

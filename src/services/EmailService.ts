@@ -1,8 +1,9 @@
 import { ConfigService } from "@nestjs/config";
 import { Injectable, Logger } from "@nestjs/common";
 import mailJet, { Client } from "node-mailjet";
-import { ConfigSettings, IEmailService } from "./../interfaces";
+import { IEmailService } from "./../interfaces";
 import * as openpgp from "openpgp";
+import { ConfigSettings } from "../types";
 
 @Injectable()
 export class EmailService implements IEmailService {

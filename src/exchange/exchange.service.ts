@@ -1,14 +1,11 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { User } from "../data/entities/user.entity";
 import { Request } from "../data/entities/request.entity";
-import {
-    ConfigSettings,
-    RequestType,
-    ExchangeSignupCallBack
-} from "../interfaces";
+import { ExchangeSignupCallBack } from "../interfaces";
 import { Repository } from "typeorm";
 import Expo from "expo-server-sdk";
 import { ConfigService } from "@nestjs/config";
+import { ConfigSettings, RequestType } from "../types";
 
 @Injectable()
 export class ExchangeService {

@@ -1,9 +1,7 @@
 import {
     IKycService,
-    KycResponse,
     NotificationRequest,
     UserDto,
-    UsersResponse,
     IUserService,
     VerifyUserRequest
 } from "./../interfaces";
@@ -23,6 +21,7 @@ import { User } from "../data/entities/user.entity";
 import { Public } from "../auth/anonymous";
 import { LocalGuard } from "../auth/auth-local.guard";
 import { hashMessage } from "ethers/lib/utils";
+import { KycResponse, UsersResponse } from "../types";
 @Controller("users")
 @UseGuards(LocalGuard)
 export class UserController {
@@ -39,12 +38,12 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async create(@Body() body: UserDto): Promise<User> {
+    async create(@Body() body: UserDto): Promise<void> {
         return this.userService.create(body);
     }
 
     @Post("verify")
-    @ApiOperation({ summary: "Verify user" })
+    @ApiOperation({ summary: "Verify claims" })
     @ApiResponse({
         status: HttpStatus.OK
     })
@@ -52,23 +51,14 @@ export class UserController {
         status: HttpStatus.BAD_REQUEST
     })
     async verify(@Body() body: VerifyUserRequest): Promise<KycResponse> {
-        let user: User;
         const findUser = await this.userService.findOne(body.hashEmail);
-        if (!findUser) {
-            user = await this.userService.create({
-                email: body.hashEmail,
-                expoToken: "",
-                pgpPublicKey: ""
-            });
-        } else {
-            user = findUser;
-        }
+        if (!findUser) throw new Error("User not found");
+
         //TODO: Implement Green ID KYC verification
         const response = await this.kycService.verify();
 
         //mock response
         response.thirdPartyVerified = true;
-        response.userId = user.userId;
 
         return response;
     }
@@ -123,7 +113,7 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    @Get("/:email")
+    @Get(":email")
     async getUser(
         @Param("email") email: string
     ): Promise<UsersResponse | undefined> {

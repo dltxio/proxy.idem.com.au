@@ -1,4 +1,5 @@
-import { VendorEnum } from "./../interfaces";
+import { VendorEnum } from "../types";
+
 export const getVendorName = (vendor: number) => {
     switch (vendor) {
         case VendorEnum.GPIB:

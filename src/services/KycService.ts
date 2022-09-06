@@ -5,14 +5,10 @@ import {
     ClaimResponsePayload,
     VerifiableCredential
 } from "../types/verification";
-import {
-    ConfigSettings,
-    IKycService,
-    KycResponse,
-    KycResult
-} from "../interfaces";
+import { IKycService } from "../interfaces";
 import { signMessage } from "../utils/wallet";
 import { ethers } from "ethers";
+import { ConfigSettings, KycResponse, KycResult } from "../types";
 
 @Injectable()
 export class KycService implements IKycService {
@@ -83,7 +79,6 @@ export class KycService implements IKycService {
                 result: KycResult.Completed,
 
                 thirdPartyVerified: false,
-                userId: "",
                 signature: await signMessage(
                     hashedPayload,
                     this.config,
