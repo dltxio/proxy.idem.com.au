@@ -222,7 +222,7 @@ psveQryoSUS65RNftyqCqhCeUdm5tqSeYbeQ33EtdLVsyHLvleL2y7jIn8h9E1vE
 1hkDSwOLgM2W0EqG861y0BK0PowMlckUKrnho2O5FXFI53SsLi9TJPEpFvH3fI5z
 vUB8a6TA9WFtT0ldj92f5I0fJpJ4bLJRpKwOqyYN3HSXmPy+rTDvAvub6QwGx1aF
 pqmWJqaAPe8aJyBCSZa1FkF8Nr4D77FSwZCrwZn1HVmH7bhhFPYdxJl01FpUeYMC
-dLAekEXat9W8LmThkNbVAhLNfdLVLoBXN/H29lFXuhXCV6T2Ipup66ukf/GAkBSC
+dLAekEXat9W8LmThkNbVAhLNfdLVLoBXN/H29lFXuhXCV6T2Ipup66ukf/GAkBSCl
 byoQCYjsMEYGqCyRuHRk580vL7a2SAMRPstVftB09Ta+1cY=
 =0ktQ
 -----END PGP PUBLIC KEY BLOCK-----
@@ -230,12 +230,33 @@ byoQCYjsMEYGqCyRuHRk580vL7a2SAMRPstVftB09Ta+1cY=
 
 ### Xero
 
-1. Go to https://login.xero.com/identity/connect/authorize?response_type=code&client_id=873C683D0CA5428F8DB12E1D0CC24185&redirect_uri=http://localhost/&scope=openid profile email accounting.transactions accounting.contacts offline_access&state=DLTXisTheBest
+1. Go to [this link](https://login.xero.com/identity/connect/authorize?response_type=code&client_id=873C683D0CA5428F8DB12E1D0CC24185&redirect_uri=http://localhost/&scope=openid profile email accounting.transactions accounting.contacts offline_access&state=DLTXisTheBest)
 
 2. Get the code from the redirect URL (After “code=”)
 
-3. Exchange code within 5 mins of revival, otherwise it will expire. Use the `Request Xero Token` endpoint found in the DLTX https://hoppscotch.io/ collection, adding the code you got in the previous step into the "code" value in the body. Click send. The response will be the Xero token set.
+3. Within 5 minutes of receiving code, go to the endpoint `Request Xero Token` endpoint found in the DLTX https://hoppscotch.io/ collection, adding the code you got in the previous step into the "code" value in the body (otherwise it will expire). Click send. The response will be the Xero token set.
+    - Example token set:
+
+    ```
+    {
+        "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjFDQUY4RTY2NzcyRDZEQzAyOEQ2NzI2RkQwMjYxNTgxNTcwRUZDMTkiLCJ0eXAiOiJKV1QiLCJ4NXQiOiJISy1PWm5jdGJjQW8xbkp2MENZVmdWY09fQmsifQ.eyJuYmYiOjE2NjI0NDgzMTYsImV4cCI6MTY2MjQ0ODYxNiwiaXNzIjoiaHR0cHM6Ly9pZGVudGl0eS54ZXJvLmNvbSIsImF1ZCI6Ijg3M0M2ODNEMENBNTQyOEY4REIxMkUxRDBDQzI0MTg1IiwiaWG0IjoxNjYyNDQ4MzE2LCJhdF9oYXNoIjoiYlhYZGNxZXV1c0NrZHBfUnR5SmN3QSIsInNpZCI6IjRjMTRjMmFjOWQxNDQ2YmY5MDU4ZGQ2YWEwMzQ4MzhhIiwic3ViIjoiODU3ZjJmYmU5ZWM1NTE2ZmFmOTY0NDFiMTM5MTMxNWYiLCJhdXRoX3RpbWUiOjE2NjI0Mzg3ODEsInhlcm9fdXNlcmlkIjoiYjQ2MzEzMGUtNjJkZi00ZjVmLTg0NzUtZDEzYTY0ZDA4ZTFkIiwiZ2xvYmFsX3Nlc3Npb25faWQiOiI0YzE0YzJhYzlkMTQ0NmJmOTA1OGRkNmFhMDM0ODM4YSIsInByZWZlcnJlZF91c2VybmFtZSI6ImRldkBkbHR4LmlvIiwiZW1haWwiOiJkZXZAZGx0eC5pbyIsImdpdmVuX25hbWUiOiJkZXYiLCJmYW1pbHlfbmFtZSI6ImRsdHgiLCJuYW1lIjoiZGV2IGRsdHgiLCJhbXIiOlsicHdkIl19.zAGi08E2YCdWN9lmgfIHfiPXmrXFkcy8Jf8NBfqrPv7_o_cAmRR7JcWC6rOEWgCoL91UUchgCc08MVrTfTsUE1yX0n-x91kygbyO-NPimdm7hYKyK6Wlzj0hvUFDRqG1XyYl7TklzQDiyLOsMoiD1jza0Fzh7I1av1NK_6rx-ydRYDecTWb_BGQ_qQwh3jtB17nLY2t_MTHcQdA_I53li9ItWhmH0aKtrqhkOUDyMt0TQ15HFk2mnv1cpVeICjFPH3fLCYAzVDGo3AdCeWOL_SE1o1Fqmuwa1v0_YCjCUbVLLzk3boUcEoMWtLqv6b2XxuNlwy6xHpJy-NZV9bDjnQ",
+        "access_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjFKQUY4RTY2NzcyRDZEQzAyOEQ2NzI2RkQwMjYxNTgxNTcwRUZDMTkiLCJ0eXAiOiJKV1QiLCJ4NXQiOiJISy1PWm5jdGJjQW8xbkp2MENZVmdWY09fQmsifQ.eyJuYmYiOjE2NjI0NDgzMTYsImV4cCI6MTY2MjQ1MDExNiwiaXNzIjoiaHR0cHM6Ly9pZGVudGl0eS54ZXJvLmNvbSIsImF1ZCI6Imh0dHBzOi8vaWRlbnRpdHkueGVyby5jb20vcmVzb3VyY2VzIiwiY2xpZW50X2lkIjoiODczQzY4M0QwQ0E1NDI4RjhEQjEyRTFEMENDMjQxODUiLCJzdWIiOiI4NTdmMmZiZTllYzU1MTZmYWY5NjQ0MWIxMzkxMzE1ZiIsImF1dGhfdGltZSI6MTY2MjQzODc4MSwieGVyb191c2VyaWQiOiJiNDYzMTMwZS02MmRmLTRmNWYtODQ3NS1kMTNhNjRkMDhlMWQiLCJnbG9iYWxfc2Vzc2lvbl9pZCI6IjRjMTRjMmFjOWQxNDQ2YmY5MDU4ZGQ2YWEwMzQ4MzhhIiwianRpIjoiY2U3MTEzYjM4YjVhY2I4MDFhMDk2OTkwOTRjYWVlODgiLCJhdXRoZW50aWNhdGlvbl9ldmVudF9pZCI6ImU4MmU0ZGI4LTBiOGMtNDA2Ni1iZWNkLThjZWJmMjk1ZDljNCIsInNjb3BlIjpbImVtYWlsIiwicHJvZmlsZSIsIm9wZW5pZCIsImFjY291bnRpbmcudHJhbnNhY3Rpb25zIiwiYWNjb3VudGluZy5jb250YWN0cyIsIm9mZmxpbmVfYWNjZXNzIl0sImFtciI6WyJwd2QiXX0.B6Cc5SnpG9UsrMb2CFm_Szn1Szv-Ru_M9UewZ0wrOO-FR9TfaxM0VxVUJRRoB4WXATVRpsdlN6kK0Q86hpXdMtb_X5hQz2i1E5wAipblegmChBxByLPSg_yxaUlN92EEASnpkK5YL_SS7KF9Y6srVABVCfdE-YMXI_rsXg324gg0iwgPcNEM67kI4ioUJ6UxMMmqLGcTIVnX8v9tl0enyPkU2WxA___h2bdpORdTOAdlrd2w6ltCkRke5Mb_IrIsmHC2oYxbU4MWR-HE5Uq2haETBcvCqIWOfQRu3PtZtnSsAagFqomcxtiX-w7PWVWe5kmNtXCLxFco50FzJuB1MQ",
+        "expires_in": 1800,
+        "token_type": "Bearer",
+        "refresh_token": "b5a3ef86406ba7af606486338367b1edd37fb0302cb8008ef99ccedbf45e3ae7",
+        "scope": "openid profile email accounting.transactions accounting.contacts offline_access"
+    }
+    ```
 
 4. Then find the `Send Invoices` endpoint in the DLTX https://hoppscotch.io/ collection  and add the Xero token set along with the Xero client ID.
 
 NOTE: The access_token will be valid for 30 mins.
+
+### Demo Company Reset Instructions
+
+Every 28 days the Demo Company resets, so when this happens run the following to get back up and running.
+
+1. Get a new tenant id for the demo company by making a GET request to https://api.xero.com/connections
+2. Update the `.env` file with the new tenant id
+4. Push the changes to github, and wait for deployment
+5. Verify Idem is working as normal
