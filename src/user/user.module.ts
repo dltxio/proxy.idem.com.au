@@ -9,6 +9,7 @@ import { SmsService } from "../services/SmsService";
 import { EmailService } from "../services/EmailService";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { XeroService } from "../services/XeroService";
 
 @Module({
     imports: [
@@ -47,6 +48,10 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
         {
             provide: "IEmailService",
             useClass: EmailService
+        },
+        {
+            provide: "IXeroService",
+            useClass: XeroService
         }
     ]
 })
