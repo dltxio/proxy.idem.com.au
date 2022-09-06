@@ -13,16 +13,16 @@ import {
 
 const XERO_SCOPES =
     "openid profile email accounting.transactions accounting.contacts offline_access";
-const XERO_SALES_CODE = "000";
 const XERO_INVOICE_DESCRIPTION = "KYC";
-const XERO_PRICE = 10.0;
 
 @Injectable()
 export class XeroService implements IXeroService {
     private client: XeroClient;
     private readonly logger = new Logger("XeroService");
-    private tenantId = "";
-    private gpibId = "";
+    private accountCode;
+    private price;
+    private tenantId;
+    private gpibId;
 
     constructor(
         private config: ConfigService,
@@ -35,6 +35,9 @@ export class XeroService implements IXeroService {
                 this.config.get(ConfigSettings.XERO_CLIENT_SECRET) ?? "",
             scopes: XERO_SCOPES.split(" ")
         });
+        this.accountCode =
+            this.config.get(ConfigSettings.XERO_SALES_CODE) ?? "";
+        this.price = this.config.get(ConfigSettings.XERO_PRICE) ?? "";
         this.tenantId = this.config.get(ConfigSettings.XERO_TENANT_ID) ?? "";
         this.gpibId = this.config.get(ConfigSettings.XERO_GPIB_ID) ?? "";
     }
@@ -61,8 +64,8 @@ export class XeroService implements IXeroService {
                 {
                     description: XERO_INVOICE_DESCRIPTION,
                     quantity: totalRequests,
-                    unitAmount: XERO_PRICE,
-                    accountCode: XERO_SALES_CODE
+                    unitAmount: +this.price,
+                    accountCode: this.accountCode
                 }
             ];
 
