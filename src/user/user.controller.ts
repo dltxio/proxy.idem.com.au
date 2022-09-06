@@ -12,6 +12,7 @@ import {
     TestFlightRequest,
     UserSignupRequest,
     UsersResponse,
+    VendorEnum,
     VerifyOtpRequest,
     XeroTokenSet
 } from "./../interfaces";
@@ -260,8 +261,9 @@ export class UserController {
     })
     @Post("send-invoices")
     async sendInvoices(
-        @Body("authToken") authToken: XeroTokenSet
+        @Body("authToken") authToken: XeroTokenSet,
+        @Body("vendor") vendor: VendorEnum
     ): Promise<string> {
-        return this.xeroService.sendInvoices(authToken);
+        return this.xeroService.sendInvoices(authToken, vendor);
     }
 }

@@ -81,11 +81,6 @@ export enum ConfigSettings {
     XERO_GPIB_ID = "XERO_GPIB_ID"
 }
 
-// XERO enum for contact names
-export enum XeroClients {
-    GPIB_NAME = "Get Paid In Bitcoin"
-}
-
 //=== Abstract Error classes
 export abstract class EntityMissingIdError extends Error {
     constructor(entity: string) {
@@ -165,7 +160,7 @@ export interface IUserService {
     addPublicKey(body: PublicKeyDto): Promise<boolean>;
     verifyEmail(email: string, token: string): Promise<boolean>;
     decodeEmailFromToken(token: string): Promise<string>;
-    sendInvoices(authToken: XeroTokenSet): Promise<string>;
+    sendInvoices(authToken: XeroTokenSet, vendor: VendorEnum): Promise<string>;
 }
 
 export interface IEmailService {
@@ -185,7 +180,7 @@ export interface IVendor {
 }
 
 export interface IXeroService {
-    sendInvoices(authToken: XeroTokenSet): Promise<string>;
+    sendInvoices(authToken: XeroTokenSet, vendor: VendorEnum): Promise<string>;
 }
 
 export class NewUser {

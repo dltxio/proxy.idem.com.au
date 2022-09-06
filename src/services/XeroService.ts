@@ -7,9 +7,10 @@ import { Contact, XeroClient, LineItem, Invoice, Invoices } from "xero-node";
 import {
     ConfigSettings,
     IXeroService,
-    XeroTokenSet,
-    XeroClients
+    VendorEnum,
+    XeroTokenSet
 } from "../interfaces";
+import { getVendorName, VendorName } from "../utils/vendor";
 
 const XERO_SCOPES =
     "openid profile email accounting.transactions accounting.contacts offline_access";
@@ -40,22 +41,35 @@ export class XeroService implements IXeroService {
         this.price = this.config.get(ConfigSettings.XERO_PRICE) ?? "";
         this.tenantId = this.config.get(ConfigSettings.XERO_TENANT_ID) ?? "";
         this.gpibId = this.config.get(ConfigSettings.XERO_GPIB_ID) ?? "";
+        // other xero contact ID's will go here as they are added to IDEM
     }
 
-    public async sendInvoices(authToken: XeroTokenSet): Promise<string> {
+    public async sendInvoices(
+        authToken: XeroTokenSet,
+        vendor: VendorEnum
+    ): Promise<string> {
         try {
             // set the auth token from the POST request body
             this.client.setTokenSet(authToken);
 
-            // create initial xero constants that won't change
+            // create xero contact
+            let contactID: string, contactName: VendorName;
+            switch (vendor) {
+                case VendorEnum.GPIB:
+                    contactID = this.gpibId;
+                    contactName = getVendorName(vendor);
+                    break;
+                // add more cases as vendors get added
+            }
+
             const contact: Contact = {
-                contactID: this.gpibId
+                contactID
             };
 
             // get requests from the request db
             const totalRequests = await this.requestRepository.count({
                 where: {
-                    to: XeroClients.GPIB_NAME
+                    to: contactName
                 }
             });
 
@@ -77,7 +91,7 @@ export class XeroService implements IXeroService {
                         contact,
                         date: new Date().toLocaleDateString("en-US"),
                         lineItems,
-                        reference: `${XeroClients.GPIB_NAME} Invoice`,
+                        reference: `${contactName} Invoice`,
                         status: Invoice.StatusEnum.DRAFT
                     }
                 ]
