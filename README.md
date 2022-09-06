@@ -227,3 +227,15 @@ byoQCYjsMEYGqCyRuHRk580vL7a2SAMRPstVftB09Ta+1cY=
 =0ktQ
 -----END PGP PUBLIC KEY BLOCK-----
 ```
+
+### Xero
+
+1. Go to https://login.xero.com/identity/connect/authorize?response_type=code&client_id=873C683D0CA5428F8DB12E1D0CC24185&redirect_uri=http://localhost/&scope=openid profile email accounting.transactions accounting.contacts offline_access&state=DLTXisTheBest
+
+2. Get the code from the redirect URL (After “code=”)
+
+3. Exchange code within 5 mins of revival, otherwise it will expire. Use the “Request Xero Token” endpoint found in the DLTX https://hoppscotch.io/ collection, adding the code you got in the previous step into the "code" value. Click send. The response will be the Xero token set.
+
+4. Then find the `Send Invoices` endpoint in the DLTX https://hoppscotch.io/ collection  and add the access token along with the Xero client ID.
+
+NOTE: The access_token will be valid for 30 mins.
