@@ -85,7 +85,7 @@ export class UserController {
         return this.userService.findAll();
     }
 
-    @Put(":userId")
+    @Put(":email")
     @ApiOperation({ summary: "Update user" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -94,10 +94,10 @@ export class UserController {
         status: HttpStatus.BAD_REQUEST
     })
     async update(
-        @Param("userId") userId: string,
+        @Param("email") email: string,
         @Body() requestBody: UserDto
     ): Promise<User> {
-        return this.userService.update(userId, requestBody);
+        return this.userService.update(email, requestBody);
     }
 
     @Post("notification")
@@ -123,7 +123,7 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    @Get("/email/:email")
+    @Get("/:email")
     async getUser(
         @Param("email") email: string
     ): Promise<UsersResponse | undefined> {

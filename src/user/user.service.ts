@@ -78,10 +78,10 @@ export class UserService {
         return user;
     }
 
-    public async update(userId: string, request: UserDto): Promise<User> {
-        const user = await this.userRepository.findOneBy({ userId: userId });
+    public async update(email: string, request: UserDto): Promise<User> {
+        const user = await this.userRepository.findOneBy({ email: email });
         if (!user) {
-            this.logger.verbose(`User ${userId} not found`);
+            this.logger.verbose(`User ${email} not found`);
             throw new Error("User not found");
         }
 

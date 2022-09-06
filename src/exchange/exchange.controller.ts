@@ -8,7 +8,7 @@ import {
     UserSignupRequest
 } from "../interfaces";
 
-@Controller("exchange")
+@Controller("exchanges")
 export class ExchangeController {
     constructor(
         @Inject("IThirdPartyService")
