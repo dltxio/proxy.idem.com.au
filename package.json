@@ -57,7 +57,8 @@
         "soap": "^0.45.0",
         "swagger-ui-express": "^4.5.0",
         "typeorm": "^0.3.7",
-        "uuid": "^8.3.2"
+        "uuid": "^8.3.2",
+        "xero-node": "^4.26.0"
     },
     "devDependencies": {
         "@nestjs/cli": "^9.0.0",

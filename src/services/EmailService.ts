@@ -23,7 +23,7 @@ export class EmailService implements IEmailService {
         const subject = `PGP key email verification`;
         const link = `${this.config.get(
             ConfigSettings.WEBSITE_URL
-        )}/verifyEmail?token=${token}`;
+        )}/verify-email?token=${token}`;
         this.logger.log(`${email} Verification email sent`);
 
         return this.sendRawEmail({

@@ -10,6 +10,7 @@ import { EmailService } from "../services/EmailService";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { GreenIdService } from "src/services/GreenIdService";
+import { XeroService } from "../services/XeroService";
 
 @Module({
     imports: [
@@ -48,6 +49,10 @@ import { GreenIdService } from "src/services/GreenIdService";
         {
             provide: "IEmailService",
             useClass: EmailService
+        },
+        {
+            provide: "IXeroService",
+            useClass: XeroService
         },
         {
             provide: "IGreenIdService",
