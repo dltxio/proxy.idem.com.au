@@ -40,7 +40,7 @@ import { Tester } from "../data/entities/tester.entity";
 import { Public } from "../auth/anonymous";
 import { LocalGuard } from "../auth/auth-local.guard";
 import { hashMessage } from "ethers/lib/utils";
-import { Source } from "src/services/GreenIdService";
+
 @Controller("user")
 @UseGuards(LocalGuard)
 export class UserController {
@@ -253,7 +253,6 @@ export class UserController {
         return this.userService.verifyEmail(email, token);
     }
 
-    @Public()
     @ApiOperation({
         summary: "Send invoices"
     })
@@ -271,9 +270,8 @@ export class UserController {
         return this.xeroService.sendInvoices(authToken, vendor);
     }
 
-    @Public()
     @ApiOperation({
-        summary: "Get valid sources from Green ID"
+        summary: "Verify with greenId"
     })
     @ApiResponse({
         status: HttpStatus.OK
@@ -281,10 +279,11 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    @Get("greenid/sources/:verificationId")
-    async getGreenIdSources(
-        @Param("verificationId") verificationId: string
-    ): Promise<Source[]> {
-        return this.greenIdService.getSources(verificationId);
+    @Post("greenid/verify")
+    async verifyGreenId(
+        @Body("user") user: greenid.RegisterVerificationData,
+        @Body("licence") licence: greenid.LicenceData
+    ): Promise<greenid.VerifyResult> {
+        return this.greenIdService.verify(user, licence);
     }
 }

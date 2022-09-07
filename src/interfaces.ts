@@ -12,7 +12,6 @@ import { User } from "./data/entities/user.entity";
 import { Tester } from "./data/entities/tester.entity";
 import { ClaimResponsePayload } from "./types/verification";
 import { Type } from "class-transformer";
-import { Source } from "./services/GreenIdService";
 
 export interface IExampleService {
     getById(id: string): string;
@@ -82,7 +81,8 @@ export enum ConfigSettings {
     XERO_GPIB_ID = "XERO_GPIB_ID",
     GREENID_URL = "GREENID_URL",
     GREENID_ACCOUNT_ID = "GREENID_ACCOUNT_ID",
-    GREENID_PASSWORD = "GREENID_PASSWORD"
+    GREENID_PASSWORD = "GREENID_PASSWORD",
+    REALLY_VERIFY_IDENTITY = "REALLY_VERIFY_IDENTITY"
 }
 
 //=== Abstract Error classes
@@ -136,7 +136,10 @@ export class AccountMissingIdError extends EntityMissingIdError {
 }
 
 export interface IGreenIdService {
-    getSources(verificationId: string): Promise<Source[]>;
+    verify(
+        user: greenid.RegisterVerificationData,
+        licence?: greenid.LicenceData
+    ): Promise<greenid.VerifyResult>;
 }
 
 export interface IKycService {
