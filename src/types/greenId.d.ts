@@ -80,11 +80,12 @@ declare namespace greenid {
         };
     };
 
-    type state = "QLD" | "NSW" | "ACT" | "VIC" | "NT" | "SA" | "WA" | "TAS";
+    type State = "QLD" | "NSW" | "ACT" | "VIC" | "NT" | "SA" | "WA" | "TAS";
 
     type LicenceData = {
-        state: greenid.state;
+        state: greenid.State;
         number: string;
+        cardNumber: string;
         name: Fullname;
         dob: DOB;
     };
@@ -106,5 +107,34 @@ declare namespace greenid {
         day: number;
         month: number;
         year: number;
+    };
+
+    type medicareData = {
+        colour: "Green" | "Blue" | "Yellow";
+        number: string;
+        individualReferenceNumber: string;
+        name: string;
+        dob: DOB;
+        expiry: string;
+        name2?: string;
+        name3?: string;
+        name4?: string;
+    };
+
+    type PassportData = {
+        number: string;
+        name: Fullname;
+        dob: DOB;
+    };
+
+    type BirthCertificateData = {
+        number: string;
+        state: State;
+        name: Fullname;
+        dob: DOB;
+        registrationYear?: string;
+        registrationDate?: string;
+        certificateNumber?: string;
+        certificatePrintedDate?: string;
     };
 }
