@@ -1,6 +1,5 @@
 import {
     IsBoolean,
-    IsEmail,
     IsEnum,
     IsNotEmpty,
     IsObject,
@@ -73,7 +72,13 @@ export enum ConfigSettings {
     JWT_SECRET = "JWT_SECRET",
     JWT_EXPIRATION_SECONDS = "JWT_EXPIRATION_SECONDS",
     PGP_PASSPHRASE = "PGP_PASSPHRASE",
-    PGP_PRIVATE_KEY = "PGP_PRIVATE_KEY"
+    PGP_PRIVATE_KEY = "PGP_PRIVATE_KEY",
+    XERO_CLIENT_ID = "XERO_CLIENT_ID",
+    XERO_CLIENT_SECRET = "XERO_CLIENT_SECRET",
+    XERO_TENANT_ID = "XERO_TENANT_ID",
+    XERO_SALES_CODE = "XERO_SALES_CODE",
+    XERO_PRICE = "XERO_PRICE",
+    XERO_GPIB_ID = "XERO_GPIB_ID"
 }
 
 //=== Abstract Error classes
@@ -155,6 +160,7 @@ export interface IUserService {
     addPublicKey(body: PublicKeyDto): Promise<boolean>;
     verifyEmail(email: string, token: string): Promise<boolean>;
     decodeEmailFromToken(token: string): Promise<string>;
+    sendInvoices(authToken: XeroTokenSet, vendor: VendorEnum): Promise<string>;
 }
 
 export interface IEmailService {
@@ -171,6 +177,10 @@ export interface IVendor {
         userId: string;
         password?: string;
     }>;
+}
+
+export interface IXeroService {
+    sendInvoices(authToken: XeroTokenSet, vendor: VendorEnum): Promise<string>;
 }
 
 export class NewUser {
@@ -289,6 +299,18 @@ export type SignupResponse = {
     userId: string;
     password?: string;
 };
+
+// all optional params as documented by Xero
+export type XeroTokenSet = {
+    access_token?: string;
+    token_type?: string;
+    id_token?: string;
+    refresh_token?: string;
+    expires_in?: number;
+    session_state?: string;
+    scope?: string;
+};
+
 export class SignupNotificationRequest {
     @ApiProperty()
     @IsNotEmpty()
