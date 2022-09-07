@@ -1,6 +1,7 @@
 import {
     IKycService,
     IThirdPartyService,
+    IXeroService,
     KycResponse,
     NewUser,
     PublicKeyDto,
@@ -11,7 +12,9 @@ import {
     TestFlightRequest,
     UserSignupRequest,
     UsersResponse,
-    VerifyOtpRequest
+    VendorEnum,
+    VerifyOtpRequest,
+    XeroTokenSet
 } from "./../interfaces";
 import {
     Controller,
@@ -43,7 +46,9 @@ export class UserController {
         @Inject("IUserService") private userService: IUserService,
         @Inject("IKycService") private kycService: IKycService,
         @Inject("IThirdPartyService")
-        private thirdPartyService: IThirdPartyService
+        private thirdPartyService: IThirdPartyService,
+        @Inject("IXeroService")
+        private xeroService: IXeroService
     ) {}
 
     @Post("")
@@ -243,5 +248,22 @@ export class UserController {
     async verifyEmail(@Body("token") token: string): Promise<boolean> {
         const email = await this.userService.decodeEmailFromToken(token);
         return this.userService.verifyEmail(email, token);
+    }
+
+    @ApiOperation({
+        summary: "Send invoices"
+    })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    @Post("send-invoices")
+    async sendInvoices(
+        @Body("authToken") authToken: XeroTokenSet,
+        @Body("vendor") vendor: VendorEnum
+    ): Promise<string> {
+        return this.xeroService.sendInvoices(authToken, vendor);
     }
 }
