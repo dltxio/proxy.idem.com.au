@@ -21,10 +21,7 @@ export const getVendorId = (vendor: VendorEnum, config: ConfigService) => {
         case VendorEnum.GPIB:
             contactID = config.get(ConfigSettings.XERO_GPIB_ID);
             contactName = getVendorName(vendor);
-            return {
-                contactID,
-                contactName
-            };
+            break;
     }
 
     return {
