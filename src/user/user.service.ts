@@ -319,11 +319,13 @@ export class UserService {
             if (hashMessage(emailFromPublicKey) != body.hashEmail)
                 throw new Error("Email does not match");
 
-            const payload = { email: emailFromPublicKey };
-            const token = this.jwtService.sign(payload);
             user = await this.userRepository.findOneBy({
                 email: body.hashEmail
             });
+
+            const token =
+                this._generateEmailVerificationToken(emailFromPublicKey);
+
             if (user) {
                 //Update the public key if user found.
                 user.publicKey = body.publicKeyArmored;
@@ -390,5 +392,44 @@ export class UserService {
             }
             throw new BadRequestException("Bad confirmation token");
         }
+    }
+
+    public async resendEmailVerification(
+        hashedEmail: string
+    ): Promise<boolean> {
+        try {
+            const user = await this.userRepository.findOneBy({
+                email: hashedEmail
+            });
+            if (!user || !user.publicKey)
+                throw new Error("Email or PGP key not found");
+
+            const publicKey = await openpgp.readKey({
+                armoredKey: user.publicKey
+            });
+
+            const emailFromPublicKey = publicKey.users[0].userID.email;
+
+            if (hashMessage(emailFromPublicKey) != hashedEmail)
+                throw new Error("Email does not match pgp key");
+
+            const token =
+                this._generateEmailVerificationToken(emailFromPublicKey);
+            await this.emailService.sendEmailVerification(
+                emailFromPublicKey,
+                token
+            );
+            return true;
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(error);
+        }
+    }
+
+    private _generateEmailVerificationToken(
+        emailFromPublicKey: string
+    ): string {
+        const payload = { email: emailFromPublicKey };
+        return this.jwtService.sign(payload);
     }
 }
