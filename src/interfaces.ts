@@ -160,7 +160,7 @@ export interface IUserService {
     addPublicKey(body: PublicKeyDto): Promise<boolean>;
     verifyEmail(email: string, token: string): Promise<boolean>;
     decodeEmailFromToken(token: string): Promise<string>;
-    sendInvoices(authToken: XeroTokenSet, vendor: VendorEnum): Promise<string>;
+    sendInvoices(body: SendInvoicesRequestBody): Promise<string>;
 }
 
 export interface IEmailService {
@@ -180,7 +180,7 @@ export interface IVendor {
 }
 
 export interface IXeroService {
-    sendInvoices(authToken: XeroTokenSet, vendor: VendorEnum): Promise<string>;
+    sendInvoices(body: SendInvoicesRequestBody): Promise<string>;
 }
 
 export class NewUser {
@@ -227,6 +227,15 @@ export class UserExpoPushTokenRequestBody {
     @ApiProperty()
     @IsNotEmpty()
     token: string;
+}
+
+export class SendInvoicesRequestBody {
+    @ApiProperty()
+    @IsNotEmpty()
+    authToken: XeroTokenSet;
+    @ApiProperty()
+    @IsNotEmpty()
+    vendor: VendorEnum;
 }
 
 export type AusPostRequest = {
