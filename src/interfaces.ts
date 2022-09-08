@@ -161,6 +161,7 @@ export interface IUserService {
     verifyEmail(email: string, token: string): Promise<boolean>;
     decodeEmailFromToken(token: string): Promise<string>;
     sendInvoices(body: SendInvoicesRequestBody): Promise<string>;
+    resendEmailVerification(hashedEmail: string): Promise<boolean>;
 }
 
 export interface IEmailService {
@@ -452,4 +453,10 @@ export class PublicKeyDto {
     @ApiProperty()
     @IsNotEmpty()
     hashEmail: string;
+}
+
+export class ResendEmailRequestBody {
+    @ApiProperty()
+    @IsNotEmpty()
+    hashedEmail: string;
 }

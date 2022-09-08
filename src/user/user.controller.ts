@@ -7,6 +7,7 @@ import {
     PublicKeyDto,
     RequestOtpRequest,
     RequestOtpResponse,
+    ResendEmailRequestBody,
     SendInvoicesRequestBody,
     SignupNotificationRequest,
     SignupResponse,
@@ -261,5 +262,21 @@ export class UserController {
     @Post("send-invoices")
     async sendInvoices(@Body() body: SendInvoicesRequestBody): Promise<string> {
         return this.xeroService.sendInvoices(body);
+    }
+
+    @ApiOperation({
+        summary: "Resend email verification"
+    })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    @Post("resend-email")
+    async resendEmailVerification(
+        @Body() body: ResendEmailRequestBody
+    ): Promise<boolean> {
+        return this.userService.resendEmailVerification(body.hashedEmail);
     }
 }
