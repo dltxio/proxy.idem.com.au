@@ -36,7 +36,6 @@ export class XeroService implements IXeroService {
         this.accountCode = this.config.get(ConfigSettings.XERO_SALES_CODE);
         this.price = this.config.get(ConfigSettings.XERO_PRICE);
         this.tenantId = this.config.get(ConfigSettings.XERO_TENANT_ID);
-        // other xero contact ID's will go here as they are added to IDEM
     }
 
     public async sendInvoices(body: SendInvoicesRequest): Promise<string> {
