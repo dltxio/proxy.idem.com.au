@@ -7,7 +7,7 @@ import {
     PublicKeyDto,
     RequestOtpRequest,
     RequestOtpResponse,
-    SendInvoicesRequest,
+    SendInvoicesRequestBody,
     SignupNotificationRequest,
     SignupResponse,
     TestFlightRequest,
@@ -259,7 +259,7 @@ export class UserController {
         status: HttpStatus.BAD_REQUEST
     })
     @Post("send-invoices")
-    async sendInvoices(@Body() body: SendInvoicesRequest): Promise<string> {
+    async sendInvoices(@Body() body: SendInvoicesRequestBody): Promise<string> {
         return this.xeroService.sendInvoices(body);
     }
 }

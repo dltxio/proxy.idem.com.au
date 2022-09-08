@@ -7,7 +7,7 @@ import { Contact, XeroClient, LineItem, Invoice, Invoices } from "xero-node";
 import {
     ConfigSettings,
     IXeroService,
-    SendInvoicesRequest
+    SendInvoicesRequestBody
 } from "../interfaces";
 import { getVendorId } from "../utils/vendor";
 
@@ -38,7 +38,7 @@ export class XeroService implements IXeroService {
         this.tenantId = this.config.get(ConfigSettings.XERO_TENANT_ID);
     }
 
-    public async sendInvoices(body: SendInvoicesRequest): Promise<string> {
+    public async sendInvoices(body: SendInvoicesRequestBody): Promise<string> {
         const { authToken, vendor } = body;
         try {
             // set the auth token from the POST request body
