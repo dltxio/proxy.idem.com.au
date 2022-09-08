@@ -160,7 +160,7 @@ export interface IUserService {
     addPublicKey(body: PublicKeyDto): Promise<boolean>;
     verifyEmail(email: string, token: string): Promise<boolean>;
     decodeEmailFromToken(token: string): Promise<string>;
-    sendInvoices(authToken: XeroTokenSet, vendor: VendorEnum): Promise<string>;
+    sendInvoices(body: SendInvoicesRequest): Promise<string>;
 }
 
 export interface IEmailService {
@@ -180,7 +180,7 @@ export interface IVendor {
 }
 
 export interface IXeroService {
-    sendInvoices(authToken: XeroTokenSet, vendor: VendorEnum): Promise<string>;
+    sendInvoices(body: SendInvoicesRequest): Promise<string>;
 }
 
 export class NewUser {
@@ -288,6 +288,11 @@ export type GPIBVerifyRequest = {
     phoneNumberVerified: boolean;
     emailVerified: boolean;
     idVerified: boolean;
+};
+
+export type SendInvoicesRequest = {
+    authToken: XeroTokenSet;
+    vendor: VendorEnum;
 };
 
 export type RequestOtpResponse = {

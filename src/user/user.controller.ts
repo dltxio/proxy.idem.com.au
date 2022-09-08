@@ -7,14 +7,13 @@ import {
     PublicKeyDto,
     RequestOtpRequest,
     RequestOtpResponse,
+    SendInvoicesRequest,
     SignupNotificationRequest,
     SignupResponse,
     TestFlightRequest,
     UserSignupRequest,
     UsersResponse,
-    VendorEnum,
-    VerifyOtpRequest,
-    XeroTokenSet
+    VerifyOtpRequest
 } from "./../interfaces";
 import {
     Controller,
@@ -260,10 +259,7 @@ export class UserController {
         status: HttpStatus.BAD_REQUEST
     })
     @Post("send-invoices")
-    async sendInvoices(
-        @Body("authToken") authToken: XeroTokenSet,
-        @Body("vendor") vendor: VendorEnum
-    ): Promise<string> {
-        return this.xeroService.sendInvoices(authToken, vendor);
+    async sendInvoices(@Body() body: SendInvoicesRequest): Promise<string> {
+        return this.xeroService.sendInvoices(body);
     }
 }
