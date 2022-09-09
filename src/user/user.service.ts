@@ -415,6 +415,8 @@ export class UserService {
 
             const token =
                 this._generateEmailVerificationToken(emailFromPublicKey);
+            user.emailVerificationCode = token;
+            await this.userRepository.save(user);
             await this.emailService.sendEmailVerification(
                 emailFromPublicKey,
                 token
