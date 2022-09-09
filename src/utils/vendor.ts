@@ -1,4 +1,5 @@
-import { VendorEnum } from "./../interfaces";
+import { ConfigService } from "@nestjs/config";
+import { ConfigSettings, VendorEnum } from "./../interfaces";
 export const getVendorName = (vendor: number) => {
     switch (vendor) {
         case VendorEnum.GPIB:
@@ -12,6 +13,21 @@ export const getVendorName = (vendor: number) => {
         default:
             return undefined;
     }
+};
+
+export const getVendorId = (vendor: VendorEnum, config: ConfigService) => {
+    let contactID: string, contactName: VendorName;
+    switch (vendor) {
+        case VendorEnum.GPIB:
+            contactID = config.get(ConfigSettings.XERO_GPIB_ID);
+            contactName = getVendorName(vendor);
+            break;
+    }
+
+    return {
+        contactID,
+        contactName
+    };
 };
 
 export enum VendorName {

@@ -1,11 +1,14 @@
 import {
     IKycService,
     IThirdPartyService,
+    IXeroService,
     KycResponse,
     NewUser,
     PublicKeyDto,
     RequestOtpRequest,
     RequestOtpResponse,
+    ResendEmailRequestBody,
+    SendInvoicesRequestBody,
     SignupNotificationRequest,
     SignupResponse,
     TestFlightRequest,
@@ -43,7 +46,9 @@ export class UserController {
         @Inject("IUserService") private userService: IUserService,
         @Inject("IKycService") private kycService: IKycService,
         @Inject("IThirdPartyService")
-        private thirdPartyService: IThirdPartyService
+        private thirdPartyService: IThirdPartyService,
+        @Inject("IXeroService")
+        private xeroService: IXeroService
     ) {}
 
     @Post("")
@@ -243,5 +248,35 @@ export class UserController {
     async verifyEmail(@Body("token") token: string): Promise<boolean> {
         const email = await this.userService.decodeEmailFromToken(token);
         return this.userService.verifyEmail(email, token);
+    }
+
+    @ApiOperation({
+        summary: "Send invoices"
+    })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    @Post("send-invoices")
+    async sendInvoices(@Body() body: SendInvoicesRequestBody): Promise<string> {
+        return this.xeroService.sendInvoices(body);
+    }
+
+    @ApiOperation({
+        summary: "Resend email verification"
+    })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    @Post("resend-email")
+    async resendEmailVerification(
+        @Body() body: ResendEmailRequestBody
+    ): Promise<boolean> {
+        return this.userService.resendEmailVerification(body.hashedEmail);
     }
 }
