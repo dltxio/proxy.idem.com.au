@@ -84,7 +84,7 @@ declare namespace greenid {
 
     type LicenceData = {
         state: greenid.State;
-        number: string;
+        licenceNumber: string;
         cardNumber: string;
         name: Fullname;
         dob: DOB;

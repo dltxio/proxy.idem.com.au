@@ -35,7 +35,7 @@ export class GreenIdService implements IGreenIdService {
             this.config.get(ConfigSettings.REALLY_VERIFY_IDENTITY) === "false"
         ) {
             this.logger.debug("Mocking verification response to save money!");
-            if (licence.number === "123456789") {
+            if (licence.licenceNumber === "123456789") {
                 return {
                     success: true,
                     verificationId: "DebugId"
@@ -50,8 +50,6 @@ export class GreenIdService implements IGreenIdService {
                 verificationResult: { verificationId }
             }
         } = await this.registerVerification(user);
-
-        console.log("test");
 
         const result = await this.setFields({
             verificationId,
@@ -168,7 +166,7 @@ export class GreenIdService implements IGreenIdService {
         const variables = [
             {
                 name: `greenid_${state}regodvs_number`,
-                value: data.number
+                value: data.licenceNumber
             },
             {
                 name: `greenid_${state}regodvs_givenname`,
