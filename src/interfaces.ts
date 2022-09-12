@@ -17,8 +17,10 @@ import {
     KycResult,
     RequestOtpResponse,
     SignupResponse,
-    UsersResponse
-} from "./types";
+    UsersResponse,
+    VendorEnum,
+    XeroTokenSet
+} from "./types/general";
 
 export interface IExampleService {
     getById(id: string): string;
@@ -93,6 +95,8 @@ export interface IUserService {
     pushNotifications(message: string): Promise<void>;
     verifyEmail(token: string): Promise<boolean>;
     decodeEmailFromToken(token: string): Promise<string>;
+    sendInvoices(body: SendInvoicesRequestBody): Promise<string>;
+    resendEmailVerification(hashedEmail: string): Promise<boolean>;
 }
 
 export interface IOtpService {
@@ -120,6 +124,10 @@ export interface IVendor {
         userId: string;
         password?: string;
     }>;
+}
+
+export interface IXeroService {
+    sendInvoices(body: SendInvoicesRequestBody): Promise<string>;
 }
 
 export class UserDto {
@@ -282,4 +290,19 @@ export class NotificationRequest {
     @ApiProperty()
     @IsNotEmpty()
     message: string;
+}
+
+export class ResendEmailRequestBody {
+    @ApiProperty()
+    @IsNotEmpty()
+    hashedEmail: string;
+}
+
+export class SendInvoicesRequestBody {
+    @ApiProperty()
+    @IsNotEmpty()
+    authToken: XeroTokenSet;
+    @ApiProperty()
+    @IsNotEmpty()
+    vendor: VendorEnum;
 }

@@ -227,3 +227,36 @@ byoQCYjsMEYGqCyRuHRk580vL7a2SAMRPstVftB09Ta+1cY=
 =0ktQ
 -----END PGP PUBLIC KEY BLOCK-----
 ```
+
+### Xero
+
+1. Go to [this link](https://login.xero.com/identity/connect/authorize?response_type=code&client_id=873C683D0CA5428F8DB12E1D0CC24185&redirect_uri=http://localhost/&scope=openid profile email accounting.transactions accounting.contacts offline_access&state=DLTXisTheBest)
+
+2. Get the code from the redirect URL (After “code=”)
+
+3. Within 5 minutes of receiving code, go to the endpoint `Request Xero Token` endpoint found in the DLTX https://hoppscotch.io/ collection, adding the code you got in the previous step into the "code" value in the body (otherwise it will expire). Click send. The response will be the Xero token set. The generated token set is valid for 30 minutes.
+    - Example token set:
+
+    ```
+    {
+        "id_token": "<TOKEN>",
+        "access_token": "<TOKEN>",
+        "expires_in": 1800,
+        "token_type": "Bearer",
+        "refresh_token": "<TOKEN>",
+        "scope": "openid profile email accounting.transactions accounting.contacts offline_access"
+    }
+    ```
+
+4. Then find the `Send Invoices` endpoint in the DLTX https://hoppscotch.io/ collection  and add the Xero token set along with the Xero client ID.
+
+NOTE: The access_token will be valid for 30 mins.
+
+### Demo Company Reset Instructions
+
+Every 28 days the Demo Company resets, so when this happens run the following to get back up and running.
+
+1. Get a new tenant id for the demo company by making a GET request to https://api.xero.com/connections
+2. Update the `.env` file with the new tenant id
+4. Push the changes to github, and wait for deployment
+5. Verify Idem is working as normal

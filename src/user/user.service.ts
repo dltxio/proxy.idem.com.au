@@ -12,7 +12,7 @@ import { Repository } from "typeorm";
 import Expo from "expo-server-sdk";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { ConfigSettings, UsersResponse } from "../types";
+import { ConfigSettings, UsersResponse } from "../types/general";
 
 @Injectable()
 export class UserService {
@@ -238,5 +238,46 @@ export class UserService {
             }
             throw new BadRequestException("Bad confirmation token");
         }
+    }
+
+    public async resendEmailVerification(
+        hashedEmail: string
+    ): Promise<boolean> {
+        try {
+            const user = await this.userRepository.findOneBy({
+                email: hashedEmail
+            });
+            if (!user || !user.publicKey)
+                throw new Error("Email or PGP key not found");
+
+            const publicKey = await openpgp.readKey({
+                armoredKey: user.publicKey
+            });
+
+            const emailFromPublicKey = publicKey.users[0].userID.email;
+
+            if (hashMessage(emailFromPublicKey) != hashedEmail)
+                throw new Error("Email does not match pgp key");
+
+            const token =
+                this._generateEmailVerificationToken(emailFromPublicKey);
+            user.emailVerificationCode = token;
+            await this.userRepository.save(user);
+            await this.emailService.sendEmailVerification(
+                emailFromPublicKey,
+                token
+            );
+            return true;
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(error);
+        }
+    }
+
+    private _generateEmailVerificationToken(
+        emailFromPublicKey: string
+    ): string {
+        const payload = { email: emailFromPublicKey };
+        return this.jwtService.sign(payload);
     }
 }

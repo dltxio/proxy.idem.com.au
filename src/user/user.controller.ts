@@ -3,7 +3,10 @@ import {
     NotificationRequest,
     UserDto,
     IUserService,
-    VerifyUserRequest
+    VerifyUserRequest,
+    IXeroService,
+    SendInvoicesRequestBody,
+    ResendEmailRequestBody
 } from "./../interfaces";
 import {
     Controller,
@@ -21,13 +24,15 @@ import { User } from "../data/entities/user.entity";
 import { Public } from "../auth/anonymous";
 import { LocalGuard } from "../auth/auth-local.guard";
 import { hashMessage } from "ethers/lib/utils";
-import { KycResponse, UsersResponse } from "../types";
+import { KycResponse, UsersResponse } from "../types/general";
 @Controller("users")
 @UseGuards(LocalGuard)
 export class UserController {
     constructor(
         @Inject("IUserService") private userService: IUserService,
-        @Inject("IKycService") private kycService: IKycService
+        @Inject("IKycService") private kycService: IKycService,
+        @Inject("IXeroService")
+        private xeroService: IXeroService
     ) {}
 
     @Post("create")
@@ -135,5 +140,35 @@ export class UserController {
     @Post("verify-email")
     async verifyEmail(@Body("token") token: string): Promise<boolean> {
         return this.userService.verifyEmail(token);
+    }
+
+    @ApiOperation({
+        summary: "Send invoices"
+    })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    @Post("send-invoices")
+    async sendInvoices(@Body() body: SendInvoicesRequestBody): Promise<string> {
+        return this.xeroService.sendInvoices(body);
+    }
+
+    @ApiOperation({
+        summary: "Resend email verification"
+    })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    @Post("resend-email")
+    async resendEmailVerification(
+        @Body() body: ResendEmailRequestBody
+    ): Promise<boolean> {
+        return this.userService.resendEmailVerification(body.hashedEmail);
     }
 }
