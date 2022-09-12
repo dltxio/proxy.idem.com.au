@@ -8,7 +8,7 @@ import {
 import { IKycService } from "../interfaces";
 import { signMessage } from "../utils/wallet";
 import { ethers } from "ethers";
-import { ConfigSettings, KycResponse, KycResult } from "../types";
+import { ConfigSettings, KycResponse, KycResult } from "../types/general";
 
 @Injectable()
 export class KycService implements IKycService {

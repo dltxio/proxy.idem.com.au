@@ -1,6 +1,6 @@
 import { Body, Controller, HttpStatus, Inject, Ip, Post } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
-import { SignupResponse } from "src/types";
+import { SignupResponse } from "../types/general";
 import {
     ExchangeSignupCallBack,
     IExchangeService,

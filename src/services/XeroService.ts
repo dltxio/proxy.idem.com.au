@@ -4,12 +4,9 @@ import { Logger } from "ethers/lib/utils";
 import { Repository } from "typeorm";
 import { Request } from "../data/entities/request.entity";
 import { Contact, XeroClient, LineItem, Invoice, Invoices } from "xero-node";
-import {
-    ConfigSettings,
-    IXeroService,
-    SendInvoicesRequestBody
-} from "../interfaces";
+import { IXeroService, SendInvoicesRequestBody } from "../interfaces";
 import { getVendorId } from "../utils/vendor";
+import { ConfigSettings } from "../types/general";
 
 const XERO_SCOPES =
     "openid profile email accounting.transactions accounting.contacts offline_access";

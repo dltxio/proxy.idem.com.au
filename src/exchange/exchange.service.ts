@@ -5,7 +5,7 @@ import { ExchangeSignupCallBack } from "../interfaces";
 import { Repository } from "typeorm";
 import Expo from "expo-server-sdk";
 import { ConfigService } from "@nestjs/config";
-import { ConfigSettings, RequestType } from "../types";
+import { ConfigSettings, RequestType } from "../types/general";
 
 @Injectable()
 export class ExchangeService {

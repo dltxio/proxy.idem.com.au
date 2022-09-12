@@ -1,4 +1,4 @@
-import { ClaimResponsePayload } from "./types/verification";
+import { ClaimResponsePayload } from "./verification";
 
 // String values used in user-facing error messages
 export enum EntityNames {
@@ -54,26 +54,14 @@ export enum ConfigSettings {
     JWT_SECRET = "JWT_SECRET",
     JWT_EXPIRATION_SECONDS = "JWT_EXPIRATION_SECONDS",
     PGP_PASSPHRASE = "PGP_PASSPHRASE",
-    PGP_PRIVATE_KEY = "PGP_PRIVATE_KEY"
+    PGP_PRIVATE_KEY = "PGP_PRIVATE_KEY",
+    XERO_CLIENT_ID = "XERO_CLIENT_ID",
+    XERO_CLIENT_SECRET = "XERO_CLIENT_SECRET",
+    XERO_TENANT_ID = "XERO_TENANT_ID",
+    XERO_SALES_CODE = "XERO_SALES_CODE",
+    XERO_PRICE = "XERO_PRICE",
+    XERO_GPIB_ID = "XERO_GPIB_ID"
 }
-
-//Can have more than below such as "watchlist" and "found_sources" and "sources_category" but will need live account
-export type AusPostResponse = {
-    verification_status: "in_progress" | "completed" | "failed";
-    verification_session_token: string;
-    data_source_events: string[];
-    transaction_id: string;
-    //sources_category: string;
-    //found_sources: {
-    //     name:string;
-    //     category:string;
-    // }[];
-    // watchlist:{
-    //     "check_performed": boolean,
-    //     "check_performed_date": string,
-    //     "found": boolean,
-    // }
-};
 
 export type UsersResponse = {
     userId: string;
@@ -109,20 +97,13 @@ export type SignupResponse = {
     password?: string;
 };
 
-export type AusPostRequest = {
-    given_name: string;
-    middle_name: string | null;
-    family_name: string;
-    dob: string;
-    address: {
-        unit_number: string | null;
-        street_number: string;
-        street_name: string;
-        street_type: string;
-        locality: string;
-        region: string;
-        postal_code: string;
-        country: string;
-    };
-    consent: string;
+// all optional params as documented by Xero
+export type XeroTokenSet = {
+    access_token?: string;
+    token_type?: string;
+    id_token?: string;
+    refresh_token?: string;
+    expires_in?: number;
+    session_state?: string;
+    scope?: string;
 };

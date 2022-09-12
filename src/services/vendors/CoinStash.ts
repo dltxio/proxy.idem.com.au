@@ -1,7 +1,7 @@
 import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AxiosInstance } from "axios";
-import { ConfigSettings } from "../../types";
+import { ConfigSettings } from "../../types/general";
 import { IVendor, UserSignupRequest } from "../../interfaces";
 
 export class CoinStashVendor implements IVendor {

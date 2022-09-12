@@ -2,7 +2,7 @@ import { Inject, Injectable, Logger } from "@nestjs/common";
 import { ISmsService, RequestOtp, VerifyOtp } from "./../interfaces";
 import crypto from "crypto";
 import { ConfigService } from "@nestjs/config";
-import { ConfigSettings, RequestOtpResponse } from "../types";
+import { ConfigSettings, RequestOtpResponse } from "../types/general";
 
 @Injectable()
 export class OtpService {

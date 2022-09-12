@@ -17,7 +17,7 @@ import {
     RequestType,
     SignupResponse,
     VendorEnum
-} from "../types";
+} from "../types/general";
 
 @Injectable()
 export class ThirdPartyService implements IThirdPartyService {

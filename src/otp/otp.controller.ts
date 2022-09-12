@@ -1,6 +1,6 @@
 import { Body, Controller, HttpStatus, Inject, Post } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
-import { RequestOtpResponse } from "../types";
+import { RequestOtpResponse } from "../types/general";
 import { RequestOtp, VerifyOtp, IOtpService } from "../interfaces";
 
 @Controller("otp")
