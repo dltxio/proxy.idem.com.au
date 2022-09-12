@@ -23,7 +23,7 @@ export class GPIBVendor implements IVendor {
             lastName,
             email,
             password,
-            referralCode: "",
+            referralCode: this.config.get(ConfigSettings.GPIB_REFERRAL_CODE),
             mobile: mobile.trim(),
             yob: moment(signupInfo.dob, "DD/MM/YYYY").year(),
             trackAddress: true,
