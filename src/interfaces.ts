@@ -78,7 +78,8 @@ export enum ConfigSettings {
     XERO_TENANT_ID = "XERO_TENANT_ID",
     XERO_SALES_CODE = "XERO_SALES_CODE",
     XERO_PRICE = "XERO_PRICE",
-    XERO_GPIB_ID = "XERO_GPIB_ID"
+    XERO_GPIB_ID = "XERO_GPIB_ID",
+    GPIB_REFERRAL_CODE = "GPIB_REFERRAL_CODE"
 }
 
 //=== Abstract Error classes

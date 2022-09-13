@@ -18,12 +18,13 @@ export class GPIBVendor implements IVendor {
             signupInfo;
 
         const endPoint = `${this.baseUrl}/user/idem`;
+        const referralCode = this.config.get(ConfigSettings.GPIB_REFERRAL_CODE);
         const requestBody = {
             firstName,
             lastName,
             email,
             password,
-            referralCode: "",
+            referralCode: referralCode ?? "",
             mobile: mobile.trim(),
             yob: moment(signupInfo.dob, "DD/MM/YYYY").year(),
             trackAddress: true,
