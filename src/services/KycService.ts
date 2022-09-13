@@ -1,19 +1,14 @@
-import { hashMessage } from "ethers/lib/utils";
-import { Inject, Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import axios, { AxiosInstance } from "axios";
 import {
     ClaimResponsePayload,
     VerifiableCredential
 } from "../types/verification";
-import {
-    ConfigSettings,
-    IKycService,
-    KycResponse,
-    KycResult
-} from "../interfaces";
+import { IKycService } from "../interfaces";
 import { signMessage } from "../utils/wallet";
 import { ethers } from "ethers";
+import { ConfigSettings, KycResponse, KycResult } from "../types/general";
 
 @Injectable()
 export class KycService implements IKycService {
@@ -84,7 +79,6 @@ export class KycService implements IKycService {
                 result: KycResult.Completed,
 
                 thirdPartyVerified: false,
-                userId: "",
                 signature: await signMessage(
                     hashedPayload,
                     this.config,

@@ -1,28 +1,34 @@
-import { UserModule } from "./user.module";
-import { Test, TestingModule } from "@nestjs/testing";
-import { UserController } from "./user.controller";
-import { expect } from "chai";
 import { ConfigModule } from "@nestjs/config";
-import { UserService } from "./user.service";
-import { repositoryMockFactory } from "./user.service.spec";
+import { Test, TestingModule } from "@nestjs/testing";
+import { expect } from "chai";
+import { repositoryMockFactory } from "../user/user.service.spec";
+import { KycService } from "../services/KycService";
+import { UserService } from "../user/user.service";
+import { OtpController } from "./otp.controller";
 import { EmailService } from "../services/EmailService";
 import { JwtService } from "@nestjs/jwt";
-import { KycService } from "../services/KycService";
+import { OtpService } from "./otp.service";
 
-//TODO: need to fix the unit test later
-describe("UserController", () => {
-    let controller: UserController;
+describe("OtpController", () => {
+    let controller: OtpController;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            controllers: [UserController],
+            controllers: [OtpController],
             imports: [
                 ConfigModule.forRoot({
                     isGlobal: true
-                }),
-                UserModule
+                })
             ],
             providers: [
+                {
+                    provide: "IOtpService",
+                    useClass: OtpService
+                },
+                {
+                    provide: "ISmsService",
+                    useFactory: () => ({})
+                },
                 {
                     provide: "USER_REPOSITORY",
                     useFactory: repositoryMockFactory
@@ -43,10 +49,10 @@ describe("UserController", () => {
             ]
         }).compile();
 
-        controller = module.get<UserController>(UserController);
+        controller = module.get<OtpController>(OtpController);
     });
 
     it("should be defined", () => {
-        expect(controller).to.be.not.undefined;
+        expect(controller).to.not.be.undefined;
     });
 });

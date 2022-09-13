@@ -1,5 +1,5 @@
 import { ConfigService } from "@nestjs/config";
-import { ConfigSettings, VendorEnum } from "./../interfaces";
+import { ConfigSettings, VendorEnum } from "../types/general";
 export const getVendorName = (vendor: number) => {
     switch (vendor) {
         case VendorEnum.GPIB:
