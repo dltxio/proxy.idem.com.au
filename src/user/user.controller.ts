@@ -7,8 +7,7 @@ import {
     VerifyUserRequest,
     IXeroService,
     SendInvoicesRequestBody,
-    ResendEmailRequestBody,
-    IThirdPartyService
+    ResendEmailRequestBody
 } from "./../interfaces";
 import {
     Controller,
@@ -34,8 +33,6 @@ export class UserController {
         @Inject("IUserService") private userService: IUserService,
         @Inject("IKycService") private kycService: IKycService,
         @Inject("IGreenIdService") private greenIdService: IGreenIdService,
-        @Inject("IThirdPartyService")
-        private thirdPartyService: IThirdPartyService,
         @Inject("IXeroService")
         private xeroService: IXeroService
     ) {}
@@ -177,6 +174,7 @@ export class UserController {
         return this.userService.resendEmailVerification(body.hashedEmail);
     }
 
+    @Public()
     @ApiOperation({
         summary: "Verify with greenId"
     })
@@ -189,8 +187,13 @@ export class UserController {
     @Post("greenid/verify")
     async verifyGreenId(
         @Body("user") user: greenid.RegisterVerificationData,
-        @Body("licence") licence: greenid.LicenceData
+        @Body("licence") licence: greenid.LicenceData,
+        @Body("medicare") medicare: greenid.medicareData
     ): Promise<greenid.VerifyReturnData> {
-        return this.greenIdService.verify(user, licence);
+        return this.greenIdService.verify({
+            user: user,
+            licence: licence,
+            medicare: medicare
+        });
     }
 }

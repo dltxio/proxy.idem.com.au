@@ -25,10 +25,9 @@ export class GreenIdService implements IGreenIdService {
     }
 
     public async verify(
-        user: greenid.RegisterVerificationData,
-        licence?: greenid.LicenceData,
-        medicare?: greenid.medicareData
+        _props: greenid.verifyProps
     ): Promise<greenid.VerifyReturnData> {
+        const { user, licence, medicare } = _props;
         let errorMessage: string;
         if (!user.name) errorMessage = "User doesn't have name";
 
@@ -83,7 +82,10 @@ export class GreenIdService implements IGreenIdService {
 
         const result = await this.GetVerificationResult(verificationId);
 
-        if (result.return.checkResult.state === "VERIFIED") {
+        if (
+            result.return.verificationResult.overallVerificationStatus ===
+            "VERIFIED"
+        ) {
             const signedNameCredential = await this.createVerifiableCredential(
                 "NameCredential",
                 {
@@ -216,7 +218,6 @@ export class GreenIdService implements IGreenIdService {
     private async registerVerification(
         data: greenid.RegisterVerificationData
     ): Promise<greenid.RegisterVerificationResult> {
-        console.log(data);
         return new Promise<greenid.RegisterVerificationResult>(
             (resolve, reject) => {
                 this.greenId.registerVerification(

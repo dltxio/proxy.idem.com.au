@@ -15,6 +15,12 @@ declare namespace greenid {
         };
     };
 
+    type verifyProps = {
+        user: greenid.RegisterVerificationData;
+        licence?: greenid.LicenceData;
+        medicare?: greenid.medicareData;
+    };
+
     type Source = {
         available: boolean;
         name: string;
@@ -138,7 +144,13 @@ declare namespace greenid {
         certificatePrintedDate?: string;
     };
 
-    type GetVerificationResult = SetFieldResult;
+    type GetVerificationResult = {
+        return: {
+            verificationResult: {
+                overallVerificationStatus: "VERIFIED" | "IN_PROGRESS";
+            };
+        };
+    };
 
     type VerifyReturnData = {
         success: boolean;

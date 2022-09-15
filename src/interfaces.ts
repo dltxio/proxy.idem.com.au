@@ -78,10 +78,7 @@ export class AccountMissingIdError extends EntityMissingIdError {
 }
 
 export interface IGreenIdService {
-    verify(
-        user: greenid.RegisterVerificationData,
-        licence?: greenid.LicenceData
-    ): Promise<greenid.VerifyReturnData>;
+    verify(_props: greenid.verifyProps): Promise<greenid.VerifyReturnData>;
 }
 
 export interface IKycService {
