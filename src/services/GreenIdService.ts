@@ -1,12 +1,13 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { ConfigSettings, IGreenIdService } from "../interfaces";
+import { IGreenIdService } from "../interfaces";
 import soap from "soap";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const soapImport = require("soap");
 import * as openpgp from "openpgp";
 import { getPrivateKey } from "src/utils/pgp";
 import { ClaimType } from "src/types/verification";
+import { ConfigSettings } from "src/types/general";
 
 @Injectable()
 export class GreenIdService implements IGreenIdService {

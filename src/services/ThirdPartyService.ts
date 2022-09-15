@@ -1,16 +1,9 @@
-import { hashMessage } from "ethers/lib/utils";
-import {
-    IVendor,
-    RequestType,
-    SignupResponse,
-    UserSignupRequest,
-    VendorEnum
-} from "./../interfaces";
+import { IVendor, UserSignupRequest } from "./../interfaces";
 import { ConfigService } from "@nestjs/config";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import axios, { AxiosInstance } from "axios";
 import { HttpsProxyAgent } from "https-proxy-agent";
-import { ConfigSettings, IThirdPartyService } from "../interfaces";
+import { IThirdPartyService } from "../interfaces";
 import { Repository } from "typeorm";
 import { Request } from "../data/entities/request.entity";
 import { getVendorName } from "../utils/vendor";
@@ -19,6 +12,12 @@ import { GPIBVendor } from "./vendors/GPIB";
 import { CoinStashVendor } from "./vendors/CoinStash";
 import { EasyCryptoVendor } from "./vendors/EasyCrypto";
 import { DigitalSurgeVendor } from "./vendors/DigitalSurge";
+import {
+    ConfigSettings,
+    RequestType,
+    SignupResponse,
+    VendorEnum
+} from "../types/general";
 
 @Injectable()
 export class ThirdPartyService implements IThirdPartyService {

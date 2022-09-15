@@ -1,8 +1,10 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { ExampleService } from "./services/Example.service";
 import { UserModule } from "./user/user.module";
 import { AuthModule } from "./auth/auth.module";
+import { HealthModule } from "./health/health.module";
+import { OtpModule } from "./otp/otp.module";
+import { ExchangeModule } from "./exchange/exchange.module";
 
 @Module({
     imports: [
@@ -10,8 +12,10 @@ import { AuthModule } from "./auth/auth.module";
             isGlobal: true
         }),
         UserModule,
-        AuthModule
-    ],
-    providers: [ExampleService]
+        AuthModule,
+        HealthModule,
+        OtpModule,
+        ExchangeModule
+    ]
 })
 export class AppModule {}
