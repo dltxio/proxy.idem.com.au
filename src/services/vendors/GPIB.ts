@@ -34,6 +34,7 @@ export class GPIBVendor implements IVendor {
             signature: verification.signature
         };
 
+        console.log(requestBody);
         const response = await this.axios
             .post<SignupResponse>(endPoint, JSON.stringify(requestBody))
             .catch(error => {
