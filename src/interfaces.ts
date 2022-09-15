@@ -139,7 +139,7 @@ export interface IGreenIdService {
     verify(
         user: greenid.RegisterVerificationData,
         licence?: greenid.LicenceData
-    ): Promise<greenid.VerifyResult>;
+    ): Promise<greenid.VerifyReturnData>;
 }
 
 export interface IKycService {

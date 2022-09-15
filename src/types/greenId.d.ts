@@ -46,12 +46,12 @@ declare namespace greenid {
         ruleId: "default";
         name: Fullname;
         email?: string;
-        currentResidentialAddress: Address;
+        currentResidentialAddress?: Address;
         previousResidentialAddress?: Address;
         dob: DOB;
         homePhone?: string;
         workPhone?: string;
-        mobilePhone: string;
+        // mobilePhone: string;
     };
 
     type Address = {
@@ -136,5 +136,38 @@ declare namespace greenid {
         registrationDate?: string;
         certificateNumber?: string;
         certificatePrintedDate?: string;
+    };
+
+    type GetVerificationResult = SetFieldResult;
+
+    type VerifyReturnData = {
+        success: boolean;
+        didCredentials?: VerifiableCredential[];
+    };
+
+    type UnverifiableCredential = {
+        "@context": [string];
+        type: [string, ClaimType];
+        issuer: string;
+        issuanceDate: string;
+        expirationDate: string;
+        credentialSubject: object; // each claim type has it own value type. todo - make generic;
+    };
+
+    type VerifiableCredential = {
+        "@context": [string];
+        type: [string, ClaimType];
+        issuer: string;
+        issuanceDate: string;
+        expirationDate: string;
+        credentialSubject: object; // each claim type has it own value type. todo - make generic;
+        proof: {
+            type: string;
+            created: string;
+            proofPurpose: string;
+            verificationMethod: string; //Test ETH address, need to change to IDEM eth address
+            signatureValue: string;
+            // jws: "eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..TCYt5XsITJX1CxPCT8yAV-TVkIEq_PbChOMqsLfRoPsnsgw5WEuts01mq-pQy7UJiN5mgRxD-WUcX16dUEMGlv50aqzpqh4Qktb3rk-BuQy72IFLOqV0G_zS245-kronKb78cPN25DGlcTwLtjPAYuNzVBAh4vGHSrQyHUdBBPM";
+        };
     };
 }

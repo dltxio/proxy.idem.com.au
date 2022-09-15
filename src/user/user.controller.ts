@@ -283,7 +283,7 @@ export class UserController {
     async verifyGreenId(
         @Body("user") user: greenid.RegisterVerificationData,
         @Body("licence") licence: greenid.LicenceData
-    ): Promise<greenid.VerifyResult> {
+    ): Promise<greenid.VerifyReturnData> {
         return this.greenIdService.verify(user, licence);
     }
 }

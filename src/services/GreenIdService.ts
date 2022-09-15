@@ -4,6 +4,9 @@ import { ConfigSettings, IGreenIdService } from "../interfaces";
 import soap from "soap";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const soapImport = require("soap");
+import * as openpgp from "openpgp";
+import { getPrivateKey } from "src/utils/pgp";
+import { ClaimType } from "src/types/verification";
 
 @Injectable()
 export class GreenIdService implements IGreenIdService {
@@ -22,13 +25,20 @@ export class GreenIdService implements IGreenIdService {
 
     public async verify(
         user: greenid.RegisterVerificationData,
-        licence?: greenid.LicenceData
-    ): Promise<greenid.VerifyResult> {
-        if (!user.mobilePhone) {
-            const message = "User doesn't have a phone number";
-            const error = new Error(message);
-            this.logger.error(message, error);
-            throw error;
+        licence?: greenid.LicenceData,
+        medicare?: greenid.medicareData
+    ): Promise<greenid.VerifyReturnData> {
+        let errorMessage: string;
+        if (!user.name) errorMessage = "User doesn't have name";
+
+        if (!user.dob) errorMessage = "User doesn't have a date of birth";
+
+        if (!licence && !medicare)
+            errorMessage = "Need either Drivers licence or medicare card";
+
+        if (errorMessage) {
+            this.logger.error(errorMessage);
+            throw new Error(errorMessage);
         }
 
         if (
@@ -37,12 +47,11 @@ export class GreenIdService implements IGreenIdService {
             this.logger.debug("Mocking verification response to save money!");
             if (licence.licenceNumber === "123456789") {
                 return {
-                    success: true,
-                    verificationId: "DebugId"
+                    success: true
                 };
             }
 
-            return { success: false };
+            throw new Error("Error, please contract support");
         }
 
         const {
@@ -51,23 +60,92 @@ export class GreenIdService implements IGreenIdService {
             }
         } = await this.registerVerification(user);
 
-        const result = await this.setFields({
-            verificationId,
-            sourceId: `${licence.state.toLowerCase()}regodvs`,
-            inputFields: {
-                input: this.getDriversLicenseeInputs(licence)
-            }
-        });
+        if (licence) {
+            await this.setFields({
+                verificationId,
+                sourceId: `${licence.state.toLowerCase()}regodvs`,
+                inputFields: {
+                    input: this.getDriversLicenseeInputs(licence)
+                }
+            });
+        }
+
+        if (medicare) {
+            await this.setFields({
+                verificationId,
+                sourceId: `medicaredvs`,
+                inputFields: {
+                    input: this.getMedicareInputs(medicare)
+                }
+            });
+        }
+
+        const result = await this.GetVerificationResult(verificationId);
 
         if (result.return.checkResult.state === "VERIFIED") {
+            const signedNameCredential = await this.createVerifiableCredential(
+                "NameCredential",
+                {
+                    givenName: user.name.givenName,
+                    middleNames: user.name.middleNames,
+                    surname: user.name.surname
+                }
+            );
+            const signedDobCredential = await this.createVerifiableCredential(
+                "BirthCredential",
+                {
+                    day: user.dob.day,
+                    month: user.dob.month,
+                    year: user.dob.year
+                }
+            );
+
             return {
                 success: true,
-                verificationId
+                didCredentials: [signedNameCredential, signedDobCredential]
             };
         }
 
+        throw new Error("Error, please contract support");
+    }
+
+    private async createVerifiableCredential(
+        credentialType: ClaimType,
+        credentialSubject: object
+    ): Promise<greenid.VerifiableCredential> {
+        const date = new Date();
+        const yearFromNow = new Date(
+            date.valueOf() + 1000 * 60 * 60 * 24 * 365
+        );
+
+        const UnverifiableCredential: greenid.UnverifiableCredential = {
+            "@context": ["https://www.w3.org/2018/credentials/v1"],
+            type: ["VerifiableCredential", credentialType],
+            issuer: this.config.get(ConfigSettings.IDEM_URL),
+            issuanceDate: date.toISOString(),
+            expirationDate: yearFromNow.toISOString(), //expires after 1 year
+            credentialSubject: credentialSubject
+        };
+
+        const privateKey = await getPrivateKey(this.config);
+        const message = await openpgp.createCleartextMessage({
+            text: JSON.stringify(UnverifiableCredential)
+        });
+        const nameSignature = await openpgp.sign({
+            message: message,
+            signingKeys: privateKey,
+            detached: true
+        });
+
         return {
-            success: false
+            ...UnverifiableCredential,
+            proof: {
+                type: "GpgSignature2020",
+                created: new Date().toISOString(),
+                proofPurpose: "assertionMethod",
+                verificationMethod: "",
+                signatureValue: nameSignature
+            }
         };
     }
 
@@ -108,6 +186,27 @@ export class GreenIdService implements IGreenIdService {
                     }
 
                     resolve(result?.return?.sourceList ?? []);
+                }
+            );
+        });
+    }
+
+    public async GetVerificationResult(
+        verificationId: string
+    ): Promise<greenid.GetVerificationResult> {
+        return new Promise<greenid.GetVerificationResult>((resolve, reject) => {
+            this.greenId.getSources(
+                {
+                    verificationId: verificationId,
+                    accountId: this.greenIdAccountId,
+                    password: this.greenIdPassword
+                },
+                (error: unknown, result: greenid.GetVerificationResult) => {
+                    if (error) {
+                        reject(error);
+                    }
+
+                    resolve(result);
                 }
             );
         });
@@ -252,6 +351,8 @@ export class GreenIdService implements IGreenIdService {
                 value: data.name4
             });
         }
+
+        return variables;
     }
 
     private getPassportInputs(data: greenid.PassportData) {
@@ -284,6 +385,8 @@ export class GreenIdService implements IGreenIdService {
                 value: data.name.middleNames
             });
         }
+
+        return variables;
     }
 
     private getBirthCertificateInputs(data: greenid.BirthCertificateData) {
@@ -344,5 +447,7 @@ export class GreenIdService implements IGreenIdService {
                 value: data.name.middleNames
             });
         }
+
+        return variables;
     }
 }
