@@ -46,8 +46,8 @@ export class GreenIdService implements IGreenIdService {
         ) {
             this.logger.debug("Mocking verification response to save money!");
             if (
-                licence.licenceNumber === "123456789" &&
-                medicare.number === "123456789"
+                licence.licenceNumber === "11111111" &&
+                medicare.number === "2111111111"
             ) {
                 const signedNameCredential =
                     await this.createVerifiableCredential("NameCredential", {
