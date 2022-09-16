@@ -78,7 +78,7 @@ export class AccountMissingIdError extends EntityMissingIdError {
 }
 
 export interface IGreenIdService {
-    verify(_props: greenid.verifyProps): Promise<greenid.VerifyReturnData>;
+    verify(_props: greenid.VerifyProps): Promise<greenid.VerifyReturnData>;
 }
 
 export interface IKycService {

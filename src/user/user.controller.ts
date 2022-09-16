@@ -187,7 +187,7 @@ export class UserController {
     async verifyGreenId(
         @Body("user") user: greenid.RegisterVerificationData,
         @Body("licence") licence: greenid.LicenceData,
-        @Body("medicare") medicare: greenid.medicareData
+        @Body("medicare") medicare: greenid.MedicareData
     ): Promise<greenid.VerifyReturnData> {
         return this.greenIdService.verify({
             user: user,

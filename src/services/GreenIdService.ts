@@ -25,7 +25,7 @@ export class GreenIdService implements IGreenIdService {
     }
 
     public async verify(
-        _props: greenid.verifyProps
+        _props: greenid.VerifyProps
     ): Promise<greenid.VerifyReturnData> {
         const { user, licence, medicare } = _props;
         let errorMessage: string;
@@ -323,7 +323,7 @@ export class GreenIdService implements IGreenIdService {
         return variables;
     }
 
-    private getMedicareInputs(data: greenid.medicareData) {
+    private getMedicareInputs(data: greenid.MedicareData) {
         const variables = [
             {
                 name: `greenid_medicaredvs_cardColour`,

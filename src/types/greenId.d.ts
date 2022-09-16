@@ -9,16 +9,16 @@ declare namespace greenid {
 
     type GetSourcesResult = {
         return: {
-            registrationDetails: registrationDetails;
+            registrationDetails: RegistrationDetails;
             sourceList: Source[];
-            verificationResult: verificationResult;
+            verificationResult: VerificationResult;
         };
     };
 
-    type verifyProps = {
+    type VerifyProps = {
         user: greenid.RegisterVerificationData;
         licence?: greenid.LicenceData;
-        medicare?: greenid.medicareData;
+        medicare?: greenid.MedicareData;
     };
 
     type Source = {
@@ -32,7 +32,7 @@ declare namespace greenid {
         version: number;
     };
 
-    type registrationDetails = {
+    type RegistrationDetails = {
         currentResidentialAddress: object;
         dateCreated: Date;
         dob: object;
@@ -40,7 +40,7 @@ declare namespace greenid {
         name: object;
     };
 
-    type verificationResult = {
+    type VerificationResult = {
         dateVerifed: Date;
         individualResult: [];
         overallVerificationStatus: string;
@@ -115,7 +115,7 @@ declare namespace greenid {
         year: number;
     };
 
-    type medicareData = {
+    type MedicareData = {
         colour: "Green" | "Blue" | "Yellow";
         number: string;
         individualReferenceNumber: string;
