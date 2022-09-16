@@ -45,9 +45,26 @@ export class GreenIdService implements IGreenIdService {
             this.config.get(ConfigSettings.REALLY_VERIFY_IDENTITY) === "false"
         ) {
             this.logger.debug("Mocking verification response to save money!");
-            if (licence.licenceNumber === "123456789") {
+            if (
+                licence.licenceNumber === "123456789" &&
+                medicare.number === "123456789"
+            ) {
+                const signedNameCredential =
+                    await this.createVerifiableCredential("NameCredential", {
+                        givenName: user.name.givenName,
+                        middleNames: user.name.middleNames,
+                        surname: user.name.surname
+                    });
+                const signedDobCredential =
+                    await this.createVerifiableCredential("BirthCredential", {
+                        day: user.dob.day,
+                        month: user.dob.month,
+                        year: user.dob.year
+                    });
+
                 return {
-                    success: true
+                    success: true,
+                    didCredentials: [signedNameCredential, signedDobCredential]
                 };
             }
 
