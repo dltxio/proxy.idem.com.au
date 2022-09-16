@@ -131,13 +131,18 @@ export class GreenIdService implements IGreenIdService {
         };
 
         const privateKey = await getPrivateKey(this.config);
-        const message = await openpgp.createCleartextMessage({
+        const message = await openpgp.createMessage({
             text: JSON.stringify(UnverifiableCredential)
         });
-        const nameSignature = await openpgp.sign({
+        const detachedSignature = await openpgp.sign({
             message: message,
             signingKeys: privateKey,
+            format: "object",
             detached: true
+        });
+
+        const signature = await openpgp.readSignature({
+            armoredSignature: detachedSignature.armor() // parse detached signature
         });
 
         return {
@@ -147,7 +152,7 @@ export class GreenIdService implements IGreenIdService {
                 created: new Date().toISOString(),
                 proofPurpose: "assertionMethod",
                 verificationMethod: "",
-                signatureValue: nameSignature
+                signatureValue: signature.armor()
             }
         };
     }
