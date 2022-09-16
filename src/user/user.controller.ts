@@ -174,7 +174,6 @@ export class UserController {
         return this.userService.resendEmailVerification(body.hashedEmail);
     }
 
-    @Public()
     @ApiOperation({
         summary: "Verify with greenId"
     })
