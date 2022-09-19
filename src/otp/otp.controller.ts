@@ -1,4 +1,11 @@
-import { Body, Controller, HttpStatus, Inject, Post } from "@nestjs/common";
+import {
+    Body,
+    Controller,
+    Get,
+    HttpStatus,
+    Inject,
+    Post
+} from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { RequestOtpResponse } from "../types/general";
 import { RequestOtp, VerifyOtp, IOtpService } from "../interfaces";
@@ -7,7 +14,7 @@ import { RequestOtp, VerifyOtp, IOtpService } from "../interfaces";
 export class OtpController {
     constructor(@Inject("IOtpService") private otpService: IOtpService) {}
 
-    @Post("request")
+    @Get("request")
     @ApiOperation({
         summary:
             "User request otp to be sent via SMS to verify their phone number"
