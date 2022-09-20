@@ -14,7 +14,7 @@ import { RequestOtp, VerifyOtp, IOtpService } from "../interfaces";
 export class OtpController {
     constructor(@Inject("IOtpService") private otpService: IOtpService) {}
 
-    @Get("request")
+    @Post("request")
     @ApiOperation({
         summary:
             "User request otp to be sent via SMS to verify their phone number"

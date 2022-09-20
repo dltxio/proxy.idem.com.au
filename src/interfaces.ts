@@ -226,7 +226,7 @@ export class UserSignupRequest {
     @IsNotEmpty()
     lastName: string;
     @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     password: string;
     @ApiProperty()
     @IsNotEmpty()
@@ -235,7 +235,6 @@ export class UserSignupRequest {
     @IsOptional()
     mobile: string;
     @ApiProperty()
-    @IsNotEmpty()
     @ValidateNested()
     @Type(() => Verification)
     verification: Verification;
