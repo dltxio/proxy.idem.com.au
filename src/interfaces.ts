@@ -100,7 +100,7 @@ export interface IUserService {
 }
 
 export interface IOtpService {
-    requestOtp(body: RequestOtp): Promise<RequestOtpResponse>;
+    requestOtp(mobile: string): Promise<RequestOtpResponse>;
     verifyOtp(body: VerifyOtp): Promise<boolean>;
 }
 export interface IEmailService {
@@ -262,12 +262,6 @@ export class UserDetailRequest {
     @ApiProperty()
     @IsNotEmpty()
     dob: string;
-}
-
-export class RequestOtp {
-    @ApiProperty()
-    @IsNotEmpty()
-    mobileNumber: string;
 }
 
 export class VerifyOtp {
