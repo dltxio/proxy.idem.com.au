@@ -1,11 +1,16 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { ISmsService, RequestOtp, VerifyOtp } from "./../interfaces";
+import {
+    IOtpService,
+    ISmsService,
+    RequestOtp,
+    VerifyOtp
+} from "./../interfaces";
 import crypto from "crypto";
 import { ConfigService } from "@nestjs/config";
 import { ConfigSettings, RequestOtpResponse } from "../types/general";
 
 @Injectable()
-export class OtpService {
+export class OtpService implements IOtpService {
     private readonly logger = new Logger("OtpService");
     constructor(
         private readonly config: ConfigService,

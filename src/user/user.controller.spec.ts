@@ -29,7 +29,7 @@ describe("UserController", () => {
                 },
                 {
                     provide: "IEmailService",
-                    useClass: EmailService
+                    useFactory: () => ({})
                 },
                 {
                     provide: "IUserService",
@@ -39,6 +39,10 @@ describe("UserController", () => {
                 {
                     provide: "IKycService",
                     useClass: KycService
+                },
+                {
+                    provide: "IXeroService",
+                    useFactory: () => ({})
                 }
             ]
         }).compile();
