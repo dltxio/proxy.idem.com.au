@@ -8,6 +8,8 @@ import * as openpgp from "openpgp";
 import { getPrivateKey } from "src/utils/pgp";
 import { ClaimType } from "src/types/verification";
 import { ConfigSettings } from "src/types/general";
+import { ethers } from "ethers";
+import { EthrDID } from "ethr-did";
 
 @Injectable()
 export class GreenIdService implements IGreenIdService {
@@ -50,21 +52,27 @@ export class GreenIdService implements IGreenIdService {
                 medicare.number === "2111111111"
             ) {
                 const signedNameCredential =
-                    await this.createVerifiableCredential("NameCredential", {
+                    await this.createJWTVerifiableCredential("NameCredential", {
                         givenName: user.name.givenName,
                         middleNames: user.name.middleNames,
                         surname: user.name.surname
                     });
                 const signedDobCredential =
-                    await this.createVerifiableCredential("BirthCredential", {
-                        day: user.dob.day,
-                        month: user.dob.month,
-                        year: user.dob.year
-                    });
+                    await this.createJWTVerifiableCredential(
+                        "BirthCredential",
+                        {
+                            day: user.dob.day,
+                            month: user.dob.month,
+                            year: user.dob.year
+                        }
+                    );
 
                 return {
                     success: true,
-                    didCredentials: [signedNameCredential, signedDobCredential]
+                    didJWTCredentials: [
+                        signedNameCredential,
+                        signedDobCredential
+                    ]
                 };
             }
 
@@ -103,33 +111,66 @@ export class GreenIdService implements IGreenIdService {
             result.return.verificationResult.overallVerificationStatus ===
             "VERIFIED"
         ) {
-            const signedNameCredential = await this.createVerifiableCredential(
-                "NameCredential",
-                {
+            const signedNameCredential =
+                await this.createJWTVerifiableCredential("NameCredential", {
                     givenName: user.name.givenName,
                     middleNames: user.name.middleNames,
                     surname: user.name.surname
-                }
-            );
-            const signedDobCredential = await this.createVerifiableCredential(
-                "BirthCredential",
-                {
+                });
+            const signedDobCredential =
+                await this.createJWTVerifiableCredential("BirthCredential", {
                     day: user.dob.day,
                     month: user.dob.month,
                     year: user.dob.year
-                }
-            );
+                });
 
             return {
                 success: true,
-                didCredentials: [signedNameCredential, signedDobCredential]
+                didJWTCredentials: [signedNameCredential, signedDobCredential]
             };
         }
 
         throw new Error("Error, please contract support");
     }
 
-    private async createVerifiableCredential(
+    private async createJWTVerifiableCredential(
+        credentialType: ClaimType,
+        credentialSubject: object
+    ): Promise<string> {
+        const date = new Date();
+        const yearFromNow = new Date(
+            date.valueOf() + 1000 * 60 * 60 * 24 * 365
+        );
+
+        const publicKey = new ethers.Wallet(
+            this.config.get(ConfigSettings.WALLET_PRIVATE_KEY)
+        ).publicKey;
+
+        const keypair = {
+            address: this.config.get(ConfigSettings.WALLET_ADDRESS),
+            privateKey: this.config.get(ConfigSettings.WALLET_PRIVATE_KEY),
+            publicKey: publicKey,
+            identifier: publicKey
+        };
+
+        const ethrDid = new EthrDID({ ...keypair });
+
+        const UnverifiableCredential: greenid.UnverifiableCredential = {
+            "@context": ["https://www.w3.org/2018/credentials/v1"],
+            type: ["VerifiableCredential", credentialType],
+            issuer: ethrDid.did,
+            issuanceDate: date.toISOString(),
+            expirationDate: yearFromNow.toISOString(), //expires after 1 year
+            credentialSubject: credentialSubject
+        };
+
+        const JWT = await ethrDid.signJWT({ vc: UnverifiableCredential });
+
+        return JWT;
+    }
+
+    ///Create verifiable credential signed with pgp key
+    private async createPGPVerifiableCredential(
         credentialType: ClaimType,
         credentialSubject: object
     ): Promise<greenid.VerifiableCredential> {

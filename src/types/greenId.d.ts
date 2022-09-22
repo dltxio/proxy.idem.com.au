@@ -154,7 +154,8 @@ declare namespace greenid {
 
     type VerifyReturnData = {
         success: boolean;
-        didCredentials?: VerifiableCredential[];
+        didJWTCredentials?: string[];
+        didPGPCredentials?: VerifiableCredential[];
     };
 
     type UnverifiableCredential = {
