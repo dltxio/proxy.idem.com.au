@@ -23,7 +23,6 @@ export class DigitalSurgeVendor implements IVendor {
             email,
             phone_number: mobile
         };
-
         const response = await this.axios
             .post(this.signUpEndpoint, JSON.stringify(requestBody), {
                 headers: {
