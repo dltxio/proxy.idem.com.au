@@ -1,12 +1,8 @@
-import { UserModule } from "./user.module";
 import { Test, TestingModule } from "@nestjs/testing";
 import { UserController } from "./user.controller";
 import { expect } from "chai";
-import { ConfigModule } from "@nestjs/config";
-import { UserService } from "./user.service";
 import { repositoryMockFactory } from "./user.service.spec";
 import { JwtService } from "@nestjs/jwt";
-import { GreenIdService } from "../services/GreenIdService";
 
 //TODO: need to fix the unit test later
 describe("UserController", () => {
@@ -15,12 +11,6 @@ describe("UserController", () => {
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [UserController],
-            imports: [
-                ConfigModule.forRoot({
-                    isGlobal: true
-                }),
-                UserModule
-            ],
             providers: [
                 {
                     provide: "USER_REPOSITORY",
@@ -28,18 +18,16 @@ describe("UserController", () => {
                 },
                 {
                     provide: "IEmailService",
-                    useFactory: () => ({
-                        sendEmailVerification: () => ({})
-                    })
+                    useFactory: () => ({})
                 },
                 {
                     provide: "IUserService",
-                    useClass: UserService
+                    useFactory: () => ({})
                 },
                 JwtService,
                 {
                     provide: "IGreenIdService",
-                    useClass: GreenIdService
+                    useFactory: () => ({})
                 },
                 {
                     provide: "IXeroService",
