@@ -67,7 +67,6 @@ export class ThirdPartyService implements IThirdPartyService {
         ip: string
     ): Promise<SignupResponse> {
         const vendorFromSitesJson = getVendorFromSitesJson(signupInfo.source);
-        console.log(signupInfo);
         if (vendorFromSitesJson.verifyClaims) {
             const { verification } = signupInfo;
             const { hashedPayload, signature } = verification;
