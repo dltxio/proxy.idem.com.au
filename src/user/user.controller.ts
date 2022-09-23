@@ -47,7 +47,7 @@ export class UserController {
         return this.userService.create(body);
     }
 
-    @Post("verify")
+    @Post("verify-claims")
     @ApiOperation({ summary: "Verify claims" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -95,7 +95,7 @@ export class UserController {
         return this.userService.update(email, requestBody);
     }
 
-    @Post("notification")
+    @Post("notify")
     @ApiOperation({ summary: "Push notification" })
     @ApiResponse({
         status: HttpStatus.OK
