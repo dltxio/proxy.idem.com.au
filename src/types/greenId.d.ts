@@ -57,7 +57,7 @@ declare namespace greenid {
         dob: DOB;
         homePhone?: string;
         workPhone?: string;
-        // mobilePhone: string;
+        mobilePhone?: string;
     };
 
     type Address = {

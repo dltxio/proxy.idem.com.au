@@ -6,10 +6,11 @@ import soap from "soap";
 const soapImport = require("soap");
 import * as openpgp from "openpgp";
 import { getPrivateKey } from "src/utils/pgp";
-import { ClaimType } from "src/types/verification";
-import { ConfigSettings } from "src/types/general";
+import { ClaimResponsePayload, ClaimType } from "src/types/verification";
+import { ConfigSettings, KycResponse, KycResult } from "src/types/general";
 import { ethers } from "ethers";
 import { EthrDID } from "ethr-did";
+import { signMessage } from "src/utils/wallet";
 
 @Injectable()
 export class GreenIdService implements IGreenIdService {
@@ -46,37 +47,7 @@ export class GreenIdService implements IGreenIdService {
         if (
             this.config.get(ConfigSettings.REALLY_VERIFY_IDENTITY) === "false"
         ) {
-            this.logger.debug("Mocking verification response to save money!");
-            if (
-                licence.licenceNumber === "11111111" &&
-                medicare.number === "2111111111"
-            ) {
-                const signedNameCredential =
-                    await this.createJWTVerifiableCredential("NameCredential", {
-                        givenName: user.name.givenName,
-                        middleNames: user.name.middleNames,
-                        surname: user.name.surname
-                    });
-                const signedDobCredential =
-                    await this.createJWTVerifiableCredential(
-                        "BirthCredential",
-                        {
-                            day: user.dob.day,
-                            month: user.dob.month,
-                            year: user.dob.year
-                        }
-                    );
-
-                return {
-                    success: true,
-                    didJWTCredentials: [
-                        signedNameCredential,
-                        signedDobCredential
-                    ]
-                };
-            }
-
-            throw new Error("Error, please contract support");
+            this.mockGreenIdCall(_props);
         }
 
         const {
@@ -110,6 +81,94 @@ export class GreenIdService implements IGreenIdService {
         if (
             result.return.verificationResult.overallVerificationStatus ===
             "VERIFIED"
+        ) {
+            const signedNameCredential =
+                await this.createJWTVerifiableCredential("NameCredential", {
+                    givenName: user.name.givenName,
+                    middleNames: user.name.middleNames,
+                    surname: user.name.surname
+                });
+            const signedDobCredential =
+                await this.createJWTVerifiableCredential("BirthCredential", {
+                    day: user.dob.day,
+                    month: user.dob.month,
+                    year: user.dob.year
+                });
+
+            const PGPSignedNameCredential =
+                await this.createPGPVerifiableCredential("NameCredential", {
+                    givenName: user.name.givenName,
+                    middleNames: user.name.middleNames,
+                    surname: user.name.surname
+                });
+            const PGPSignedDobCredential =
+                await this.createPGPVerifiableCredential("BirthCredential", {
+                    day: user.dob.day,
+                    month: user.dob.month,
+                    year: user.dob.year
+                });
+
+            return {
+                success: true,
+                didJWTCredentials: [signedNameCredential, signedDobCredential],
+                didPGPCredentials: [
+                    PGPSignedNameCredential,
+                    PGPSignedDobCredential
+                ]
+            };
+        }
+
+        throw new Error("Error, please contract support");
+    }
+
+    public async formatReturnData(
+        data: greenid.VerifyReturnData
+    ): Promise<KycResponse> {
+        const credentials = data.didPGPCredentials[0];
+
+        const claimPayload = {
+            "@context": [
+                "https://www.w3.org/2018/credentials/v1",
+                "https://schema.org"
+            ],
+            type: "VerifiablePresentation",
+            proof: {
+                type: "EcdsaSecp256k1Signature2019",
+                created: new Date(),
+                proofPurpose: "authentication",
+                verificationMethod: `did:idem:${this.config.get(
+                    ConfigSettings.WALLET_ADDRESS
+                )}`,
+                domain: this.config.get(ConfigSettings.IDEM_URL)
+            },
+            verifiableCredential: [credentials]
+        } as unknown as ClaimResponsePayload;
+
+        const hashedPayload = ethers.utils.hashMessage(
+            JSON.stringify(claimPayload)
+        );
+
+        return {
+            result: KycResult.Completed,
+
+            thirdPartyVerified: false,
+            signature: await signMessage(
+                hashedPayload,
+                this.config,
+                this.logger
+            ),
+            message: claimPayload,
+            hashedPayload: hashedPayload,
+            JWTs: data.didJWTCredentials
+        };
+    }
+
+    private async mockGreenIdCall(_props: greenid.VerifyProps) {
+        const { user, licence, medicare } = _props;
+        this.logger.debug("Mocking verification response to save money!");
+        if (
+            licence.licenceNumber === "11111111" &&
+            medicare.number === "2111111111"
         ) {
             const signedNameCredential =
                 await this.createJWTVerifiableCredential("NameCredential", {

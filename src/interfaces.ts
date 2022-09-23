@@ -78,11 +78,8 @@ export class AccountMissingIdError extends EntityMissingIdError {
 }
 
 export interface IGreenIdService {
+    formatReturnData(data: greenid.VerifyReturnData): Promise<KycResponse>;
     verify(_props: greenid.VerifyProps): Promise<greenid.VerifyReturnData>;
-}
-
-export interface IKycService {
-    verify(): Promise<KycResponse>;
 }
 
 export interface ISmsService {
@@ -168,6 +165,9 @@ export class VerifyUserRequest {
     street: string;
     @ApiProperty()
     @IsNotEmpty()
+    streetType: string;
+    @ApiProperty()
+    @IsNotEmpty()
     suburb: string;
     @ApiProperty()
     @IsNotEmpty()
@@ -178,6 +178,12 @@ export class VerifyUserRequest {
     @ApiProperty()
     @IsNotEmpty()
     country: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    driversLicence: greenid.LicenceData;
+    @ApiProperty()
+    @IsNotEmpty()
+    medicareCard: greenid.MedicareData;
 }
 
 export class ExchangeSignupCallBack {
@@ -216,6 +222,9 @@ class Verification implements KycResponse {
     @ApiProperty()
     @IsNotEmpty()
     hashedPayload: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    JWTs: string[];
 }
 export class UserSignupRequest {
     @ApiProperty({

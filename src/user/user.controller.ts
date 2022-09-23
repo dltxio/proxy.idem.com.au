@@ -1,6 +1,5 @@
 import {
     IGreenIdService,
-    IKycService,
     NotificationRequest,
     UserDto,
     IUserService,
@@ -26,12 +25,12 @@ import { Public } from "../auth/anonymous";
 import { LocalGuard } from "../auth/auth-local.guard";
 import { hashMessage } from "ethers/lib/utils";
 import { KycResponse, UsersResponse } from "../types/general";
+
 @Controller("users")
 @UseGuards(LocalGuard)
 export class UserController {
     constructor(
         @Inject("IUserService") private userService: IUserService,
-        @Inject("IKycService") private kycService: IKycService,
         @Inject("IGreenIdService") private greenIdService: IGreenIdService,
         @Inject("IXeroService")
         private xeroService: IXeroService
@@ -61,13 +60,45 @@ export class UserController {
         const findUser = await this.userService.findOne(body.hashEmail);
         if (!findUser) throw new Error("User not found");
 
-        //TODO: Implement Green ID KYC verification
-        const response = await this.kycService.verify();
+        const dob = body.dob.split("/");
+        if (dob.length !== 3) {
+            throw new Error(
+                "Can't parse Date of birth please make sure it is in dd/mm/yyyy format"
+            );
+        }
 
-        //mock response
-        response.thirdPartyVerified = true;
+        const greenIdU: greenid.RegisterVerificationData = {
+            ruleId: "default",
+            name: {
+                givenName: body.firstName,
+                middleNames: body.middleName,
+                surname: body.lastName
+            },
+            currentResidentialAddress: {
+                country: body.country,
+                postcode: body.postcode,
+                state: body.state,
+                streetName: body.street,
+                streetType: body.streetType,
+                streetNumber: body.houseNumber,
+                suburb: body.suburb
+            },
+            dob: {
+                day: parseInt(dob[0]),
+                month: parseInt(dob[1]),
+                year: parseInt(dob[2])
+            }
+        };
 
-        return response;
+        const response = await this.greenIdService.verify({
+            user: greenIdU,
+            licence: body.driversLicence,
+            medicare: body.medicareCard
+        });
+
+        const result = await this.greenIdService.formatReturnData(response);
+
+        return result;
     }
 
     @Get("")

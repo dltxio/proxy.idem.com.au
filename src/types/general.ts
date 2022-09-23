@@ -81,6 +81,7 @@ export type KycResponse = {
     signature: string; //signed claim response
     message: ClaimResponsePayload;
     hashedPayload: string;
+    JWTs: string[];
 };
 
 export type GPIBVerifyRequest = {

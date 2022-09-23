@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common";
-import { KycService } from "../services/KycService";
 import { DatabaseModule } from "../data/database.module";
 import { UserController } from "./user.controller";
 import { userProviders } from "./user.providers";
@@ -31,10 +30,6 @@ import { XeroService } from "../services/XeroService";
         {
             provide: "IUserService",
             useClass: UserService
-        },
-        {
-            provide: "IKycService",
-            useClass: KycService
         },
         {
             provide: "IEmailService",

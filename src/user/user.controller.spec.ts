@@ -7,7 +7,7 @@ import { UserService } from "./user.service";
 import { repositoryMockFactory } from "./user.service.spec";
 import { EmailService } from "../services/EmailService";
 import { JwtService } from "@nestjs/jwt";
-import { KycService } from "../services/KycService";
+import { GreenIdService } from "src/services/GreenIdService";
 
 //TODO: need to fix the unit test later
 describe("UserController", () => {
@@ -37,8 +37,8 @@ describe("UserController", () => {
                 },
                 JwtService,
                 {
-                    provide: "IKycService",
-                    useClass: KycService
+                    provide: "IGreenIdService",
+                    useClass: GreenIdService
                 }
             ]
         }).compile();
