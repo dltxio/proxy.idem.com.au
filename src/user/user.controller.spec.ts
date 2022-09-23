@@ -5,7 +5,6 @@ import { expect } from "chai";
 import { ConfigModule } from "@nestjs/config";
 import { UserService } from "./user.service";
 import { repositoryMockFactory } from "./user.service.spec";
-import { EmailService } from "../services/EmailService";
 import { JwtService } from "@nestjs/jwt";
 import { KycService } from "../services/KycService";
 
@@ -29,7 +28,9 @@ describe("UserController", () => {
                 },
                 {
                     provide: "IEmailService",
-                    useClass: EmailService
+                    useFactory: () => ({
+                        sendEmailVerification: () => ({})
+                    })
                 },
                 {
                     provide: "IUserService",
@@ -39,6 +40,10 @@ describe("UserController", () => {
                 {
                     provide: "IKycService",
                     useClass: KycService
+                },
+                {
+                    provide: "IXeroService",
+                    useFactory: () => ({})
                 }
             ]
         }).compile();

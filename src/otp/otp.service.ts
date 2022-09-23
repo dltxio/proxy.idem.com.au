@@ -1,19 +1,18 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { ISmsService, RequestOtp, VerifyOtp } from "./../interfaces";
+import { IOtpService, ISmsService, VerifyOtp } from "./../interfaces";
 import crypto from "crypto";
 import { ConfigService } from "@nestjs/config";
 import { ConfigSettings, RequestOtpResponse } from "../types/general";
 
 @Injectable()
-export class OtpService {
+export class OtpService implements IOtpService {
     private readonly logger = new Logger("OtpService");
     constructor(
         private readonly config: ConfigService,
         @Inject("ISmsService") private smsService: ISmsService
     ) {}
 
-    public async requestOtp(body: RequestOtp): Promise<RequestOtpResponse> {
-        const { mobileNumber } = body;
+    public async requestOtp(mobile: string): Promise<RequestOtpResponse> {
         const otp = Math.floor(Math.random() * 900000) + 100000;
         const expiryTimestamp =
             new Date().getTime() +
@@ -22,7 +21,7 @@ export class OtpService {
             ConfigSettings.OTP_HASHING_SALT,
             "Hi i'm default salt from idem proxy :)"
         );
-        const messageForHash = mobileNumber + otp + expiryTimestamp + salt;
+        const messageForHash = mobile + otp + expiryTimestamp + salt;
         const hash = crypto
             .createHmac(
                 "sha256",
@@ -32,7 +31,7 @@ export class OtpService {
             .digest("hex");
 
         const message = `Your OTP code for IDEM is ${otp}`;
-        await this.smsService.send(mobileNumber, message);
+        await this.smsService.send(mobile, message);
 
         return {
             hash,

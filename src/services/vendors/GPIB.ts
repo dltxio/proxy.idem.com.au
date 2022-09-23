@@ -17,7 +17,6 @@ export class GPIBVendor implements IVendor {
     async signUp(signupInfo: UserSignupRequest) {
         const { firstName, lastName, email, password, verification, mobile } =
             signupInfo;
-
         const endPoint = `${this.baseUrl}/user/idem`;
         const referralCode = this.config.get(ConfigSettings.GPIB_REFERRAL_CODE);
         const requestBody = {
@@ -33,7 +32,6 @@ export class GPIBVendor implements IVendor {
             hashedPayload: verification.hashedPayload,
             signature: verification.signature
         };
-
         const response = await this.axios
             .post<SignupResponse>(endPoint, JSON.stringify(requestBody))
             .catch(error => {

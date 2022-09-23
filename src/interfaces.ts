@@ -100,7 +100,7 @@ export interface IUserService {
 }
 
 export interface IOtpService {
-    requestOtp(body: RequestOtp): Promise<RequestOtpResponse>;
+    requestOtp(mobile: string): Promise<RequestOtpResponse>;
     verifyOtp(body: VerifyOtp): Promise<boolean>;
 }
 export interface IEmailService {
@@ -226,7 +226,7 @@ export class UserSignupRequest {
     @IsNotEmpty()
     lastName: string;
     @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     password: string;
     @ApiProperty()
     @IsNotEmpty()
@@ -235,7 +235,6 @@ export class UserSignupRequest {
     @IsOptional()
     mobile: string;
     @ApiProperty()
-    @IsNotEmpty()
     @ValidateNested()
     @Type(() => Verification)
     verification: Verification;
@@ -263,12 +262,6 @@ export class UserDetailRequest {
     @ApiProperty()
     @IsNotEmpty()
     dob: string;
-}
-
-export class RequestOtp {
-    @ApiProperty()
-    @IsNotEmpty()
-    mobileNumber: string;
 }
 
 export class VerifyOtp {
