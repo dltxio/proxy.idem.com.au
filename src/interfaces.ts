@@ -21,6 +21,12 @@ import {
     VendorEnum,
     XeroTokenSet
 } from "./types/general";
+import {
+    LicenceData,
+    MedicareData,
+    VerifyProps,
+    VerifyReturnData
+} from "./types/greenId";
 
 export interface IExampleService {
     getById(id: string): string;
@@ -78,8 +84,8 @@ export class AccountMissingIdError extends EntityMissingIdError {
 }
 
 export interface IGreenIdService {
-    formatReturnData(data: greenid.VerifyReturnData): Promise<KycResponse>;
-    verify(_props: greenid.VerifyProps): Promise<greenid.VerifyReturnData>;
+    formatReturnData(data: VerifyReturnData): Promise<KycResponse>;
+    verify(_props: VerifyProps): Promise<VerifyReturnData>;
 }
 
 export interface ISmsService {
@@ -180,10 +186,10 @@ export class VerifyUserRequest {
     country: string;
     @ApiProperty()
     @IsNotEmpty()
-    driversLicence: greenid.LicenceData;
+    driversLicence: LicenceData;
     @ApiProperty()
     @IsNotEmpty()
-    medicareCard: greenid.MedicareData;
+    medicareCard: MedicareData;
 }
 
 export class ExchangeSignupCallBack {

@@ -1,6 +1,6 @@
 import { ConfigService } from "@nestjs/config";
 import * as openpgp from "openpgp";
-import { ConfigSettings } from "src/types/general";
+import { ConfigSettings } from "../types/general";
 
 export const getPrivateKey = async (
     config: ConfigService

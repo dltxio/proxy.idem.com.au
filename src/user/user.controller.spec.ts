@@ -6,7 +6,7 @@ import { ConfigModule } from "@nestjs/config";
 import { UserService } from "./user.service";
 import { repositoryMockFactory } from "./user.service.spec";
 import { JwtService } from "@nestjs/jwt";
-import { GreenIdService } from "src/services/GreenIdService";
+import { GreenIdService } from "../services/GreenIdService";
 
 //TODO: need to fix the unit test later
 describe("UserController", () => {

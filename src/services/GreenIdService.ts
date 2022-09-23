@@ -5,12 +5,29 @@ import soap from "soap";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const soapImport = require("soap");
 import * as openpgp from "openpgp";
-import { getPrivateKey } from "src/utils/pgp";
-import { ClaimResponsePayload, ClaimType } from "src/types/verification";
-import { ConfigSettings, KycResponse, KycResult } from "src/types/general";
+import { getPrivateKey } from "../utils/pgp";
+import { ClaimResponsePayload, ClaimType } from "../types/verification";
+import { ConfigSettings, KycResponse, KycResult } from "../types/general";
 import { ethers } from "ethers";
 import { EthrDID } from "ethr-did";
-import { signMessage } from "src/utils/wallet";
+import { signMessage } from "../utils/wallet";
+import {
+    BirthCertificateData,
+    GetSourcesResult,
+    GetVerificationResult,
+    LicenceData,
+    MedicareData,
+    PassportData,
+    PGPVerifiableCredential,
+    RegisterVerificationData,
+    RegisterVerificationResult,
+    SetFieldResult,
+    SetFieldsPayload,
+    Source,
+    UnverifiableCredential,
+    VerifyProps,
+    VerifyReturnData
+} from "../types/greenId";
 
 @Injectable()
 export class GreenIdService implements IGreenIdService {
@@ -27,9 +44,7 @@ export class GreenIdService implements IGreenIdService {
         this.greenIdPassword = this.config.get(ConfigSettings.GREENID_PASSWORD);
     }
 
-    public async verify(
-        _props: greenid.VerifyProps
-    ): Promise<greenid.VerifyReturnData> {
+    public async verify(_props: VerifyProps): Promise<VerifyReturnData> {
         const { user, licence, medicare } = _props;
         let errorMessage: string;
         if (!user.name) errorMessage = "User doesn't have name";
@@ -122,7 +137,7 @@ export class GreenIdService implements IGreenIdService {
     }
 
     public async formatReturnData(
-        data: greenid.VerifyReturnData
+        data: VerifyReturnData
     ): Promise<KycResponse> {
         const credentials = data.didPGPCredentials[0];
 
@@ -163,7 +178,7 @@ export class GreenIdService implements IGreenIdService {
         };
     }
 
-    private async mockGreenIdCall(_props: greenid.VerifyProps) {
+    private async mockGreenIdCall(_props: VerifyProps) {
         const { user, licence, medicare } = _props;
         this.logger.debug("Mocking verification response to save money!");
         if (
@@ -214,7 +229,7 @@ export class GreenIdService implements IGreenIdService {
 
         const ethrDid = new EthrDID({ ...keypair });
 
-        const UnverifiableCredential: greenid.UnverifiableCredential = {
+        const unverifiableCredential: UnverifiableCredential = {
             "@context": ["https://www.w3.org/2018/credentials/v1"],
             type: ["VerifiableCredential", credentialType],
             issuer: ethrDid.did,
@@ -223,7 +238,7 @@ export class GreenIdService implements IGreenIdService {
             credentialSubject: credentialSubject
         };
 
-        const JWT = await ethrDid.signJWT({ vc: UnverifiableCredential });
+        const JWT = await ethrDid.signJWT({ vc: unverifiableCredential });
 
         return JWT;
     }
@@ -232,13 +247,13 @@ export class GreenIdService implements IGreenIdService {
     private async createPGPVerifiableCredential(
         credentialType: ClaimType,
         credentialSubject: object
-    ): Promise<greenid.VerifiableCredential> {
+    ): Promise<PGPVerifiableCredential> {
         const date = new Date();
         const yearFromNow = new Date(
             date.valueOf() + 1000 * 60 * 60 * 24 * 365
         );
 
-        const UnverifiableCredential: greenid.UnverifiableCredential = {
+        const UnverifiableCredential: UnverifiableCredential = {
             "@context": ["https://www.w3.org/2018/credentials/v1"],
             type: ["VerifiableCredential", credentialType],
             issuer: this.config.get(ConfigSettings.IDEM_URL),
@@ -297,15 +312,15 @@ export class GreenIdService implements IGreenIdService {
         });
     }
 
-    public async getSources(verificationId: string): Promise<greenid.Source[]> {
-        return new Promise<greenid.Source[]>((resolve, reject) => {
+    public async getSources(verificationId: string): Promise<Source[]> {
+        return new Promise<Source[]>((resolve, reject) => {
             this.greenId.getSources(
                 {
                     verificationId: verificationId,
                     accountId: this.greenIdAccountId,
                     password: this.greenIdPassword
                 },
-                (error: unknown, result: greenid.GetSourcesResult) => {
+                (error: unknown, result: GetSourcesResult) => {
                     if (error) {
                         reject(error);
                     }
@@ -318,15 +333,15 @@ export class GreenIdService implements IGreenIdService {
 
     public async GetVerificationResult(
         verificationId: string
-    ): Promise<greenid.GetVerificationResult> {
-        return new Promise<greenid.GetVerificationResult>((resolve, reject) => {
+    ): Promise<GetVerificationResult> {
+        return new Promise<GetVerificationResult>((resolve, reject) => {
             this.greenId.getSources(
                 {
                     verificationId: verificationId,
                     accountId: this.greenIdAccountId,
                     password: this.greenIdPassword
                 },
-                (error: unknown, result: greenid.GetVerificationResult) => {
+                (error: unknown, result: GetVerificationResult) => {
                     if (error) {
                         reject(error);
                     }
@@ -338,42 +353,16 @@ export class GreenIdService implements IGreenIdService {
     }
 
     private async registerVerification(
-        data: greenid.RegisterVerificationData
-    ): Promise<greenid.RegisterVerificationResult> {
-        return new Promise<greenid.RegisterVerificationResult>(
-            (resolve, reject) => {
-                this.greenId.registerVerification(
-                    {
-                        ...data,
-                        accountId: this.greenIdAccountId,
-                        password: this.greenIdPassword
-                    },
-                    (
-                        error: unknown,
-                        result: greenid.RegisterVerificationResult
-                    ) => {
-                        if (error) {
-                            reject(error);
-                        }
-
-                        resolve(result);
-                    }
-                );
-            }
-        );
-    }
-
-    private async setFields(
-        data: greenid.SetFieldsPayload
-    ): Promise<greenid.SetFieldResult> {
-        return new Promise<greenid.SetFieldResult>((resolve, reject) => {
-            this.greenId.setFields(
+        data: RegisterVerificationData
+    ): Promise<RegisterVerificationResult> {
+        return new Promise<RegisterVerificationResult>((resolve, reject) => {
+            this.greenId.registerVerification(
                 {
                     ...data,
                     accountId: this.greenIdAccountId,
                     password: this.greenIdPassword
                 },
-                (error: unknown, result: greenid.SetFieldResult) => {
+                (error: unknown, result: RegisterVerificationResult) => {
                     if (error) {
                         reject(error);
                     }
@@ -384,7 +373,26 @@ export class GreenIdService implements IGreenIdService {
         });
     }
 
-    private getDriversLicenseeInputs(data: greenid.LicenceData) {
+    private async setFields(data: SetFieldsPayload): Promise<SetFieldResult> {
+        return new Promise<SetFieldResult>((resolve, reject) => {
+            this.greenId.setFields(
+                {
+                    ...data,
+                    accountId: this.greenIdAccountId,
+                    password: this.greenIdPassword
+                },
+                (error: unknown, result: SetFieldResult) => {
+                    if (error) {
+                        reject(error);
+                    }
+
+                    resolve(result);
+                }
+            );
+        });
+    }
+
+    private getDriversLicenseeInputs(data: LicenceData) {
         const state = data.state.toLowerCase();
         const variables = [
             {
@@ -423,7 +431,7 @@ export class GreenIdService implements IGreenIdService {
         return variables;
     }
 
-    private getMedicareInputs(data: greenid.MedicareData) {
+    private getMedicareInputs(data: MedicareData) {
         const variables = [
             {
                 name: `greenid_medicaredvs_cardColour`,
@@ -479,7 +487,7 @@ export class GreenIdService implements IGreenIdService {
         return variables;
     }
 
-    private getPassportInputs(data: greenid.PassportData) {
+    private getPassportInputs(data: PassportData) {
         const variables = [
             {
                 name: `greenid_passportdvs_number`,
@@ -513,7 +521,7 @@ export class GreenIdService implements IGreenIdService {
         return variables;
     }
 
-    private getBirthCertificateInputs(data: greenid.BirthCertificateData) {
+    private getBirthCertificateInputs(data: BirthCertificateData) {
         const variables = [
             {
                 name: `greenid_birthcertificatedvs_registration_number`,

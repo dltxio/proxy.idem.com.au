@@ -25,6 +25,7 @@ import { Public } from "../auth/anonymous";
 import { LocalGuard } from "../auth/auth-local.guard";
 import { hashMessage } from "ethers/lib/utils";
 import { KycResponse, UsersResponse } from "../types/general";
+import { RegisterVerificationData } from "../types/greenId";
 
 @Controller("users")
 @UseGuards(LocalGuard)
@@ -67,7 +68,7 @@ export class UserController {
             );
         }
 
-        const greenIdU: greenid.RegisterVerificationData = {
+        const greenIdU: RegisterVerificationData = {
             ruleId: "default",
             name: {
                 givenName: body.firstName,
@@ -203,27 +204,5 @@ export class UserController {
         @Body() body: ResendEmailRequestBody
     ): Promise<boolean> {
         return this.userService.resendEmailVerification(body.hashedEmail);
-    }
-
-    @ApiOperation({
-        summary: "Verify with greenId"
-    })
-    @ApiResponse({
-        status: HttpStatus.OK
-    })
-    @ApiResponse({
-        status: HttpStatus.BAD_REQUEST
-    })
-    @Post("greenid/verify")
-    async verifyGreenId(
-        @Body("user") user: greenid.RegisterVerificationData,
-        @Body("licence") licence: greenid.LicenceData,
-        @Body("medicare") medicare: greenid.MedicareData
-    ): Promise<greenid.VerifyReturnData> {
-        return this.greenIdService.verify({
-            user: user,
-            licence: licence,
-            medicare: medicare
-        });
     }
 }

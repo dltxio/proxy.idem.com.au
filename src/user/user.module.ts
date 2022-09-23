@@ -6,7 +6,7 @@ import { UserService } from "./user.service";
 import { EmailService } from "../services/EmailService";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { GreenIdService } from "src/services/GreenIdService";
+import { GreenIdService } from "../services/GreenIdService";
 import { XeroService } from "../services/XeroService";
 
 @Module({
