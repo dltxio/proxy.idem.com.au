@@ -7,12 +7,13 @@ import {
     IsString,
     ValidateNested
 } from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { User } from "./data/entities/user.entity";
 import { ClaimResponsePayload } from "./types/verification";
 import { Type } from "class-transformer";
 import {
     EntityNames,
+    JWT,
     KycResponse,
     KycResult,
     RequestOtpResponse,
@@ -21,6 +22,15 @@ import {
     VendorEnum,
     XeroTokenSet
 } from "./types/general";
+import {
+    Address,
+    DOB,
+    Fullname,
+    LicenceData,
+    MedicareData,
+    VerifyProps,
+    VerifyReturnData
+} from "./types/greenId";
 
 export interface IExampleService {
     getById(id: string): string;
@@ -77,8 +87,9 @@ export class AccountMissingIdError extends EntityMissingIdError {
     }
 }
 
-export interface IKycService {
-    verify(): Promise<KycResponse>;
+export interface IGreenIdService {
+    formatReturnData(data: VerifyReturnData): Promise<KycResponse>;
+    verify(_props: VerifyProps): Promise<VerifyReturnData>;
 }
 
 export interface ISmsService {
@@ -145,35 +156,22 @@ export class UserDto {
 export class VerifyUserRequest {
     @ApiProperty()
     @IsNotEmpty()
-    firstName: string;
-    @ApiProperty()
-    middleName: string;
+    fullName: Fullname;
     @ApiProperty()
     @IsNotEmpty()
-    lastName: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    dob: string;
+    dob: DOB;
     @ApiProperty()
     @IsNotEmpty()
     hashEmail: string;
-    @ApiProperty()
-    houseNumber: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    street: string;
+    @ApiPropertyOptional()
+    @IsOptional()
+    address: Address;
     @ApiProperty()
     @IsNotEmpty()
-    suburb: string;
+    driversLicence: LicenceData;
     @ApiProperty()
     @IsNotEmpty()
-    postcode: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    state: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    country: string;
+    medicareCard: MedicareData;
 }
 
 export class ExchangeSignupCallBack {
@@ -212,6 +210,9 @@ class Verification implements KycResponse {
     @ApiProperty()
     @IsNotEmpty()
     hashedPayload: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    JWTs: JWT[];
 }
 export class UserSignupRequest {
     @ApiProperty({

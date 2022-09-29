@@ -1,5 +1,5 @@
 import {
-    IKycService,
+    IGreenIdService,
     NotificationRequest,
     UserDto,
     IUserService,
@@ -25,12 +25,14 @@ import { Public } from "../auth/anonymous";
 import { LocalGuard } from "../auth/auth-local.guard";
 import { hashMessage } from "ethers/lib/utils";
 import { KycResponse, UsersResponse } from "../types/general";
+import { RegisterVerificationData } from "../types/greenId";
+
 @Controller("users")
 @UseGuards(LocalGuard)
 export class UserController {
     constructor(
         @Inject("IUserService") private userService: IUserService,
-        @Inject("IKycService") private kycService: IKycService,
+        @Inject("IGreenIdService") private greenIdService: IGreenIdService,
         @Inject("IXeroService")
         private xeroService: IXeroService
     ) {}
@@ -59,13 +61,22 @@ export class UserController {
         const findUser = await this.userService.findOne(body.hashEmail);
         if (!findUser) throw new Error("User not found");
 
-        //TODO: Implement Green ID KYC verification
-        const response = await this.kycService.verify();
+        const greenIdU: RegisterVerificationData = {
+            ruleId: "default",
+            name: body.fullName,
+            currentResidentialAddress: body.address,
+            dob: body.dob
+        };
 
-        //mock response
-        response.thirdPartyVerified = true;
+        const response = await this.greenIdService.verify({
+            user: greenIdU,
+            licence: body.driversLicence,
+            medicare: body.medicareCard
+        });
 
-        return response;
+        const result = await this.greenIdService.formatReturnData(response);
+
+        return result;
     }
 
     @Get("")

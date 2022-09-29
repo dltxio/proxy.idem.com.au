@@ -1,4 +1,4 @@
-import { ClaimResponsePayload } from "./verification";
+import { ClaimResponsePayload, ClaimType } from "./verification";
 
 // String values used in user-facing error messages
 export enum EntityNames {
@@ -61,7 +61,11 @@ export enum ConfigSettings {
     XERO_SALES_CODE = "XERO_SALES_CODE",
     XERO_PRICE = "XERO_PRICE",
     XERO_GPIB_ID = "XERO_GPIB_ID",
-    GPIB_REFERRAL_CODE = "GPIB_REFERRAL_CODE"
+    GPIB_REFERRAL_CODE = "GPIB_REFERRAL_CODE",
+    GREENID_URL = "GREENID_URL",
+    GREENID_ACCOUNT_ID = "GREENID_ACCOUNT_ID",
+    GREENID_PASSWORD = "GREENID_PASSWORD",
+    REALLY_VERIFY_IDENTITY = "REALLY_VERIFY_IDENTITY"
 }
 
 export type UsersResponse = {
@@ -77,6 +81,12 @@ export type KycResponse = {
     signature: string; //signed claim response
     message: ClaimResponsePayload;
     hashedPayload: string;
+    JWTs: JWT[];
+};
+
+export type JWT = {
+    claimType: ClaimType;
+    jwt: string;
 };
 
 export type GPIBVerifyRequest = {
