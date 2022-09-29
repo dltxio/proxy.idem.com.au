@@ -1,4 +1,4 @@
-import { ClaimResponsePayload } from "./verification";
+import { ClaimResponsePayload, ClaimType } from "./verification";
 
 // String values used in user-facing error messages
 export enum EntityNames {
@@ -81,7 +81,12 @@ export type KycResponse = {
     signature: string; //signed claim response
     message: ClaimResponsePayload;
     hashedPayload: string;
-    JWTs: string[];
+    JWTs: JWT[];
+};
+
+export type JWT = {
+    claimType: ClaimType;
+    jwt: string;
 };
 
 export type GPIBVerifyRequest = {

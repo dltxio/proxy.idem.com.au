@@ -62,14 +62,14 @@ export type RegisterVerificationData = {
 };
 
 export type Address = {
-    country: string;
     flatNumber?: string;
-    postcode: string;
-    state: string;
-    streetName: string;
     streetNumber: string;
+    streetName: string;
     streetType: string;
+    postcode: string;
     suburb: string;
+    state: string;
+    country: string;
 };
 
 export type RegisterVerificationResult = {

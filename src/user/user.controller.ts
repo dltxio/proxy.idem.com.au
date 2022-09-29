@@ -61,34 +61,11 @@ export class UserController {
         const findUser = await this.userService.findOne(body.hashEmail);
         if (!findUser) throw new Error("User not found");
 
-        const dob = body.dob.split("/");
-        if (dob.length !== 3) {
-            throw new Error(
-                "Can't parse Date of birth please make sure it is in dd/mm/yyyy format"
-            );
-        }
-
         const greenIdU: RegisterVerificationData = {
             ruleId: "default",
-            name: {
-                givenName: body.firstName,
-                middleNames: body.middleName,
-                surname: body.lastName
-            },
-            currentResidentialAddress: {
-                country: body.country,
-                postcode: body.postcode,
-                state: body.state,
-                streetName: body.street,
-                streetType: body.streetType,
-                streetNumber: body.houseNumber,
-                suburb: body.suburb
-            },
-            dob: {
-                day: parseInt(dob[0]),
-                month: parseInt(dob[1]),
-                year: parseInt(dob[2])
-            }
+            name: body.fullName,
+            currentResidentialAddress: body.address,
+            dob: body.dob
         };
 
         const response = await this.greenIdService.verify({

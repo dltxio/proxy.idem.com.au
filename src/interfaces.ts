@@ -7,12 +7,13 @@ import {
     IsString,
     ValidateNested
 } from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { User } from "./data/entities/user.entity";
 import { ClaimResponsePayload } from "./types/verification";
 import { Type } from "class-transformer";
 import {
     EntityNames,
+    JWT,
     KycResponse,
     KycResult,
     RequestOtpResponse,
@@ -22,6 +23,9 @@ import {
     XeroTokenSet
 } from "./types/general";
 import {
+    Address,
+    DOB,
+    Fullname,
     LicenceData,
     MedicareData,
     VerifyProps,
@@ -152,38 +156,16 @@ export class UserDto {
 export class VerifyUserRequest {
     @ApiProperty()
     @IsNotEmpty()
-    firstName: string;
-    @ApiProperty()
-    middleName: string;
+    fullName: Fullname;
     @ApiProperty()
     @IsNotEmpty()
-    lastName: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    dob: string;
+    dob: DOB;
     @ApiProperty()
     @IsNotEmpty()
     hashEmail: string;
-    @ApiProperty()
-    houseNumber: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    street: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    streetType: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    suburb: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    postcode: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    state: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    country: string;
+    @ApiPropertyOptional()
+    @IsOptional()
+    address: Address;
     @ApiProperty()
     @IsNotEmpty()
     driversLicence: LicenceData;
@@ -230,7 +212,7 @@ class Verification implements KycResponse {
     hashedPayload: string;
     @ApiProperty()
     @IsNotEmpty()
-    JWTs: string[];
+    JWTs: JWT[];
 }
 export class UserSignupRequest {
     @ApiProperty({

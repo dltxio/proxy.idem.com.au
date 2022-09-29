@@ -59,6 +59,8 @@ export class GreenIdService implements IGreenIdService {
             throw new Error(errorMessage);
         }
 
+        this.logger.log("Verifying with GreenID");
+
         if (
             this.config.get(ConfigSettings.REALLY_VERIFY_IDENTITY) === "false"
         ) {
@@ -98,30 +100,26 @@ export class GreenIdService implements IGreenIdService {
             "VERIFIED"
         ) {
             const signedNameCredential =
-                await this.createJWTVerifiableCredential("NameCredential", {
-                    givenName: user.name.givenName,
-                    middleNames: user.name.middleNames,
-                    surname: user.name.surname
-                });
+                await this.createJWTVerifiableCredential(
+                    "NameCredential",
+                    user.name
+                );
             const signedDobCredential =
-                await this.createJWTVerifiableCredential("BirthCredential", {
-                    day: user.dob.day,
-                    month: user.dob.month,
-                    year: user.dob.year
-                });
+                await this.createJWTVerifiableCredential(
+                    "BirthCredential",
+                    user.dob
+                );
 
             const PGPSignedNameCredential =
-                await this.createPGPVerifiableCredential("NameCredential", {
-                    givenName: user.name.givenName,
-                    middleNames: user.name.middleNames,
-                    surname: user.name.surname
-                });
+                await this.createPGPVerifiableCredential(
+                    "NameCredential",
+                    user.name
+                );
             const PGPSignedDobCredential =
-                await this.createPGPVerifiableCredential("BirthCredential", {
-                    day: user.dob.day,
-                    month: user.dob.month,
-                    year: user.dob.year
-                });
+                await this.createPGPVerifiableCredential(
+                    "BirthCredential",
+                    user.dob
+                );
 
             return {
                 success: true,
@@ -165,7 +163,6 @@ export class GreenIdService implements IGreenIdService {
 
         return {
             result: KycResult.Completed,
-
             thirdPartyVerified: false,
             signature: await signMessage(
                 hashedPayload,
@@ -174,7 +171,10 @@ export class GreenIdService implements IGreenIdService {
             ),
             message: claimPayload,
             hashedPayload: hashedPayload,
-            JWTs: data.didJWTCredentials
+            JWTs: data.didJWTCredentials.map((jwt, index) => ({
+                claimType: data.didPGPCredentials[index].type[1],
+                jwt
+            }))
         };
     }
 
@@ -186,21 +186,34 @@ export class GreenIdService implements IGreenIdService {
             medicare.number === "2111111111"
         ) {
             const signedNameCredential =
-                await this.createJWTVerifiableCredential("NameCredential", {
-                    givenName: user.name.givenName,
-                    middleNames: user.name.middleNames,
-                    surname: user.name.surname
-                });
+                await this.createJWTVerifiableCredential(
+                    "NameCredential",
+                    user.name
+                );
             const signedDobCredential =
-                await this.createJWTVerifiableCredential("BirthCredential", {
-                    day: user.dob.day,
-                    month: user.dob.month,
-                    year: user.dob.year
-                });
+                await this.createJWTVerifiableCredential(
+                    "BirthCredential",
+                    user.dob
+                );
+
+            const PGPSignedNameCredential =
+                await this.createPGPVerifiableCredential(
+                    "NameCredential",
+                    user.name
+                );
+            const PGPSignedDobCredential =
+                await this.createPGPVerifiableCredential(
+                    "BirthCredential",
+                    user.dob
+                );
 
             return {
                 success: true,
-                didJWTCredentials: [signedNameCredential, signedDobCredential]
+                didJWTCredentials: [signedNameCredential, signedDobCredential],
+                didPGPCredentials: [
+                    PGPSignedNameCredential,
+                    PGPSignedDobCredential
+                ]
             };
         }
 
