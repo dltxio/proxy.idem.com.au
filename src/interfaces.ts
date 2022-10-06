@@ -7,78 +7,34 @@ import {
     IsString,
     ValidateNested
 } from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { User } from "./data/entities/user.entity";
-import { Tester } from "./data/entities/tester.entity";
 import { ClaimResponsePayload } from "./types/verification";
 import { Type } from "class-transformer";
+import {
+    EntityNames,
+    JWT,
+    KycResponse,
+    KycResult,
+    RequestOtpResponse,
+    SignupResponse,
+    UsersResponse,
+    VendorEnum,
+    XeroTokenSet
+} from "./types/general";
+import {
+    Address,
+    DOB,
+    Fullname,
+    LicenceData,
+    MedicareData,
+    VerifyProps,
+    VerifyReturnData
+} from "./types/greenId";
 
 export interface IExampleService {
     getById(id: string): string;
     getAll(): string[];
-}
-
-// String values used in user-facing error messages
-export enum EntityNames {
-    Account = "Account"
-}
-
-export enum KycResult {
-    InProgress = "in_progress",
-    Completed = "completed",
-    Failed = "failed"
-}
-
-export enum RequestType {
-    Signup = "Signup",
-    Verify = "Verify"
-}
-
-//Add more venders
-export enum VendorEnum {
-    GPIB = 1,
-    CoinStash = 2,
-    DigitalSurge = 5,
-    EasyCrypto = 6
-}
-
-export enum ConfigSettings {
-    EXPO_ACCESS_TOKEN = "EXPO_ACCESS_TOKEN",
-    KYC_URL = "KYC_URL",
-    KYC_CLIENT_ID = "KYC_CLIENT_ID",
-    KYC_CLIENT_SECRET = "KYC_CLIENT_SECRET",
-    GPIB_API_ENDPOINT = "GPIB_API_ENDPOINT",
-    COINSTASH_SIGNUP_ENDPOINT = "COINSTASH_SIGNUP_ENDPOINT",
-    COINSTASH_TOKEN = "COINSTASH_TOKEN",
-    APP_DEEPLINK_URL = "APP_DEEPLINK_URL",
-    EC_SIGNUP_ENDPOINT = "EC_SIGNUP_ENDPOINT",
-    DIGITALSURGE_SIGNUP_ENDPOINT = "DIGITALSURGE_SIGNUP_ENDPOINT",
-    DIGITALSURGE_PARTNER_TOKEN = "DIGITALSURGE_PARTNER_TOKEN",
-    WALLET_PRIVATE_KEY = "WALLET_PRIVATE_KEY",
-    WALLET_ADDRESS = "WALLET_ADDRESS",
-    IDEM_URL = "IDEM_URL",
-    OTP_HASHING_SECRET = "OTP_HASHING_SECRET",
-    OTP_HASHING_SALT = "OTP_HASHING_SALT",
-    OTP_EXPIRY_TIME = "OTP_EXPIRY_TIME",
-    MESSAGEBIRD_API_KEY = "MESSAGEBIRD_API_KEY",
-    HTTPS_PROXY_HOST = "HTTPS_PROXY_HOST",
-    HTTPS_PROXY_PORT = "HTTPS_PROXY_PORT",
-    HTTPS_PROXY_PASSWORD = "HTTPS_PROXY_PASSWORD",
-    HTTPS_PROXY_USERNAME = "HTTPS_PROXY_USERNAME",
-    MAILJET_API_KEY = "MAILJET_API_KEY",
-    MAILJET_SECRET = "MAILJET_SECRET",
-    FROM_EMAIL_ADDRESS = "FROM_EMAIL_ADDRESS",
-    WEBSITE_URL = "WEBSITE_URL",
-    JWT_SECRET = "JWT_SECRET",
-    JWT_EXPIRATION_SECONDS = "JWT_EXPIRATION_SECONDS",
-    PGP_PASSPHRASE = "PGP_PASSPHRASE",
-    PGP_PRIVATE_KEY = "PGP_PRIVATE_KEY",
-    XERO_CLIENT_ID = "XERO_CLIENT_ID",
-    XERO_CLIENT_SECRET = "XERO_CLIENT_SECRET",
-    XERO_TENANT_ID = "XERO_TENANT_ID",
-    XERO_SALES_CODE = "XERO_SALES_CODE",
-    XERO_PRICE = "XERO_PRICE",
-    XERO_GPIB_ID = "XERO_GPIB_ID"
 }
 
 //=== Abstract Error classes
@@ -131,8 +87,9 @@ export class AccountMissingIdError extends EntityMissingIdError {
     }
 }
 
-export interface IKycService {
-    verify(): Promise<KycResponse>;
+export interface IGreenIdService {
+    formatReturnData(data: VerifyReturnData): Promise<KycResponse>;
+    verify(_props: VerifyProps): Promise<VerifyReturnData>;
 }
 
 export interface ISmsService {
@@ -140,36 +97,36 @@ export interface ISmsService {
 }
 
 export interface IUserService {
-    requestToBeTester(body: TestFlightRequest): Promise<Tester>;
-    verify(body: UserVerifyRequestBody): Promise<string>;
+    verify(body: VerifyUserRequest): Promise<string>;
     findOne(email: string): Promise<User>;
     findAll(): Promise<UsersResponse[]>;
-    create(newUser: NewUser): Promise<User>;
-    putToken(
-        userId: string,
-        token: UserExpoPushTokenRequestBody
-    ): Promise<User>;
+    create(newUser: UserDto): Promise<void>;
+    update(userId: string, requestBody: UserDto): Promise<User>;
 
     pushNotifications(message: string): Promise<void>;
-    pushSignupNotification(
-        signupRequest: SignupNotificationRequest,
-        ip: string
-    ): Promise<void>;
-    requestOtp(body: RequestOtpRequest): Promise<RequestOtpResponse>;
-    verifyOtp(body: VerifyOtpRequest): Promise<boolean>;
-    addPublicKey(body: PublicKeyDto): Promise<boolean>;
-    verifyEmail(email: string, token: string): Promise<boolean>;
+    verifyEmail(token: string): Promise<boolean>;
     decodeEmailFromToken(token: string): Promise<string>;
     sendInvoices(body: SendInvoicesRequestBody): Promise<string>;
     resendEmailVerification(hashedEmail: string): Promise<boolean>;
 }
 
+export interface IOtpService {
+    requestOtp(mobile: string): Promise<RequestOtpResponse>;
+    verifyOtp(body: VerifyOtp): Promise<boolean>;
+}
 export interface IEmailService {
     sendEmailVerification(email: string, token: string): Promise<void>;
 }
 
 export interface IThirdPartyService {
     signUp(signupInfo: UserSignupRequest, ip: string): Promise<SignupResponse>;
+}
+
+export interface IExchangeService {
+    pushSignupNotification(
+        signupRequest: ExchangeSignupCallBack,
+        ip: string
+    ): Promise<void>;
 }
 
 export interface IVendor {
@@ -184,144 +141,40 @@ export interface IXeroService {
     sendInvoices(body: SendInvoicesRequestBody): Promise<string>;
 }
 
-export class NewUser {
+export class UserDto {
     @ApiProperty()
     @IsNotEmpty()
     email: string;
+    @ApiProperty()
+    @IsOptional()
+    expoToken: string;
+    @ApiProperty()
+    @IsOptional()
+    pgpPublicKey: string;
 }
 
-export class UserVerifyRequestBody {
+export class VerifyUserRequest {
     @ApiProperty()
     @IsNotEmpty()
-    firstName: string;
-    @ApiProperty()
-    middleName: string;
+    fullName: Fullname;
     @ApiProperty()
     @IsNotEmpty()
-    lastName: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    dob: string;
+    dob: DOB;
     @ApiProperty()
     @IsNotEmpty()
     hashEmail: string;
-    @ApiProperty()
-    houseNumber: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    street: string;
+    @ApiPropertyOptional()
+    @IsOptional()
+    address: Address;
     @ApiProperty()
     @IsNotEmpty()
-    suburb: string;
+    driversLicence: LicenceData;
     @ApiProperty()
     @IsNotEmpty()
-    postcode: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    state: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    country: string;
+    medicareCard: MedicareData;
 }
 
-export class UserExpoPushTokenRequestBody {
-    @ApiProperty()
-    @IsNotEmpty()
-    token: string;
-}
-
-export class SendInvoicesRequestBody {
-    @ApiProperty()
-    @IsNotEmpty()
-    authToken: XeroTokenSet;
-    @ApiProperty()
-    @IsNotEmpty()
-    vendor: VendorEnum;
-}
-
-export type AusPostRequest = {
-    given_name: string;
-    middle_name: string | null;
-    family_name: string;
-    dob: string;
-    address: {
-        unit_number: string | null;
-        street_number: string;
-        street_name: string;
-        street_type: string;
-        locality: string;
-        region: string;
-        postal_code: string;
-        country: string;
-    };
-    consent: string;
-};
-
-//Can have more than below such as "watchlist" and "found_sources" and "sources_category" but will need live account
-export type AusPostResponse = {
-    verification_status: "in_progress" | "completed" | "failed";
-    verification_session_token: string;
-    data_source_events: string[];
-    transaction_id: string;
-    //sources_category: string;
-    //found_sources: {
-    //     name:string;
-    //     category:string;
-    // }[];
-    // watchlist:{
-    //     "check_performed": boolean,
-    //     "check_performed_date": string,
-    //     "found": boolean,
-    // }
-};
-
-export type UsersResponse = {
-    userId: string;
-    email: string;
-    createdAt: Date;
-    emailVerified: boolean;
-};
-
-export type KycResponse = {
-    result: KycResult;
-    userId: string;
-    thirdPartyVerified: boolean;
-    signature: string; //signed claim response
-    message: ClaimResponsePayload;
-    hashedPayload: string;
-};
-
-export type GPIBVerifyRequest = {
-    phoneNumber: string;
-    email: string;
-    userID: string;
-    phoneNumberVerified: boolean;
-    emailVerified: boolean;
-    idVerified: boolean;
-};
-
-export type RequestOtpResponse = {
-    hash: string;
-    expiryTimestamp: number;
-};
-
-export type SignupResponse = {
-    userId: string;
-    password?: string;
-};
-
-// all optional params as documented by Xero
-export type XeroTokenSet = {
-    access_token?: string;
-    token_type?: string;
-    id_token?: string;
-    refresh_token?: string;
-    expires_in?: number;
-    session_state?: string;
-    scope?: string;
-};
-
-export class SignupNotificationRequest {
+export class ExchangeSignupCallBack {
     @ApiProperty()
     @IsNotEmpty()
     source: string;
@@ -351,15 +204,15 @@ class Verification implements KycResponse {
     @IsEnum(KycResult)
     result: KycResult;
     @ApiProperty()
-    @IsString()
-    userId: string;
-    @ApiProperty()
     @IsNotEmpty()
     @IsBoolean()
     thirdPartyVerified: boolean;
     @ApiProperty()
     @IsNotEmpty()
     hashedPayload: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    JWTs: JWT[];
 }
 export class UserSignupRequest {
     @ApiProperty({
@@ -374,7 +227,7 @@ export class UserSignupRequest {
     @IsNotEmpty()
     lastName: string;
     @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     password: string;
     @ApiProperty()
     @IsNotEmpty()
@@ -383,7 +236,6 @@ export class UserSignupRequest {
     @IsOptional()
     mobile: string;
     @ApiProperty()
-    @IsNotEmpty()
     @ValidateNested()
     @Type(() => Verification)
     verification: Verification;
@@ -413,25 +265,7 @@ export class UserDetailRequest {
     dob: string;
 }
 
-export class TestFlightRequest {
-    @ApiProperty()
-    @IsNotEmpty()
-    email: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    firstName: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    lastName: string;
-}
-
-export class RequestOtpRequest {
-    @ApiProperty()
-    @IsNotEmpty()
-    mobileNumber: string;
-}
-
-export class VerifyOtpRequest {
+export class VerifyOtp {
     @ApiProperty()
     @IsNotEmpty()
     code: string;
@@ -446,17 +280,23 @@ export class VerifyOtpRequest {
     hash: string;
 }
 
-export class PublicKeyDto {
+export class NotificationRequest {
     @ApiProperty()
     @IsNotEmpty()
-    publicKeyArmored: string;
-    @ApiProperty()
-    @IsNotEmpty()
-    hashEmail: string;
+    message: string;
 }
 
 export class ResendEmailRequestBody {
     @ApiProperty()
     @IsNotEmpty()
     hashedEmail: string;
+}
+
+export class SendInvoicesRequestBody {
+    @ApiProperty()
+    @IsNotEmpty()
+    authToken: XeroTokenSet;
+    @ApiProperty()
+    @IsNotEmpty()
+    vendor: VendorEnum;
 }

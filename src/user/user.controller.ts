@@ -1,20 +1,12 @@
 import {
-    IKycService,
-    IThirdPartyService,
+    IGreenIdService,
+    NotificationRequest,
+    UserDto,
+    IUserService,
+    VerifyUserRequest,
     IXeroService,
-    KycResponse,
-    NewUser,
-    PublicKeyDto,
-    RequestOtpRequest,
-    RequestOtpResponse,
-    ResendEmailRequestBody,
     SendInvoicesRequestBody,
-    SignupNotificationRequest,
-    SignupResponse,
-    TestFlightRequest,
-    UserSignupRequest,
-    UsersResponse,
-    VerifyOtpRequest
+    ResendEmailRequestBody
 } from "./../interfaces";
 import {
     Controller,
@@ -25,33 +17,27 @@ import {
     Get,
     Param,
     Put,
-    Ip,
     UseGuards
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { User } from "../data/entities/user.entity";
-import {
-    IUserService,
-    UserExpoPushTokenRequestBody,
-    UserVerifyRequestBody
-} from "../interfaces";
-import { Tester } from "../data/entities/tester.entity";
 import { Public } from "../auth/anonymous";
 import { LocalGuard } from "../auth/auth-local.guard";
 import { hashMessage } from "ethers/lib/utils";
-@Controller("user")
+import { KycResponse, UsersResponse } from "../types/general";
+import { RegisterVerificationData } from "../types/greenId";
+
+@Controller("users")
 @UseGuards(LocalGuard)
 export class UserController {
     constructor(
         @Inject("IUserService") private userService: IUserService,
-        @Inject("IKycService") private kycService: IKycService,
-        @Inject("IThirdPartyService")
-        private thirdPartyService: IThirdPartyService,
+        @Inject("IGreenIdService") private greenIdService: IGreenIdService,
         @Inject("IXeroService")
         private xeroService: IXeroService
     ) {}
 
-    @Post("")
+    @Post("create")
     @ApiOperation({ summary: "Create user" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -59,37 +45,41 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async create(@Body() body: NewUser): Promise<User> {
+    async create(@Body() body: UserDto): Promise<void> {
         return this.userService.create(body);
     }
 
-    @Post("verify")
-    @ApiOperation({ summary: "Verify user" })
+    @Post("verify-claims")
+    @ApiOperation({ summary: "Verify claims" })
     @ApiResponse({
         status: HttpStatus.OK
     })
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async verify(@Body() body: UserVerifyRequestBody): Promise<KycResponse> {
-        let user: User;
+    async verify(@Body() body: VerifyUserRequest): Promise<KycResponse> {
         const findUser = await this.userService.findOne(body.hashEmail);
-        if (!findUser) {
-            user = await this.userService.create({ email: body.hashEmail });
-        } else {
-            user = findUser;
-        }
-        //TODO: Implement Green ID KYC verification
-        const response = await this.kycService.verify();
+        if (!findUser) throw new Error("User not found");
 
-        //mock response
-        response.thirdPartyVerified = true;
-        response.userId = user.userId;
+        const greenIdU: RegisterVerificationData = {
+            ruleId: "default",
+            name: body.fullName,
+            currentResidentialAddress: body.address,
+            dob: body.dob
+        };
 
-        return response;
+        const response = await this.greenIdService.verify({
+            user: greenIdU,
+            licence: body.driversLicence,
+            medicare: body.medicareCard
+        });
+
+        const result = await this.greenIdService.formatReturnData(response);
+
+        return result;
     }
 
-    @Get()
+    @Get("")
     @ApiOperation({ summary: "Get users" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -101,22 +91,22 @@ export class UserController {
         return this.userService.findAll();
     }
 
-    @Put(":userId/token")
-    @ApiOperation({ summary: "Put user token" })
+    @Put(":email")
+    @ApiOperation({ summary: "Update user" })
     @ApiResponse({
         status: HttpStatus.OK
     })
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async token(
-        @Param("userId") userId: string,
-        @Body() token: UserExpoPushTokenRequestBody
+    async update(
+        @Param("email") email: string,
+        @Body() requestBody: UserDto
     ): Promise<User> {
-        return this.userService.putToken(userId, token);
+        return this.userService.update(email, requestBody);
     }
 
-    @Post("notification/:message")
+    @Post("notify")
     @ApiOperation({ summary: "Push notification" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -124,96 +114,10 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async pushNotifications(@Param("message") message: string): Promise<void> {
-        return this.userService.pushNotifications(message);
-    }
-
-    @Post("signup/notification")
-    @ApiOperation({ summary: "Push signup notification" })
-    @ApiResponse({
-        status: HttpStatus.OK
-    })
-    @ApiResponse({
-        status: HttpStatus.BAD_REQUEST
-    })
-    async pushSignupNotification(
-        @Ip() ip: string,
-        @Body() signupRequest: SignupNotificationRequest
+    async pushNotifications(
+        @Body() request: NotificationRequest
     ): Promise<void> {
-        return this.userService.pushSignupNotification(signupRequest, ip);
-    }
-
-    @Post("signup")
-    @ApiOperation({ summary: "User signup" })
-    @ApiResponse({
-        status: HttpStatus.OK
-    })
-    @ApiResponse({
-        status: HttpStatus.BAD_REQUEST
-    })
-    async signup(
-        @Ip() ip: string,
-        @Body() body: UserSignupRequest
-    ): Promise<SignupResponse> {
-        return this.thirdPartyService.signUp(body, ip);
-    }
-
-    @Post("tester")
-    @ApiOperation({ summary: "request testflight tester" })
-    @ApiResponse({
-        status: HttpStatus.OK
-    })
-    @ApiResponse({
-        status: HttpStatus.BAD_REQUEST
-    })
-    async requestTest(@Body() body: TestFlightRequest): Promise<Tester> {
-        return this.userService.requestToBeTester(body);
-    }
-
-    @Post("requestOtp")
-    @ApiOperation({
-        summary:
-            "User request otp to be sent via SMS to verify their phone number"
-    })
-    @ApiResponse({
-        status: HttpStatus.OK
-    })
-    @ApiResponse({
-        status: HttpStatus.BAD_REQUEST
-    })
-    async requestOtp(
-        @Body() body: RequestOtpRequest
-    ): Promise<RequestOtpResponse> {
-        return this.userService.requestOtp(body);
-    }
-
-    @Post("verifyOtp")
-    @ApiOperation({
-        summary:
-            "User verify otp to be sent via SMS to verify their phone number"
-    })
-    @ApiResponse({
-        status: HttpStatus.OK
-    })
-    @ApiResponse({
-        status: HttpStatus.BAD_REQUEST
-    })
-    async verifyOtp(@Body() body: VerifyOtpRequest): Promise<boolean> {
-        return this.userService.verifyOtp(body);
-    }
-
-    @ApiOperation({
-        summary: "User upload PGP public key"
-    })
-    @ApiResponse({
-        status: HttpStatus.OK
-    })
-    @ApiResponse({
-        status: HttpStatus.BAD_REQUEST
-    })
-    @Post("key/add")
-    async addPublicKey(@Body() body: PublicKeyDto): Promise<boolean> {
-        return this.userService.addPublicKey(body);
+        return this.userService.pushNotifications(request.message);
     }
 
     @ApiOperation({
@@ -225,7 +129,7 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    @Get("/email/:email")
+    @Get(":email")
     async getUser(
         @Param("email") email: string
     ): Promise<UsersResponse | undefined> {
@@ -246,8 +150,7 @@ export class UserController {
     })
     @Post("verify-email")
     async verifyEmail(@Body("token") token: string): Promise<boolean> {
-        const email = await this.userService.decodeEmailFromToken(token);
-        return this.userService.verifyEmail(email, token);
+        return this.userService.verifyEmail(token);
     }
 
     @ApiOperation({

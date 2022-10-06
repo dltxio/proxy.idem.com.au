@@ -1,12 +1,8 @@
 import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AxiosInstance } from "axios";
-import {
-    ConfigSettings,
-    IVendor,
-    SignupResponse,
-    UserSignupRequest
-} from "../../interfaces";
+import { IVendor, UserSignupRequest } from "../../interfaces";
+import { ConfigSettings } from "../../types/general";
 
 export class DigitalSurgeVendor implements IVendor {
     name = "DigitalSurge";
@@ -27,7 +23,6 @@ export class DigitalSurgeVendor implements IVendor {
             email,
             phone_number: mobile
         };
-
         const response = await this.axios
             .post(this.signUpEndpoint, JSON.stringify(requestBody), {
                 headers: {

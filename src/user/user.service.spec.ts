@@ -4,7 +4,7 @@ import { expect } from "chai";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 
-const repositoryMockFactory = () => ({
+export const repositoryMockFactory = () => ({
     find: () => ({}),
     findOneBy: () => ({}),
     save: () => ({}),

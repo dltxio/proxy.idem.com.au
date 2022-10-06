@@ -1,24 +1,23 @@
-import { hashMessage } from "ethers/lib/utils";
-import {
-    IVendor,
-    RequestType,
-    SignupResponse,
-    UserSignupRequest,
-    VendorEnum
-} from "./../interfaces";
+import { IVendor, UserSignupRequest } from "./../interfaces";
 import { ConfigService } from "@nestjs/config";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import axios, { AxiosInstance } from "axios";
 import { HttpsProxyAgent } from "https-proxy-agent";
-import { ConfigSettings, IThirdPartyService } from "../interfaces";
+import { IThirdPartyService } from "../interfaces";
 import { Repository } from "typeorm";
 import { Request } from "../data/entities/request.entity";
-import { getVendorName } from "../utils/vendor";
+import { getVendorFromSitesJson, getVendorName } from "../utils/vendor";
 import { verifyMessage } from "../utils/wallet";
 import { GPIBVendor } from "./vendors/GPIB";
 import { CoinStashVendor } from "./vendors/CoinStash";
 import { EasyCryptoVendor } from "./vendors/EasyCrypto";
 import { DigitalSurgeVendor } from "./vendors/DigitalSurge";
+import {
+    ConfigSettings,
+    RequestType,
+    SignupResponse,
+    VendorEnum
+} from "../types/general";
 
 @Injectable()
 export class ThirdPartyService implements IThirdPartyService {
@@ -67,19 +66,23 @@ export class ThirdPartyService implements IThirdPartyService {
         signupInfo: UserSignupRequest,
         ip: string
     ): Promise<SignupResponse> {
-        const { verification, source } = signupInfo;
-        const { hashedPayload, signature } = verification;
-        const isVerified = verifyMessage(
-            hashedPayload,
-            signature,
-            this.config,
-            this.logger
-        );
-        if (!isVerified) {
-            throw new Error("Verification signature is not valid");
+        const vendorFromSitesJson = getVendorFromSitesJson(signupInfo.source);
+        if (vendorFromSitesJson.verifyClaims) {
+            const { verification } = signupInfo;
+            const { hashedPayload, signature } = verification;
+            const isVerified = verifyMessage(
+                hashedPayload,
+                signature,
+                this.config,
+                this.logger
+            );
+            if (!isVerified) {
+                throw new Error("Verification signature is not valid");
+            }
         }
 
-        const vendor = this.getVendor(source);
+        const vendor = this.getVendor(signupInfo.source);
+
         try {
             const { userId, password } = await vendor.signUp(signupInfo);
             this.logger.verbose(
@@ -88,7 +91,7 @@ export class ThirdPartyService implements IThirdPartyService {
             //Save the signup request
             await this.requestRepository.save({
                 from: "IDEM",
-                to: getVendorName(source),
+                to: getVendorName(signupInfo.source),
                 ipAddress: ip,
                 requestType: RequestType.Signup
             });
