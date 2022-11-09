@@ -73,17 +73,18 @@ export class GreenIdService implements IGreenIdService {
             }
         } = await this.registerVerification(user);
 
-        if (licence) {
-            await this.setFields({
-                verificationId,
-                sourceId: `${licence.state.toLowerCase()}regodvs`,
-                inputFields: {
-                    input: this.getDriversLicenseeInputs(licence)
-                }
-            });
-        }
+        if (!licence || !medicare)
+            throw new Error("Licence or medicare card not provided");
 
-        if (medicare) {
+        const licenceResult: SetFieldResult = await this.setFields({
+            verificationId,
+            sourceId: `${licence.state.toLowerCase()}regodvs`,
+            inputFields: {
+                input: this.getDriversLicenseeInputs(licence)
+            }
+        });
+
+        if (licenceResult.return.checkResult.state !== "VERIFIED") {
             await this.setFields({
                 verificationId,
                 sourceId: `medicaredvs`,
