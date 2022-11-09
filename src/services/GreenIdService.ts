@@ -73,7 +73,7 @@ export class GreenIdService implements IGreenIdService {
             }
         } = await this.registerVerification(user);
 
-        if (!licence && !medicare)
+        if (!licence || !medicare)
             throw new Error("Licence or medicare card not provided");
 
         const licenceResult: SetFieldResult = await this.setFields({
