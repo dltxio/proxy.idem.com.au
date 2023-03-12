@@ -17,11 +17,33 @@ export class EmailService implements IEmailService {
         );
     }
 
-    public sendEmailVerification = async (
+    // deprecated
+    public sendEmailVerificationLink = async (
         email: string,
         token: string
     ): Promise<void> => {
         const subject = `PGP key email verification`;
+        const link = `${this.config.get(
+            ConfigSettings.WEBSITE_URL
+        )}/verify-email?token=${token}`;
+        this.logger.log(`${email} Verification email sent`);
+
+        return this.sendRawEmail({
+            to: email,
+            toName: email,
+            subject,
+            text: `Please click here ${link} to verify your email.`
+        });
+    };
+
+    public sendEmailVerification = async (
+        email: string,
+        token: string
+    ): Promise<void> => {
+        const subject = `IDEM email verification`;
+
+        // CREATE A PGP SIGNED MESSAGE
+
         const link = `${this.config.get(
             ConfigSettings.WEBSITE_URL
         )}/verify-email?token=${token}`;
