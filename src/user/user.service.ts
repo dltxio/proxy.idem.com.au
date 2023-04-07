@@ -64,24 +64,16 @@ export class UserService {
 
     public async create(newUser: UserDto): Promise<void> {
         let user: User;
+        const hashedEmail = hashMessage(newUser.email);
         try {
-            const publicKey = await openpgp.readKey({
-                armoredKey: newUser.pgpPublicKey
-            });
-
-            const emailFromPublicKey = publicKey.users[0].userID.email;
-            // Should not create user if email from token is different from email from public key
-            if (hashMessage(emailFromPublicKey) != newUser.email)
-                throw new Error("Email does not match");
-
             user = await this.userRepository.findOneBy({
-                email: newUser.email
+                email: hashedEmail
             });
 
             // Do nothing if user already exists and email is verified
             if (user && user.emailVerified) return;
 
-            const payload = { email: emailFromPublicKey };
+            const payload = { email: newUser.email };
             const token = this.jwtService.sign(payload);
 
             if (user && !user.emailVerified) {
@@ -89,13 +81,12 @@ export class UserService {
             } else {
                 user = new User();
                 user.email = newUser.email;
-                user.publicKey = newUser.pgpPublicKey;
                 user.emailVerificationCode = token;
                 this.logger.verbose(`New user ${newUser.email} created`);
             }
             await this.userRepository.save(user);
             await this.emailService.sendEmailVerification(
-                publicKey.users[0].userID.email.trim().toLowerCase(),
+                newUser.email.trim().toLowerCase(),
                 token
             );
         } catch (error) {
@@ -113,10 +104,6 @@ export class UserService {
 
         if (request.expoToken && request.expoToken != user.expoPushToken) {
             user.expoPushToken = request.expoToken;
-        }
-
-        if (request.pgpPublicKey && request.pgpPublicKey != user.publicKey) {
-            user.publicKey = request.pgpPublicKey;
         }
 
         return this.userRepository.save(user);
