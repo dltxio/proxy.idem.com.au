@@ -22,7 +22,7 @@ export class EmailService implements IEmailService {
         verificationCode: string
     ): Promise<void> => {
         const subject = `IDEM email verification`;
-        this.logger.log(`${email} Verification email sent`);
+        this.logger.log(`${email} Verification code email sent`);
         const opt = {
             to: email,
             toName: email,
