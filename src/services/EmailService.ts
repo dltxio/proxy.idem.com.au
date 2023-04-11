@@ -26,7 +26,7 @@ export class EmailService implements IEmailService {
         const link = `${this.config.get(
             ConfigSettings.WEBSITE_URL
         )}/verify-email?token=${token}`;
-        this.logger.log(`${email} Verification email sent`);
+        this.logger.log(`${email} Verification link email sent`);
 
         return this.sendRawEmail({
             to: email,
@@ -38,23 +38,18 @@ export class EmailService implements IEmailService {
 
     public sendEmailVerification = async (
         email: string,
-        token: string
+        verificationCode: string
     ): Promise<void> => {
         const subject = `IDEM email verification`;
-
-        // CREATE A PGP SIGNED MESSAGE
-
-        const link = `${this.config.get(
-            ConfigSettings.WEBSITE_URL
-        )}/verify-email?token=${token}`;
         this.logger.log(`${email} Verification email sent`);
-
-        return this.sendRawEmail({
+        const opt = {
             to: email,
             toName: email,
             subject,
-            text: `Please click here ${link} to verify your email.`
-        });
+            text: `Your confirmation code is ${verificationCode}.
+             Enter the code in the IDEM mobile app to verify your email.`
+        };
+        return this.sendRawEmail(opt);
     };
 
     private getMailJetBasePayload = (params: SimpleEmailParams) => {
