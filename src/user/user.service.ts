@@ -1,5 +1,9 @@
 import { hashMessage } from "ethers/lib/utils";
-import { IEmailService, UserDto } from "./../interfaces";
+import {
+    IEmailService,
+    UserDto,
+    VerifyEmailRequestBody
+} from "./../interfaces";
 import {
     Injectable,
     Inject,
@@ -73,21 +77,22 @@ export class UserService {
             // Do nothing if user already exists and email is verified
             if (user && user.emailVerified) return;
 
-            const payload = { email: newUser.email };
-            const token = this.jwtService.sign(payload);
+            const sixDigitCode = Math.floor(
+                100000 + Math.random() * 900000
+            ).toString();
 
             if (user && !user.emailVerified) {
-                user.emailVerificationCode = token;
+                user.emailVerificationCode = sixDigitCode;
             } else {
                 user = new User();
-                user.email = newUser.email;
-                user.emailVerificationCode = token;
+                user.email = hashedEmail;
+                user.emailVerificationCode = sixDigitCode;
                 this.logger.verbose(`New user ${newUser.email} created`);
             }
             await this.userRepository.save(user);
             await this.emailService.sendEmailVerification(
                 newUser.email.trim().toLowerCase(),
-                token
+                sixDigitCode
             );
         } catch (error) {
             this.logger.error(error.message);
@@ -185,8 +190,8 @@ export class UserService {
         }
     }
 
-    public async verifyEmail(token: string): Promise<boolean> {
-        const email = await this.decodeEmailFromToken(token);
+    public async verifyEmail(body: VerifyEmailRequestBody): Promise<boolean> {
+        const email = body.email;
         const formattedEmail = email.trim().toLowerCase();
         try {
             const user = await this.userRepository.findOneBy({
@@ -195,7 +200,7 @@ export class UserService {
 
             if (!user) throw new Error("Email not found");
 
-            if (user.emailVerificationCode != token)
+            if (user.emailVerificationCode != body.verificationCode)
                 throw new Error(
                     "Verification code is wrong, please try resend email"
                 );
@@ -207,23 +212,6 @@ export class UserService {
         } catch (error) {
             this.logger.error(error);
             return false;
-        }
-    }
-
-    private async decodeEmailFromToken(token: string): Promise<string> {
-        try {
-            const payload = this.jwtService.verify(token);
-            if (typeof payload === "object" && "email" in payload) {
-                return payload.email;
-            }
-            throw new BadRequestException();
-        } catch (error) {
-            if (error?.name === "TokenExpiredError") {
-                throw new BadRequestException(
-                    "Email confirmation token expired"
-                );
-            }
-            throw new BadRequestException("Bad confirmation token");
         }
     }
 
