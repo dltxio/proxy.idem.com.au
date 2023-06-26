@@ -6,7 +6,8 @@ import {
     VerifyUserRequest,
     IXeroService,
     SendInvoicesRequestBody,
-    ResendEmailRequestBody
+    ResendEmailRequestBody,
+    VerifyEmailRequestBody
 } from "./../interfaces";
 import {
     Controller,
@@ -149,8 +150,8 @@ export class UserController {
         status: HttpStatus.BAD_REQUEST
     })
     @Post("verify-email")
-    async verifyEmail(@Body("token") token: string): Promise<boolean> {
-        return this.userService.verifyEmail(token);
+    async verifyEmail(@Body() body: VerifyEmailRequestBody): Promise<boolean> {
+        return this.userService.verifyEmail(body);
     }
 
     @ApiOperation({
