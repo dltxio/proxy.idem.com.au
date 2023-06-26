@@ -8,10 +8,10 @@ import { Repository } from "typeorm";
 import { Request } from "../data/entities/request.entity";
 import { getVendorFromSitesJson, getVendorName } from "../utils/vendor";
 import { verifyMessage } from "../utils/wallet";
-import { GPIBVendor } from "./vendors/GPIB";
-import { CoinStashVendor } from "./vendors/CoinStash";
-import { EasyCryptoVendor } from "./vendors/EasyCrypto";
-import { DigitalSurgeVendor } from "./vendors/DigitalSurge";
+import { GPIBVendor } from "./partners/GPIB";
+import { CoinStashVendor } from "./partners/CoinStash";
+import { EasyCryptoVendor } from "./partners/EasyCrypto";
+import { DigitalSurgeVendor } from "./partners/DigitalSurge";
 import {
     ConfigSettings,
     RequestType,
