@@ -76,7 +76,6 @@ This project contains a single external service `EventStore` for demo purposes a
 -   [Inversion of Control / Dependency Injection](https://martinfowler.com/articles/injection.html)
 -   Unit and Integration/E2E testing
 -   Swagger documentation via annotations
--   TODO
 
 ### Dependency Management
 
