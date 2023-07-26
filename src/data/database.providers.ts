@@ -1,4 +1,13 @@
+import fs from "fs";
 import { DataSource } from "typeorm";
+
+// Get the certificate from the environment variable or disk
+const getCert = () => {
+    if (process.env.CA_CERT) {
+        return process.env.CA_CERT;
+    }
+    return fs.readFileSync(process.env.CA_CERT_PATH || "./ca-certificate.crt");
+};
 
 export const databaseProviders = [
     {
@@ -12,10 +21,10 @@ export const databaseProviders = [
                 password: process.env.POSTGRES_PASSWORD,
                 database: process.env.POSTGRES_DB_NAME,
                 entities: [__dirname + "/../**/*.entity{.ts,.js}"],
-                ssl: process.env.CA_CERT
+                ssl: getCert()
                     ? {
                           rejectUnauthorized: true,
-                          ca: process.env.CA_CERT
+                          ca: getCert()
                       }
                     : false
             });

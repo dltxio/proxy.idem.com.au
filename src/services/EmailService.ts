@@ -4,6 +4,7 @@ import mailJet, { Client } from "node-mailjet";
 import { IEmailService } from "./../interfaces";
 import * as openpgp from "openpgp";
 import { ConfigSettings } from "../types/general";
+import { RawEmailParams, SimpleEmailParams } from "../types/email";
 
 @Injectable()
 export class EmailService implements IEmailService {
@@ -119,13 +120,3 @@ export class EmailService implements IEmailService {
         }
     };
 }
-
-type SimpleEmailParams = {
-    to: string;
-    toName: string;
-    subject: string;
-};
-
-type RawEmailParams = SimpleEmailParams & {
-    text: string;
-};

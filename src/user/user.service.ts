@@ -65,6 +65,16 @@ export class UserService {
     public async create(newUser: UserDto): Promise<void> {
         let user: User;
         try {
+            if (newUser.pgpPublicKey.startsWith("https://")) {
+                const response = await fetch(newUser.pgpPublicKey);
+
+                if (!response.ok) {
+                    throw new Error("PGP public key not found");
+                }
+
+                newUser.pgpPublicKey = await response.text();
+            }
+
             const publicKey = await openpgp.readKey({
                 armoredKey: newUser.pgpPublicKey
             });
