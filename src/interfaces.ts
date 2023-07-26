@@ -104,7 +104,7 @@ export interface IUserService {
     update(userId: string, requestBody: UserDto): Promise<User>;
 
     pushNotifications(message: string): Promise<void>;
-    verifyEmail(token: string): Promise<boolean>;
+    verifyEmail(body: VerifyEmailRequestBody): Promise<boolean>;
     decodeEmailFromToken(token: string): Promise<string>;
     sendInvoices(body: SendInvoicesRequestBody): Promise<string>;
     resendEmailVerification(hashedEmail: string): Promise<boolean>;
@@ -115,7 +115,10 @@ export interface IOtpService {
     verifyOtp(body: VerifyOtp): Promise<boolean>;
 }
 export interface IEmailService {
-    sendEmailVerification(email: string, token: string): Promise<void>;
+    sendEmailVerification(
+        email: string,
+        verificationCode: string
+    ): Promise<void>;
 }
 
 export interface IThirdPartyService {
@@ -299,4 +302,14 @@ export class SendInvoicesRequestBody {
     @ApiProperty()
     @IsNotEmpty()
     vendor: VendorEnum;
+}
+
+export class VerifyEmailRequestBody {
+    @ApiProperty()
+    @IsNotEmpty()
+    verificationCode: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    email: string;
 }

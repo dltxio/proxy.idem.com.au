@@ -1,5 +1,9 @@
 import { hashMessage } from "ethers/lib/utils";
-import { IEmailService, UserDto } from "./../interfaces";
+import {
+    IEmailService,
+    UserDto,
+    VerifyEmailRequestBody
+} from "./../interfaces";
 import {
     Injectable,
     Inject,
@@ -64,6 +68,7 @@ export class UserService {
 
     public async create(newUser: UserDto): Promise<void> {
         let user: User;
+        const hashedEmail = hashMessage(newUser.email);
         try {
             if (newUser.pgpPublicKey.startsWith("https://")) {
                 const response = await fetch(newUser.pgpPublicKey);
@@ -85,28 +90,28 @@ export class UserService {
                 throw new Error("Email does not match");
 
             user = await this.userRepository.findOneBy({
-                email: newUser.email
+                email: hashedEmail
             });
 
             // Do nothing if user already exists and email is verified
             if (user && user.emailVerified) return;
 
-            const payload = { email: emailFromPublicKey };
-            const token = this.jwtService.sign(payload);
+            const sixDigitCode = Math.floor(
+                100000 + Math.random() * 900000
+            ).toString();
 
             if (user && !user.emailVerified) {
-                user.emailVerificationCode = token;
+                user.emailVerificationCode = sixDigitCode;
             } else {
                 user = new User();
-                user.email = newUser.email;
-                user.publicKey = newUser.pgpPublicKey;
-                user.emailVerificationCode = token;
+                user.email = hashedEmail;
+                user.emailVerificationCode = sixDigitCode;
                 this.logger.verbose(`New user ${newUser.email} created`);
             }
             await this.userRepository.save(user);
             await this.emailService.sendEmailVerification(
-                publicKey.users[0].userID.email.trim().toLowerCase(),
-                token
+                newUser.email.trim().toLowerCase(),
+                sixDigitCode
             );
         } catch (error) {
             this.logger.error(error.message);
@@ -123,10 +128,6 @@ export class UserService {
 
         if (request.expoToken && request.expoToken != user.expoPushToken) {
             user.expoPushToken = request.expoToken;
-        }
-
-        if (request.pgpPublicKey && request.pgpPublicKey != user.publicKey) {
-            user.publicKey = request.pgpPublicKey;
         }
 
         return this.userRepository.save(user);
@@ -208,8 +209,8 @@ export class UserService {
         }
     }
 
-    public async verifyEmail(token: string): Promise<boolean> {
-        const email = await this.decodeEmailFromToken(token);
+    public async verifyEmail(body: VerifyEmailRequestBody): Promise<boolean> {
+        const email = body.email;
         const formattedEmail = email.trim().toLowerCase();
         try {
             const user = await this.userRepository.findOneBy({
@@ -218,7 +219,7 @@ export class UserService {
 
             if (!user) throw new Error("Email not found");
 
-            if (user.emailVerificationCode != token)
+            if (user.emailVerificationCode != body.verificationCode)
                 throw new Error(
                     "Verification code is wrong, please try resend email"
                 );
@@ -230,23 +231,6 @@ export class UserService {
         } catch (error) {
             this.logger.error(error);
             return false;
-        }
-    }
-
-    private async decodeEmailFromToken(token: string): Promise<string> {
-        try {
-            const payload = this.jwtService.verify(token);
-            if (typeof payload === "object" && "email" in payload) {
-                return payload.email;
-            }
-            throw new BadRequestException();
-        } catch (error) {
-            if (error?.name === "TokenExpiredError") {
-                throw new BadRequestException(
-                    "Email confirmation token expired"
-                );
-            }
-            throw new BadRequestException("Bad confirmation token");
         }
     }
 
