@@ -4,7 +4,11 @@ import { Logger } from "ethers/lib/utils";
 import { Repository } from "typeorm";
 import { Request } from "../data/entities/request.entity";
 import { Contact, XeroClient, LineItem, Invoice, Invoices } from "xero-node";
-import { IXeroService, SendInvoicesRequestBody } from "../interfaces";
+import {
+    IOauthService,
+    IAccountingService,
+    SendInvoicesRequestBody
+} from "../interfaces";
 import { getVendorId } from "../utils/vendor";
 import { ConfigSettings } from "../types/general";
 
@@ -13,7 +17,7 @@ const XERO_SCOPES =
 const XERO_INVOICE_DESCRIPTION = "KYC";
 
 @Injectable()
-export class XeroService implements IXeroService {
+export class XeroService implements IAccountingService, IOauthService {
     private client: XeroClient;
     private readonly logger = new Logger("XeroService");
     private accountCode;
@@ -33,6 +37,10 @@ export class XeroService implements IXeroService {
         this.accountCode = this.config.get(ConfigSettings.XERO_SALES_CODE);
         this.price = this.config.get(ConfigSettings.XERO_PRICE);
         this.tenantId = this.config.get(ConfigSettings.XERO_TENANT_ID);
+    }
+
+    public async refreshTokens(): Promise<void> {
+        throw new Error("Method not implemented.");
     }
 
     public async sendInvoices(body: SendInvoicesRequestBody): Promise<string> {

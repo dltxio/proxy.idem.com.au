@@ -1,20 +1,24 @@
 import { ConfigService } from "@nestjs/config";
 import { Injectable, Logger } from "@nestjs/common";
 import mailJet, { Client } from "node-mailjet";
-import { IEmailService } from "./../interfaces";
+import { IEmailService } from "../interfaces";
 import * as openpgp from "openpgp";
 import { ConfigSettings } from "../types/general";
 
 @Injectable()
-export class EmailService implements IEmailService {
+export class MailJetService implements IEmailService {
     private readonly emailClient: Client;
-    private readonly logger = new Logger("EmailService");
+    private readonly logger = new Logger("MailJetService");
 
     constructor(private config: ConfigService) {
         this.emailClient = mailJet.apiConnect(
             this.config.get(ConfigSettings.MAILJET_API_KEY),
             this.config.get(ConfigSettings.MAILJET_SECRET)
         );
+    }
+
+    public async refreshTokens(): Promise<void> {
+        throw new Error("Method not implemented.");
     }
 
     public sendEmailVerification = async (

@@ -110,10 +110,15 @@ export interface IUserService {
     resendEmailVerification(hashedEmail: string): Promise<boolean>;
 }
 
+export interface IOauthService {
+    refreshTokens(): Promise<void>;
+}
+
 export interface IOtpService {
     requestOtp(mobile: string): Promise<RequestOtpResponse>;
     verifyOtp(body: VerifyOtp): Promise<boolean>;
 }
+
 export interface IEmailService {
     sendEmailVerification(
         email: string,
@@ -140,7 +145,7 @@ export interface IVendor {
     }>;
 }
 
-export interface IXeroService {
+export interface IAccountingService {
     sendInvoices(body: SendInvoicesRequestBody): Promise<string>;
 }
 
