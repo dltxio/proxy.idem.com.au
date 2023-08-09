@@ -1,7 +1,7 @@
 version: "2.2"
 services:
     postgres:
-        image: postgres:12
+        image: postgres:15.3-bookworm
         environment:
             POSTGRES_DB: idem
             POSTGRES_USER: idem
