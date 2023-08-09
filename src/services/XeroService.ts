@@ -40,6 +40,9 @@ export class XeroService implements IAccountingService, IOauthService {
     }
 
     public async refreshTokens(): Promise<void> {
+
+        // add tokens to Redis
+
         throw new Error("Method not implemented.");
     }
 

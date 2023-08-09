@@ -3,7 +3,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { Client } from "node-mailjet";
 import { IEmailService, IOauthService } from "./../interfaces";
 import * as openpgp from "openpgp";
-import { ConfigSettings } from "../types/general";
+import { ConfigSettings, RawEmailParams } from "../types/general";
 
 @Injectable()
 export class OutlookService implements IEmailService, IOauthService {
@@ -62,27 +62,10 @@ export class OutlookService implements IEmailService, IOauthService {
                 signingKeys: privateKey
             });
 
-            this.emailClient.post("send", { version: "v3.1" }).request({
-                messages: [
-                    {
-                        ...this.getMailJetBasePayload(params),
-                        TextPart: cleartextMessage
-                    }
-                ]
-            });
+            throw new Error("Method not implemented.");
         } catch (error) {
             this.logger.error(error);
             throw new Error(error);
         }
     };
 }
-
-type SimpleEmailParams = {
-    to: string;
-    toName: string;
-    subject: string;
-};
-
-type RawEmailParams = SimpleEmailParams & {
-    text: string;
-};

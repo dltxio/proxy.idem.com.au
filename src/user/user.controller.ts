@@ -4,7 +4,7 @@ import {
     UserDto,
     IUserService,
     VerifyUserRequest,
-    IXeroService,
+    IAccountingService,
     SendInvoicesRequestBody,
     ResendEmailRequestBody,
     VerifyEmailRequestBody
@@ -34,8 +34,8 @@ export class UserController {
     constructor(
         @Inject("IUserService") private userService: IUserService,
         @Inject("IGreenIdService") private greenIdService: IGreenIdService,
-        @Inject("IXeroService")
-        private xeroService: IXeroService
+        @Inject("IAccountingService")
+        private xeroService: IAccountingService
     ) {}
 
     @Post("create")

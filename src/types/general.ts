@@ -118,3 +118,13 @@ export type XeroTokenSet = {
     session_state?: string;
     scope?: string;
 };
+
+export type SimpleEmailParams = {
+    to: string;
+    toName: string;
+    subject: string;
+};
+
+export type RawEmailParams = SimpleEmailParams & {
+    text: string;
+};

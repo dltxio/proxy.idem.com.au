@@ -3,7 +3,7 @@ import { DatabaseModule } from "../data/database.module";
 import { UserController } from "./user.controller";
 import { userProviders } from "./user.providers";
 import { UserService } from "./user.service";
-import { EmailService } from "../services/MailJetService";
+import { MailJetService } from "../services/MailJetService";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { GreenIdService } from "../services/GreenIdService";
@@ -33,10 +33,10 @@ import { XeroService } from "../services/XeroService";
         },
         {
             provide: "IEmailService",
-            useClass: EmailService
+            useClass: MailJetService
         },
         {
-            provide: "IXeroService",
+            provide: "IAccounting   Service",
             useClass: XeroService
         },
         {

@@ -3,7 +3,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import mailJet, { Client } from "node-mailjet";
 import { IEmailService } from "../interfaces";
 import * as openpgp from "openpgp";
-import { ConfigSettings } from "../types/general";
+import { ConfigSettings, RawEmailParams, SimpleEmailParams } from "../types/general";
 
 @Injectable()
 export class MailJetService implements IEmailService {
@@ -99,13 +99,3 @@ export class MailJetService implements IEmailService {
         }
     };
 }
-
-type SimpleEmailParams = {
-    to: string;
-    toName: string;
-    subject: string;
-};
-
-type RawEmailParams = SimpleEmailParams & {
-    text: string;
-};
