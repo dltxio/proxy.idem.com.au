@@ -10,9 +10,7 @@ export class OutlookService implements IEmailService, IOauthService {
     private readonly emailClient: Client;
     private readonly logger = new Logger("OutlookService");
 
-    constructor(private config: ConfigService) {
-
-    }
+    constructor(private config: ConfigService) {}
 
     public async refreshTokens(): Promise<void> {
         throw new Error("Method not implemented.");
