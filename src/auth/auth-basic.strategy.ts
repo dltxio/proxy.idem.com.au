@@ -12,16 +12,12 @@ export class BasicStrategy extends PassportStrategy(Strategy) {
     }
 
     public validate = async (req, username, password): Promise<boolean> => {
-        console.log("username", username);
-        console.log("password", password);
-
-        return true;
-        // if (
-        //     this.config.get<string>("HTTP_BASIC_USER") === username &&
-        //     this.config.get<string>("HTTP_BASIC_PASS") === password
-        // ) {
-        //     return true;
-        // }
-        // throw new UnauthorizedException();
+        if (
+            this.config.get<string>("HTTP_BASIC_USER") === username &&
+            this.config.get<string>("HTTP_BASIC_PASS") === password
+        ) {
+            return true;
+        }
+        throw new UnauthorizedException();
     };
 }

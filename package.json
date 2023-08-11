@@ -34,7 +34,7 @@
         "@nestjs/typeorm": "^9.0.0",
         "@types/chai": "^4.3.1",
         "@types/sinon": "^10.0.12",
-        "axios": "^0.27.2",
+        "axios": "^1.4.0",
         "chai": "^4.3.6",
         "class-transformer": "^0.5.1",
         "class-validator": "^0.13.2",
@@ -59,8 +59,8 @@
         "rxjs": "^7.5.6",
         "soap": "^0.45.0",
         "swagger-ui-express": "^4.5.0",
-        "typeorm": "^0.3.7",
-        "uuid": "^8.3.2",
+        "typeorm": "^0.3.17",
+        "uuid": "^9.0.0",
         "xero-node": "^4.26.0"
     },
     "devDependencies": {

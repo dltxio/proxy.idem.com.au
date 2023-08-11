@@ -4,12 +4,7 @@ import {
     UserDto,
     VerifyEmailRequestBody
 } from "./../interfaces";
-import {
-    Injectable,
-    Inject,
-    Logger,
-    BadRequestException
-} from "@nestjs/common";
+import { Injectable, Inject, Logger } from "@nestjs/common";
 import * as openpgp from "openpgp";
 import { User } from "../data/entities/user.entity";
 import { Repository } from "typeorm";
@@ -223,8 +218,13 @@ export class UserService {
             const user = await this.userRepository.findOneBy({
                 email: hashedEmail
             });
-            if (!user || !user.publicKey)
-                throw new Error("Email or PGP key not found");
+            if (!user)
+                throw new Error("resendEmailVerification: Email not found");
+
+            if (!user.publicKey)
+                throw new Error(
+                    "resendEmailVerification: PGP public key not found"
+                );
 
             const publicKey = await openpgp.readKey({
                 armoredKey: user.publicKey

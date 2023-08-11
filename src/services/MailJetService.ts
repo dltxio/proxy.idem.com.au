@@ -9,6 +9,8 @@ import {
     SimpleEmailParams
 } from "../types/general";
 
+import * as fs from "fs";
+
 @Injectable()
 export class MailJetService implements IEmailService {
     private readonly emailClient: Client;
@@ -61,11 +63,14 @@ export class MailJetService implements IEmailService {
                 text: params.text
             });
 
+            // const key = fs.readFileSync("idem-private-key.asc", "utf8");
+
             const privateKeyArmored = this.config.get(
                 ConfigSettings.PGP_PRIVATE_KEY
             );
 
-            if (!privateKeyArmored) throw new Error("Idem PGP key not found");
+            if (!privateKeyArmored)
+                throw new Error("sendRawEmail: Idem PGP key not found");
 
             const privateKeys = await openpgp.readPrivateKeys({
                 armoredKeys: privateKeyArmored
