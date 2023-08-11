@@ -6,7 +6,7 @@
 # e.g. ./deploy.sh
 #     or
 #      ./deploy.sh faa0e9e08ec4febd6cd00e627a388310fa358541
-GIT_TARGET="${1:-development}"
+GIT_TARGET=main
 
 sudo service nginx stop
 pm2 stop api
