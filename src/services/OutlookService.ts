@@ -1,19 +1,50 @@
 import { ConfigService } from "@nestjs/config";
 import { Injectable, Logger } from "@nestjs/common";
-import { Client } from "node-mailjet";
 import { IEmailService, IOauthService } from "./../interfaces";
 import * as openpgp from "openpgp";
-import { ConfigSettings, RawEmailParams } from "../types/general";
+import { AuthToken, ConfigSettings, RawEmailParams } from "../types/general";
+import { getCache, setCache } from "src/clients/cache";
+import axios, { AxiosInstance } from "axios";
 
 @Injectable()
 export class OutlookService implements IEmailService, IOauthService {
-    private readonly emailClient: Client;
+    private readonly httpClient: AxiosInstance;
     private readonly logger = new Logger("OutlookService");
 
     constructor(private config: ConfigService) {}
 
     public async refreshTokens(): Promise<void> {
-        throw new Error("Method not implemented.");
+        const token = await getCache<AuthToken>("outlook-token");
+
+        // call Outlook API to refresh tokens
+        const data = {
+            refresh_token: token.refresh_token,
+            client_id: process.env.OUTLOOK_CLIENT_ID,
+            scope: "Mail.ReadWrite offline_access Mail.Send",
+            redirect_uri: "https://app.getpostman.com/oauth2/callback",
+            client_secret: process.env.OUTLOOK_CLIENT_SECRET,
+            grant_type: "refresh_token"
+        };
+
+        const config = {
+            method: "post",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            data: data,
+            url: "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+        };
+
+        const result = await axios(config);
+
+        if (result.status != 200) {
+            throw new Error("Failed to refresh Outlook tokens");
+        }
+
+        const newToken = result.data as AuthToken;
+        console.log(newToken);
+
+        await setCache<AuthToken>("outlook-token", newToken, 2 * 60 * 60);
     }
 
     public sendEmailVerification = async (

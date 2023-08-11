@@ -3,7 +3,11 @@ import { Injectable, Logger } from "@nestjs/common";
 import mailJet, { Client } from "node-mailjet";
 import { IEmailService } from "../interfaces";
 import * as openpgp from "openpgp";
-import { ConfigSettings, RawEmailParams, SimpleEmailParams } from "../types/general";
+import {
+    ConfigSettings,
+    RawEmailParams,
+    SimpleEmailParams
+} from "../types/general";
 
 @Injectable()
 export class MailJetService implements IEmailService {
@@ -15,10 +19,6 @@ export class MailJetService implements IEmailService {
             this.config.get(ConfigSettings.MAILJET_API_KEY),
             this.config.get(ConfigSettings.MAILJET_SECRET)
         );
-    }
-
-    public async refreshTokens(): Promise<void> {
-        throw new Error("Method not implemented.");
     }
 
     public sendEmailVerification = async (

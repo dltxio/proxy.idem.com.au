@@ -10,7 +10,8 @@ import {
     SendInvoicesRequestBody
 } from "../interfaces";
 import { getVendorId } from "../utils/vendor";
-import { ConfigSettings } from "../types/general";
+import { AuthToken, ConfigSettings } from "../types/general";
+import { getCache, setCache } from "src/clients/cache";
 
 const XERO_SCOPES =
     "openid profile email accounting.transactions accounting.contacts offline_access";
@@ -18,7 +19,7 @@ const XERO_INVOICE_DESCRIPTION = "KYC";
 
 @Injectable()
 export class XeroService implements IAccountingService, IOauthService {
-    private client: XeroClient;
+    private readonly client: XeroClient;
     private readonly logger = new Logger("XeroService");
     private accountCode;
     private price;
@@ -40,17 +41,18 @@ export class XeroService implements IAccountingService, IOauthService {
     }
 
     public async refreshTokens(): Promise<void> {
+        // call Xero API to refresh tokens
 
         // add tokens to Redis
-
-        throw new Error("Method not implemented.");
+        await setCache<AuthToken>("redis", undefined, 2 * 60 * 60);
     }
 
     public async sendInvoices(body: SendInvoicesRequestBody): Promise<string> {
         const { authToken, vendor } = body;
         try {
             // set the auth token from the POST request body
-            this.client.setTokenSet(authToken);
+            // const token = await getCache<AuthToken>("xero-token");
+            // this.client.setTokenSet(authToken.access_token);
 
             // create xero contact
             const { contactName, contactID } = getVendorId(vendor, this.config);

@@ -108,12 +108,15 @@ export type SignupResponse = {
     password?: string;
 };
 
+export type AuthToken = {
+    access_token: string;
+    refresh_token: number;
+};
+
 // all optional params as documented by Xero
-export type XeroTokenSet = {
-    access_token?: string;
+export type XeroTokenSet = AuthToken & {
     token_type?: string;
     id_token?: string;
-    refresh_token?: string;
     expires_in?: number;
     session_state?: string;
     scope?: string;

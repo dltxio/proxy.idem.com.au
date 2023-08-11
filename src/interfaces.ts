@@ -318,3 +318,8 @@ export class VerifyEmailRequestBody {
     @IsNotEmpty()
     email: string;
 }
+
+export type RefreshToken = {
+    refreshToken: string;
+    accessToken: string;
+};
