@@ -50,6 +50,7 @@ export class UserService {
             emailVerified: user.emailVerified
         };
     }
+
     public async findAll(): Promise<UsersResponse[]> {
         const usersResponse = [];
         const users = await this.userRepository.find();

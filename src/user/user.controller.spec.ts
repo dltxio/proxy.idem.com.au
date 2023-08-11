@@ -4,7 +4,7 @@ import { expect } from "chai";
 import { repositoryMockFactory } from "./user.service.spec";
 import { JwtService } from "@nestjs/jwt";
 
-//TODO: need to fix the unit test later
+// TODO: need to fix the unit test later
 describe("UserController", () => {
     let controller: UserController;
 
@@ -30,7 +30,7 @@ describe("UserController", () => {
                     useFactory: () => ({})
                 },
                 {
-                    provide: "IXeroService",
+                    provide: "IAccountingService",
                     useFactory: () => ({})
                 }
             ]

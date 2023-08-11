@@ -11,7 +11,7 @@ import {
 } from "../interfaces";
 import { getVendorId } from "../utils/vendor";
 import { AuthToken, ConfigSettings } from "../types/general";
-import { getCache, setCache } from "src/clients/cache";
+import { getCache, setCache } from "../clients/cache";
 
 const XERO_SCOPES =
     "openid profile email accounting.transactions accounting.contacts offline_access";

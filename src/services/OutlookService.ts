@@ -3,7 +3,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { IEmailService, IOauthService } from "./../interfaces";
 import * as openpgp from "openpgp";
 import { AuthToken, ConfigSettings, RawEmailParams } from "../types/general";
-import { getCache, setCache } from "src/clients/cache";
+import { getCache, setCache } from "../clients/cache";
 import axios, { AxiosInstance } from "axios";
 
 @Injectable()
@@ -21,7 +21,7 @@ export class OutlookService implements IEmailService, IOauthService {
             refresh_token: token.refresh_token,
             client_id: process.env.OUTLOOK_CLIENT_ID,
             scope: "Mail.ReadWrite offline_access Mail.Send",
-            redirect_uri: "https://app.getpostman.com/oauth2/callback",
+            redirect_uri: "https://proxy.idem.com.au/oauth2/callback",
             client_secret: process.env.OUTLOOK_CLIENT_SECRET,
             grant_type: "refresh_token"
         };
