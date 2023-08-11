@@ -36,7 +36,7 @@ import { XeroService } from "../services/XeroService";
             useClass: MailJetService
         },
         {
-            provide: "IAccounting   Service",
+            provide: "IAccountingService",
             useClass: XeroService
         },
         {

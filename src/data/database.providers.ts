@@ -1,4 +1,5 @@
 import { DataSource } from "typeorm";
+import * as fs from "fs";
 
 export const databaseProviders = [
     {
@@ -15,7 +16,7 @@ export const databaseProviders = [
                 ssl: process.env.CA_CERT
                     ? {
                           rejectUnauthorized: true,
-                          ca: process.env.CA_CERT
+                          ca: fs.readFileSync(process.env.CA_CERT).toString()
                       }
                     : false
             });
