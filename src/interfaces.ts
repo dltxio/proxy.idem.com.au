@@ -87,7 +87,7 @@ export class AccountMissingIdError extends EntityMissingIdError {
     }
 }
 
-export interface IGreenIdService {
+export interface IKYCService {
     formatReturnData(data: VerifyReturnData): Promise<KycResponse>;
     verify(_props: VerifyProps): Promise<VerifyReturnData>;
 }
@@ -97,16 +97,16 @@ export interface ISmsService {
 }
 
 export interface IUserService {
-    verify(body: VerifyUserRequest): Promise<string>;
-    findOne(email: string): Promise<User>;
+    // verify(body: VerifyUserRequest): Promise<string>;
+    findOne(hashEmail: string): Promise<UsersResponse>;
     findAll(): Promise<UsersResponse[]>;
     create(newUser: UserDto): Promise<void>;
     update(userId: string, requestBody: UserDto): Promise<User>;
 
     pushNotifications(message: string): Promise<void>;
     verifyEmail(body: VerifyEmailRequestBody): Promise<boolean>;
-    decodeEmailFromToken(token: string): Promise<string>;
-    sendInvoices(body: SendInvoicesRequestBody): Promise<string>;
+    // decodeEmailFromToken(token: string): Promise<string>;
+    // sendInvoices(body: SendInvoicesRequestBody): Promise<string>;
     resendEmailVerification(hashedEmail: string): Promise<boolean>;
 }
 
@@ -159,6 +159,12 @@ export class UserDto {
     @ApiProperty()
     @IsOptional()
     pgpPublicKey: string;
+    @ApiProperty()
+    @IsOptional()
+    nonce: string;
+    @ApiProperty()
+    @IsOptional()
+    pgpSignedNonce: string;
 }
 
 export class VerifyUserRequest {

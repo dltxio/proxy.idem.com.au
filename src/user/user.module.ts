@@ -40,7 +40,7 @@ import { XeroService } from "../services/XeroService";
             useClass: XeroService
         },
         {
-            provide: "IGreenIdService",
+            provide: "IKYCService",
             useClass: GreenIdService
         }
     ]

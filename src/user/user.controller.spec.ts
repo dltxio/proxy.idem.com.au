@@ -26,7 +26,7 @@ describe("UserController", () => {
                 },
                 JwtService,
                 {
-                    provide: "IGreenIdService",
+                    provide: "IKYCService",
                     useFactory: () => ({})
                 },
                 {

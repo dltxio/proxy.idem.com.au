@@ -1,6 +1,7 @@
 import { hashMessage } from "ethers/lib/utils";
 import {
     IEmailService,
+    IUserService,
     UserDto,
     VerifyEmailRequestBody
 } from "./../interfaces";
@@ -14,7 +15,7 @@ import { JwtService } from "@nestjs/jwt";
 import { ConfigSettings, UsersResponse } from "../types/general";
 
 @Injectable()
-export class UserService {
+export class UserService implements IUserService {
     private expo: Expo;
     private readonly logger = new Logger("UserService");
     constructor(
@@ -29,14 +30,12 @@ export class UserService {
         });
     }
 
-    public async findOne(
-        hashEmail: string
-    ): Promise<UsersResponse | undefined> {
+    public async findOne(hashEmail: string): Promise<UsersResponse> {
         const user = await this.userRepository.findOneBy({
             email: hashEmail
         });
 
-        if (!user) return undefined;
+        if (!user) throw new Error("User not found");
 
         return {
             userId: user.userId,

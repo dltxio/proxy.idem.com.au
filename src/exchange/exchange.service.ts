@@ -24,6 +24,10 @@ export class ExchangeService {
         });
     }
 
+    public async requests(): Promise<Request[]> {
+        return this.requestRepository.find();
+    }
+
     public async pushSignupNotification(
         signupRequest: ExchangeSignupCallBack,
         ip: string

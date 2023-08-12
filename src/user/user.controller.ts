@@ -1,5 +1,4 @@
 import {
-    IGreenIdService,
     NotificationRequest,
     UserDto,
     IUserService,
@@ -7,7 +6,8 @@ import {
     IAccountingService,
     SendInvoicesRequestBody,
     ResendEmailRequestBody,
-    VerifyEmailRequestBody
+    VerifyEmailRequestBody,
+    IKYCService
 } from "./../interfaces";
 import {
     Controller,
@@ -33,12 +33,12 @@ import { RegisterVerificationData } from "../types/greenId";
 export class UserController {
     constructor(
         @Inject("IUserService") private userService: IUserService,
-        @Inject("IGreenIdService") private greenIdService: IGreenIdService,
+        @Inject("IKYCService") private greenIdService: IKYCService,
         @Inject("IAccountingService")
         private xeroService: IAccountingService
     ) {}
 
-    @Post("create")
+    @Post("")
     @ApiOperation({ summary: "Create user" })
     @ApiResponse({
         status: HttpStatus.OK
@@ -46,7 +46,7 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async create(@Body() body: UserDto): Promise<void> {
+    async createUser(@Body() body: UserDto): Promise<void> {
         return this.userService.create(body);
     }
 

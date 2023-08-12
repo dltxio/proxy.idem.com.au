@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { IGreenIdService } from "../interfaces";
+import { IKYCService } from "../interfaces";
 import soap from "soap";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const soapImport = require("soap");
@@ -30,7 +30,7 @@ import {
 } from "../types/greenId";
 
 @Injectable()
-export class GreenIdService implements IGreenIdService {
+export class GreenIdService implements IKYCService {
     private greenId: soap.Client;
     private readonly logger = new Logger("GreenIdService");
     private greenIdAccountId: string;

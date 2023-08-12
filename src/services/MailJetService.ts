@@ -28,7 +28,6 @@ export class MailJetService implements IEmailService {
         verificationCode: string
     ): Promise<void> => {
         const subject = `IDEM email verification`;
-        this.logger.log(`${email} Verification code email sent`);
         const opt = {
             to: email,
             toName: email,
@@ -36,7 +35,9 @@ export class MailJetService implements IEmailService {
             text: `Your confirmation code is ${verificationCode}.
              Enter the code in the IDEM mobile app to verify your email.`
         };
-        return this.sendRawEmail(opt);
+
+        this.sendRawEmail(opt);
+        this.logger.log(`${email} Verification code email sent`);
     };
 
     private getMailJetBasePayload = (params: SimpleEmailParams) => {
@@ -63,10 +64,9 @@ export class MailJetService implements IEmailService {
                 text: params.text
             });
 
-            // const key = fs.readFileSync("idem-private-key.asc", "utf8");
-
-            const privateKeyArmored = this.config.get(
-                ConfigSettings.PGP_PRIVATE_KEY
+            const privateKeyArmored = fs.readFileSync(
+                "idem-test-pgp.asc",
+                "utf8"
             );
 
             if (!privateKeyArmored)
