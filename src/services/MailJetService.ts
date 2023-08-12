@@ -34,8 +34,7 @@ export class MailJetService implements IEmailService {
             to: email,
             toName: email,
             subject,
-            text: `Your confirmation code is ${verificationCode}\n.
-             Enter the code in the IDEM mobile app to verify your email.`
+            text: `Your confirmation code is ${verificationCode}.  Enter the code in the IDEM mobile app to verify your email.`
         };
 
         if (recipientPublicKey) {

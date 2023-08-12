@@ -61,6 +61,11 @@ export class OutlookService implements IEmailService, IOauthService {
             text: `Your confirmation code is ${verificationCode}.
              Enter the code in the IDEM mobile app to verify your email.`
         };
+
+        if (recipientPublicKey) {
+            throw new Error("Method not implemented.");
+        }
+
         return this.sendRawEmail(opt);
     };
 
