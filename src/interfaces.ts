@@ -32,6 +32,8 @@ import {
     VerifyReturnData
 } from "./types/greenId";
 
+import { Request } from "./data/entities/request.entity";
+
 export interface IExampleService {
     getById(id: string): string;
     getAll(): string[];
@@ -136,6 +138,7 @@ export interface IExchangeService {
         signupRequest: ExchangeSignupCallBack,
         ip: string
     ): Promise<void>;
+    requests(): Promise<Request[]>;
 }
 
 export interface IVendor {

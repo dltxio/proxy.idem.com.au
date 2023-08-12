@@ -1,14 +1,14 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { User } from "../data/entities/user.entity";
 import { Request } from "../data/entities/request.entity";
-import { ExchangeSignupCallBack } from "../interfaces";
+import { ExchangeSignupCallBack, IExchangeService } from "../interfaces";
 import { Repository } from "typeorm";
 import Expo from "expo-server-sdk";
 import { ConfigService } from "@nestjs/config";
 import { ConfigSettings, RequestType } from "../types/general";
 
 @Injectable()
-export class ExchangeService {
+export class ExchangeService implements IExchangeService {
     private readonly logger = new Logger("ExchangeService");
     private expo: Expo;
 
@@ -25,7 +25,7 @@ export class ExchangeService {
     }
 
     public async requests(): Promise<Request[]> {
-        return this.requestRepository.find();
+        return await this.requestRepository.find();
     }
 
     public async pushSignupNotification(

@@ -45,4 +45,17 @@ export class ExchangeController {
     ): Promise<void> {
         return this.exchangeService.pushSignupNotification(request, ip);
     }
+
+    @Post("requests")
+    @ApiOperation({ summary: "Get verify requests" })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async requests(): Promise<Request[]> {
+        // return await this.exchangeService.requests();
+        throw new Error("Not implemented");
+    }
 }
