@@ -10,6 +10,7 @@ import {
 } from "../types/general";
 
 import * as fs from "fs";
+import axios from "axios";
 
 @Injectable()
 export class MailJetService implements IEmailService {
@@ -25,18 +26,24 @@ export class MailJetService implements IEmailService {
 
     public sendEmailVerification = async (
         email: string,
-        verificationCode: string
+        verificationCode: string,
+        recipientPublicKey: string
     ): Promise<void> => {
         const subject = `IDEM email verification`;
         const opt = {
             to: email,
             toName: email,
             subject,
-            text: `Your confirmation code is ${verificationCode}.
+            text: `Your confirmation code is ${verificationCode}\n.
              Enter the code in the IDEM mobile app to verify your email.`
         };
 
-        this.sendRawEmail(opt);
+        if (recipientPublicKey) {
+            await this.sendEncryptedRawEmail(opt, recipientPublicKey);
+        } else {
+            this.sendSignedRawEmail(opt);
+        }
+
         this.logger.log(`${email} Verification code email sent`);
     };
 
@@ -58,14 +65,14 @@ export class MailJetService implements IEmailService {
         };
     };
 
-    private sendRawEmail = async (params: RawEmailParams) => {
+    private sendSignedRawEmail = async (params: RawEmailParams) => {
         try {
             const unsignedMessage = await openpgp.createCleartextMessage({
                 text: params.text
             });
 
             const privateKeyArmored = fs.readFileSync(
-                "idem-test-pgp.asc",
+                this.config.get(ConfigSettings.PGP_PRIVATE_KEY),
                 "utf8"
             );
 
@@ -95,6 +102,62 @@ export class MailJetService implements IEmailService {
                     {
                         ...this.getMailJetBasePayload(params),
                         TextPart: cleartextMessage
+                    }
+                ]
+            });
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(error);
+        }
+    };
+
+    private sendEncryptedRawEmail = async (
+        params: RawEmailParams,
+        recipientPublicKey: string
+    ) => {
+        try {
+            const privateKeyArmored = fs.readFileSync(
+                this.config.get(ConfigSettings.PGP_PRIVATE_KEY),
+                "utf8"
+            );
+
+            if (!privateKeyArmored)
+                throw new Error("sendRawEmail: Idem PGP key not found");
+
+            const privateKeys = await openpgp.readPrivateKeys({
+                armoredKeys: privateKeyArmored
+            });
+
+            const passphrase = this.config.get(
+                ConfigSettings.PGP_PASSPHRASE
+            ) as string;
+
+            const privateKey = await openpgp.decryptKey({
+                privateKey: privateKeys[0],
+                passphrase
+            });
+
+            if (recipientPublicKey.startsWith("https://")) {
+                const result = await axios.get(recipientPublicKey);
+                recipientPublicKey = result.data;
+                console.log(recipientPublicKey);
+            }
+
+            const publicKey = await openpgp.readKey({
+                armoredKey: recipientPublicKey
+            });
+
+            const encrypted = await openpgp.encrypt({
+                message: await openpgp.createMessage({ text: params.text }), // input as Message object
+                encryptionKeys: publicKey,
+                signingKeys: privateKey
+            });
+
+            this.emailClient.post("send", { version: "v3.1" }).request({
+                messages: [
+                    {
+                        ...this.getMailJetBasePayload(params),
+                        TextPart: encrypted
                     }
                 ]
             });

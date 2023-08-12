@@ -87,7 +87,8 @@ export class UserService implements IUserService {
             await this.userRepository.save(user);
             await this.emailService.sendEmailVerification(
                 newUser.email.trim().toLowerCase(),
-                sixDigitCode
+                sixDigitCode,
+                newUser.pgpPublicKey
             );
         } catch (error) {
             this.logger.error(error.message);
@@ -240,7 +241,8 @@ export class UserService implements IUserService {
             await this.userRepository.save(user);
             await this.emailService.sendEmailVerification(
                 emailFromPublicKey,
-                token
+                token,
+                user.publicKey
             );
             return true;
         } catch (error) {

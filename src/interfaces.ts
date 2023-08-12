@@ -122,7 +122,8 @@ export interface IOtpService {
 export interface IEmailService {
     sendEmailVerification(
         email: string,
-        verificationCode: string
+        verificationCode: string,
+        recipientPublicKey: string
     ): Promise<void>;
 }
 

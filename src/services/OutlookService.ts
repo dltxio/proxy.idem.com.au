@@ -49,7 +49,8 @@ export class OutlookService implements IEmailService, IOauthService {
 
     public sendEmailVerification = async (
         email: string,
-        verificationCode: string
+        verificationCode: string,
+        recipientPublicKey: string
     ): Promise<void> => {
         const subject = `IDEM email verification`;
         this.logger.log(`${email} Verification code email sent`);
