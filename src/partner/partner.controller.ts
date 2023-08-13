@@ -8,7 +8,7 @@ import {
     Post
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
-import { SignupResponse } from "../types/general";
+// import { SignupResponse } from "../types/general";
 import { IPartnerService } from "../interfaces";
 import { Partner } from "src/data/entities/partner.entity";
 
