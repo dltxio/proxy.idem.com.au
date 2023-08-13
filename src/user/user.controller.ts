@@ -62,7 +62,7 @@ export class UserController {
         const findUser = await this.userService.findOne(body.hashEmail);
         if (!findUser) throw new Error("User not found");
 
-        const greenIdU: RegisterVerificationData = {
+        const greenIdUser: RegisterVerificationData = {
             ruleId: "default",
             name: body.fullName,
             currentResidentialAddress: body.address,
@@ -70,7 +70,7 @@ export class UserController {
         };
 
         const response = await this.greenIdService.verify({
-            user: greenIdU,
+            user: greenIdUser,
             licence: body.driversLicence,
             medicare: body.medicareCard
         });

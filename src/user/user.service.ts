@@ -70,7 +70,12 @@ export class UserService implements IUserService {
             });
 
             // Do nothing if user already exists and email is verified
-            if (user && user.emailVerified) return;
+            if (user && user.emailVerified) {
+                this.logger.verbose(
+                    `User ${newUser.email} ${hashedEmail} already exists`
+                );
+                throw new Error("User already exists");
+            }
 
             const sixDigitCode = Math.floor(
                 100000 + Math.random() * 900000
@@ -91,7 +96,7 @@ export class UserService implements IUserService {
                 newUser.pgpPublicKey
             );
         } catch (error) {
-            this.logger.error(error.message);
+            // this.logger.error(error.message);
             throw new Error(error.message);
         }
     }

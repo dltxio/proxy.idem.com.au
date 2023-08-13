@@ -37,13 +37,22 @@ export class MailJetService implements IEmailService {
             text: `Your confirmation code is ${verificationCode}.  Enter the code in the IDEM mobile app to verify your email.`
         };
 
-        if (recipientPublicKey) {
-            await this.sendEncryptedRawEmail(opt, recipientPublicKey);
-        } else {
-            this.sendSignedRawEmail(opt);
-        }
+        this.logger.log(`Sending code to ${email}`);
 
-        this.logger.log(`${email} Verification code email sent`);
+        try {
+            if (recipientPublicKey && recipientPublicKey !== "") {
+                await this.sendEncryptedRawEmail(opt, recipientPublicKey);
+                this.logger.log(
+                    `${email} Encrypted verification code email sent`
+                );
+            } else {
+                await this.sendSignedRawEmail(opt);
+                this.logger.log(`${email} Signed verification code email sent`);
+            }
+        } catch (error) {
+            this.logger.error(error.message);
+            throw new Error(error);
+        }
     };
 
     private getMailJetBasePayload = (params: SimpleEmailParams) => {
@@ -96,6 +105,8 @@ export class MailJetService implements IEmailService {
                 signingKeys: privateKey
             });
 
+            this.logger.log(cleartextMessage);
+
             this.emailClient.post("send", { version: "v3.1" }).request({
                 messages: [
                     {
@@ -105,7 +116,7 @@ export class MailJetService implements IEmailService {
                 ]
             });
         } catch (error) {
-            this.logger.error(error);
+            // this.logger.error(error.message);
             throw new Error(error);
         }
     };
