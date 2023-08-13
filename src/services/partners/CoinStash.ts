@@ -14,7 +14,8 @@ export class CoinStashVendor implements IVendor {
             ConfigSettings.COINSTASH_SIGNUP_ENDPOINT
         );
     }
-    async signUp(signupInfo: UserSignupRequest) {
+
+    public async signUp(signupInfo: UserSignupRequest) {
         const { firstName, lastName, email, password } = signupInfo;
 
         const requestBody = {

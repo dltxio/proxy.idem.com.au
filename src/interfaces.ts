@@ -33,6 +33,7 @@ import {
 } from "./types/greenId";
 
 import { Request } from "./data/entities/request.entity";
+import { Partner } from "./data/entities/partner.entity";
 
 export interface IExampleService {
     getById(id: string): string;
@@ -129,16 +130,18 @@ export interface IEmailService {
     ): Promise<void>;
 }
 
-export interface IThirdPartyService {
-    signUp(signupInfo: UserSignupRequest, ip: string): Promise<SignupResponse>;
-}
-
 export interface IExchangeService {
     pushSignupNotification(
         signupRequest: ExchangeSignupCallBack,
         ip: string
     ): Promise<void>;
     requests(): Promise<Request[]>;
+}
+
+export interface IPartnerService {
+    get(): Promise<Partner[]>;
+    requests(): Promise<Request[]>;
+    signUp(signupInfo: UserSignupRequest, ip: string): Promise<SignupResponse>;
 }
 
 export interface IVendor {

@@ -4,15 +4,15 @@ import { SignupResponse } from "../types/general";
 import {
     ExchangeSignupCallBack,
     IExchangeService,
-    IThirdPartyService,
+    IPartnerService,
     UserSignupRequest
 } from "../interfaces";
 
 @Controller("exchanges")
 export class ExchangeController {
     constructor(
-        @Inject("IThirdPartyService")
-        private thirdPartyService: IThirdPartyService,
+        @Inject("IPartnerService")
+        private thirdPartyService: IPartnerService,
         @Inject("IExchangeService") private exchangeService: IExchangeService
     ) {}
 

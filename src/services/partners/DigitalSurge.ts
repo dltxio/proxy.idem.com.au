@@ -14,7 +14,8 @@ export class DigitalSurgeVendor implements IVendor {
             ConfigSettings.DIGITALSURGE_SIGNUP_ENDPOINT
         );
     }
-    async signUp(signupInfo: UserSignupRequest) {
+
+    public async signUp(signupInfo: UserSignupRequest) {
         const { email, firstName, lastName, mobile } = signupInfo;
 
         const requestBody = {

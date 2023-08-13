@@ -14,7 +14,8 @@ export class EasyCryptoVendor implements IVendor {
             ConfigSettings.EC_SIGNUP_ENDPOINT
         );
     }
-    async signUp(signupInfo: UserSignupRequest) {
+
+    public async signUp(signupInfo: UserSignupRequest) {
         const { email, password } = signupInfo;
 
         const requestBody = {
