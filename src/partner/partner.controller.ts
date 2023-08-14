@@ -5,6 +5,7 @@ import {
     HttpStatus,
     Inject,
     Ip,
+    Param,
     Post
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
@@ -43,8 +44,8 @@ export class PartnerController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async getById(): Promise<Partner> {
-        return await this.partnerService.getById(1);
+    async getById(@Param("id") id: number): Promise<Partner> {
+        return await this.partnerService.getById(id);
     }
 
     // TODO MOVE TO INVOICE CONTROLLER
@@ -56,8 +57,8 @@ export class PartnerController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async getPartnerInvoices(): Promise<Partner> {
-        return await this.partnerService.getById(1);
+    async getPartnerInvoices(@Param("id") id: number): Promise<Partner> {
+        return await this.partnerService.getById(id);
     }
 
     @Post("authenticate")
@@ -70,7 +71,7 @@ export class PartnerController {
     })
     async authenticate(@Body() body: LoginRequest): Promise<AuthenticatedUser> {
         {
-            return { id: "1", email: body.email, role: "admin", token: "" };
+            return { id: "4", email: body.email, role: "admin", token: "" };
         }
     }
 }
