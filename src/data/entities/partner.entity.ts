@@ -54,4 +54,7 @@ export class Partner {
 
     @Column()
     expiry: number;
+
+    @Column()
+    apiKey: string;
 }
