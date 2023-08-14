@@ -28,7 +28,7 @@ import {
     Fullname,
     LicenceData,
     MedicareData,
-    VerifyProps,
+    VerifyDTO,
     VerifyReturnData
 } from "./types/greenId";
 
@@ -92,7 +92,7 @@ export class AccountMissingIdError extends EntityMissingIdError {
 
 export interface IKYCService {
     formatReturnData(data: VerifyReturnData): Promise<KycResponse>;
-    verify(_props: VerifyProps): Promise<VerifyReturnData>;
+    verify(_props: VerifyDTO): Promise<VerifyReturnData>;
 }
 
 export interface ISmsService {

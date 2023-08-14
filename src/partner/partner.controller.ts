@@ -27,7 +27,7 @@ export class PartnerController {
     ) {}
 
     @Get("requests")
-    @ApiOperation({ summary: "Get verification requests" })
+    @ApiOperation({ summary: "Get Verification Requests" })
     @ApiResponse({
         status: HttpStatus.OK
     })

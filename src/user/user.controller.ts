@@ -75,7 +75,7 @@ export class UserController {
             medicare: body.medicareCard
         });
 
-        // CACHE RESPONSE
+        // CACHE RESPONSE IN DB
 
         const result = await this.greenIdService.formatReturnData(response);
 
@@ -156,7 +156,7 @@ export class UserController {
         return this.userService.verifyEmail(body);
     }
 
-    // Remove this should be on partner controller
+    // TODO:  Remove this should be on partner controller
     @ApiOperation({
         summary: "Send invoices"
     })

@@ -56,7 +56,7 @@ export class ExchangeController {
     }
 
     @Post("requests")
-    @ApiOperation({ summary: "Get verify requests" })
+    @ApiOperation({ summary: "Get requests" })
     @ApiResponse({
         status: HttpStatus.OK
     })

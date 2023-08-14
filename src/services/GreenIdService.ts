@@ -26,7 +26,6 @@ import {
     Source,
     UnverifiableCredential,
     VerifyDTO,
-    VerifyProps,
     VerifyReturnData
 } from "../types/greenId";
 
