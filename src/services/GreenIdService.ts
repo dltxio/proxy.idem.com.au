@@ -25,6 +25,7 @@ import {
     SetFieldsPayload,
     Source,
     UnverifiableCredential,
+    VerifyDTO,
     VerifyProps,
     VerifyReturnData
 } from "../types/greenId";
@@ -44,7 +45,7 @@ export class GreenIdService implements IKYCService {
         this.greenIdPassword = this.config.get(ConfigSettings.GREENID_PASSWORD);
     }
 
-    public async verify(_props: VerifyProps): Promise<VerifyReturnData> {
+    public async verify(_props: VerifyDTO): Promise<VerifyReturnData> {
         const { user, licence, medicare } = _props;
         let errorMessage: string;
 
