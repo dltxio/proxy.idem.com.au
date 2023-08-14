@@ -45,4 +45,13 @@ export class Partner {
     @Column({ type: "timestamptz" })
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @Column()
+    abn: string;
+
+    @Column()
+    password: string;
+
+    @Column()
+    expiry: number;
 }

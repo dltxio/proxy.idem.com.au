@@ -59,8 +59,8 @@ export class UserController {
         status: HttpStatus.BAD_REQUEST
     })
     async verify(@Body() body: VerifyUserRequest): Promise<KycResponse> {
-        const findUser = await this.userService.findOne(body.hashEmail);
-        if (!findUser) throw new Error("User not found");
+        // const findUser = await this.userService.findOne(body.hashEmail);
+        // if (!findUser) throw new Error("User not found");
 
         const greenIdUser: RegisterVerificationData = {
             ruleId: "default",
@@ -74,6 +74,8 @@ export class UserController {
             licence: body.driversLicence,
             medicare: body.medicareCard
         });
+
+        // CACHE RESPONSE
 
         const result = await this.greenIdService.formatReturnData(response);
 
@@ -154,6 +156,7 @@ export class UserController {
         return this.userService.verifyEmail(body);
     }
 
+    // Remove this should be on partner controller
     @ApiOperation({
         summary: "Send invoices"
     })

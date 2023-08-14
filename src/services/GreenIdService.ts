@@ -47,12 +47,9 @@ export class GreenIdService implements IKYCService {
     public async verify(_props: VerifyProps): Promise<VerifyReturnData> {
         const { user, licence, medicare } = _props;
         let errorMessage: string;
+
         if (!user.name) errorMessage = "User doesn't have name";
-
         if (!user.dob) errorMessage = "User doesn't have a date of birth";
-
-        if (!licence && !medicare)
-            errorMessage = "Need either Drivers licence or medicare card";
 
         if (errorMessage) {
             this.logger.error(errorMessage);
@@ -61,11 +58,11 @@ export class GreenIdService implements IKYCService {
 
         this.logger.log("Verifying with GreenID");
 
-        if (
-            this.config.get(ConfigSettings.REALLY_VERIFY_IDENTITY) === "false"
-        ) {
-            this.mockGreenIdCall(_props);
-        }
+        // if (
+        //     this.config.get(ConfigSettings.REALLY_VERIFY_IDENTITY) === "false"
+        // ) {
+        //     this.mockGreenIdCall(_props);
+        // }
 
         const {
             return: {
@@ -73,8 +70,8 @@ export class GreenIdService implements IKYCService {
             }
         } = await this.registerVerification(user);
 
-        if (!licence || !medicare)
-            throw new Error("Licence or medicare card not provided");
+        if (!licence) throw new Error("Licence not provided");
+        if (!medicare) throw new Error("Medicare card not provided");
 
         const licenceResult: SetFieldResult = await this.setFields({
             verificationId,
@@ -122,6 +119,8 @@ export class GreenIdService implements IKYCService {
                     user.dob
                 );
 
+            // CACHE THIS
+
             return {
                 success: true,
                 didJWTCredentials: [signedNameCredential, signedDobCredential],
@@ -132,7 +131,7 @@ export class GreenIdService implements IKYCService {
             };
         }
 
-        throw new Error("Error, please contract support");
+        throw new Error("Error, please contact support");
     }
 
     public async formatReturnData(
@@ -179,48 +178,6 @@ export class GreenIdService implements IKYCService {
         };
     }
 
-    private async mockGreenIdCall(_props: VerifyProps) {
-        const { user, licence, medicare } = _props;
-        this.logger.debug("Mocking verification response to save money!");
-        if (
-            licence.licenceNumber === "11111111" &&
-            medicare.number === "2111111111"
-        ) {
-            const signedNameCredential =
-                await this.createJWTVerifiableCredential(
-                    "NameCredential",
-                    user.name
-                );
-            const signedDobCredential =
-                await this.createJWTVerifiableCredential(
-                    "BirthCredential",
-                    user.dob
-                );
-
-            const PGPSignedNameCredential =
-                await this.createPGPVerifiableCredential(
-                    "NameCredential",
-                    user.name
-                );
-            const PGPSignedDobCredential =
-                await this.createPGPVerifiableCredential(
-                    "BirthCredential",
-                    user.dob
-                );
-
-            return {
-                success: true,
-                didJWTCredentials: [signedNameCredential, signedDobCredential],
-                didPGPCredentials: [
-                    PGPSignedNameCredential,
-                    PGPSignedDobCredential
-                ]
-            };
-        }
-
-        throw new Error("Error, please contract support");
-    }
-
     private async createJWTVerifiableCredential(
         credentialType: ClaimType,
         credentialSubject: object
@@ -257,7 +214,7 @@ export class GreenIdService implements IKYCService {
         return JWT;
     }
 
-    ///Create verifiable credential signed with pgp key
+    // Create verifiable credential signed with pgp key
     private async createPGPVerifiableCredential(
         credentialType: ClaimType,
         credentialSubject: object

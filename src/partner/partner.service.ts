@@ -59,6 +59,12 @@ export class PartnerService implements IPartnerService {
         });
     }
 
+    public async getByEmail(email: string): Promise<Partner> {
+        return await this.partnerRepository.findOne({
+            where: { email: email }
+        });
+    }
+
     private getVendor(vendorId: number): IVendor {
         switch (vendorId) {
             case VendorEnum.GPIB:

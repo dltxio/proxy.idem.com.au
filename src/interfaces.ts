@@ -143,6 +143,7 @@ export interface IExchangeService {
 export interface IPartnerService {
     get(): Promise<Partner[]>;
     getById(vendorId: number): Promise<Partner>;
+    getByEmail(email: string): Promise<Partner>;
     requests(): Promise<Request[]>;
     signUp(signupInfo: UserSignupRequest, ip: string): Promise<SignupResponse>;
 }
@@ -340,8 +341,8 @@ export class SendInvoicesRequestBody {
 
 export type InvoiceDTO = {
     number: string;
-    issuedDate: string;
-    dueDate: string;
+    issuedDate: Date;
+    dueDate: Date;
     total: number;
     currency: string;
     status: string;

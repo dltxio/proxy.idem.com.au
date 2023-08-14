@@ -25,7 +25,9 @@ export class ExchangeService implements IExchangeService {
     }
 
     public async requests(): Promise<Request[]> {
-        return await this.requestRepository.find();
+        return await this.requestRepository.find({
+            where: { requestType: RequestType.Verify }
+        });
     }
 
     public async signups(to: string): Promise<Request[]> {

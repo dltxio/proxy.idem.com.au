@@ -12,10 +12,12 @@ import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import {
     AuthenticatedUser,
     IPartnerService,
+    InvoiceDTO,
     LoginRequest
 } from "../interfaces";
 import { Partner } from "src/data/entities/partner.entity";
 import { Request } from "src/data/entities/request.entity";
+import * as crypto from "crypto";
 
 @Controller("partners")
 export class PartnerController {
@@ -57,8 +59,17 @@ export class PartnerController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async getPartnerInvoices(@Param("id") id: number): Promise<Partner> {
-        return await this.partnerService.getById(id);
+    async getPartnerInvoices(@Param("id") id: number): Promise<InvoiceDTO> {
+        const requests = await this.partnerService.requests();
+        const total = requests.length * 6.0;
+        return {
+            number: "INV-1",
+            issuedDate: new Date(),
+            dueDate: new Date(),
+            total: total,
+            currency: "AUD",
+            status: "Unpaid"
+        };
     }
 
     @Post("authenticate")
@@ -70,8 +81,15 @@ export class PartnerController {
         status: HttpStatus.BAD_REQUEST
     })
     async authenticate(@Body() body: LoginRequest): Promise<AuthenticatedUser> {
-        {
-            return { id: "4", email: body.email, role: "admin", token: "" };
+        const partner = await this.partnerService.getByEmail(body.email);
+        const passwordHash = crypto
+            .createHash("sha256")
+            .update(body.password)
+            .digest("hex");
+        if (!partner || partner.password !== passwordHash) {
+            throw new Error("Invalid email or password");
         }
+
+        return { id: "4", email: body.email, role: "admin", token: "" };
     }
 }
