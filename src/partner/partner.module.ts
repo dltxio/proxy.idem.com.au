@@ -5,6 +5,7 @@ import { DatabaseModule } from "../data/database.module";
 import { PartnerService } from "./partner.service";
 import { DataSource } from "typeorm";
 import { Partner } from "src/data/entities/partner.entity";
+import { Request } from "src/data/entities/request.entity";
 
 @Module({
     imports: [DatabaseModule],
@@ -26,6 +27,10 @@ import { Partner } from "src/data/entities/partner.entity";
             useFactory: (dataSource: DataSource) =>
                 dataSource.getRepository(Request),
             inject: ["DATA_SOURCE"]
+        },
+        {
+            provide: Request,
+            useClass: Request
         }
     ]
 })

@@ -1,6 +1,7 @@
 import { ConfigService } from "@nestjs/config";
 import { ConfigSettings, VendorEnum } from "../types/general";
 import sites from "../utils/sites.json";
+import { VendorName } from "src/interfaces";
 
 export const getVendorFromSitesJson = (venderId: number) => {
     const vendor = sites.find(site => site.id === venderId);
@@ -39,42 +40,3 @@ export const getVendorId = (vendor: VendorEnum, config: ConfigService) => {
         contactName
     };
 };
-
-export enum VendorName {
-    GPIB = "Get Paid In Bitcoin",
-    CoinStash = "Coin Stash",
-    EasyCrypto = "Easy Crypto",
-    DigitalSurge = "Digital Surge"
-}
-
-export type Vendor = {
-    id: number;
-    description: string;
-    logo: string;
-    name: string;
-    signup: string;
-    tagline: string;
-    website: string;
-    backgroundColor: string;
-    requiredClaimTypes: RequiredClaimType[];
-    useProxy: boolean;
-    tempPassword: boolean;
-    passwordComplexity: string;
-    verifyClaims: boolean;
-    enabled: boolean;
-};
-
-export type RequiredClaimType = {
-    type: ClaimType;
-    verified: boolean;
-};
-
-export type ClaimType =
-    | "AdultCredential"
-    | "BirthCredential"
-    | "NameCredential"
-    | "EmailCredential"
-    | "MobileCredential"
-    | "AddressCredential"
-    | "TaxCredential"
-    | "ProfileImageCredential";

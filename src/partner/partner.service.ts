@@ -53,6 +53,12 @@ export class PartnerService implements IPartnerService {
         return await this.partnerRepository.find();
     }
 
+    public async getById(vendorId: number): Promise<Partner> {
+        return await this.partnerRepository.findOne({
+            where: { id: vendorId }
+        });
+    }
+
     private getVendor(vendorId: number): IVendor {
         switch (vendorId) {
             case VendorEnum.GPIB:

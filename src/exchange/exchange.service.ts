@@ -28,6 +28,12 @@ export class ExchangeService implements IExchangeService {
         return await this.requestRepository.find();
     }
 
+    public async signups(to: string): Promise<Request[]> {
+        return await this.requestRepository.find({
+            where: { requestType: RequestType.Signup, to: to }
+        });
+    }
+
     public async pushSignupNotification(
         signupRequest: ExchangeSignupCallBack,
         ip: string

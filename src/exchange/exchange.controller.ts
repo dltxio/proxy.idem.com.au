@@ -1,4 +1,12 @@
-import { Body, Controller, HttpStatus, Inject, Ip, Post } from "@nestjs/common";
+import {
+    Body,
+    Controller,
+    Get,
+    HttpStatus,
+    Inject,
+    Ip,
+    Post
+} from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { SignupResponse } from "../types/general";
 import {
@@ -7,6 +15,7 @@ import {
     IPartnerService,
     UserSignupRequest
 } from "../interfaces";
+import { Request } from "../data/entities/request.entity";
 
 @Controller("exchanges")
 export class ExchangeController {
@@ -55,7 +64,20 @@ export class ExchangeController {
         status: HttpStatus.BAD_REQUEST
     })
     async requests(): Promise<Request[]> {
-        // return await this.exchangeService.requests();
-        throw new Error("Not implemented");
+        return await this.exchangeService.requests();
+        // throw new Error("Not implemented");
+    }
+
+    @Get("signups/:to")
+    @ApiOperation({ summary: "Get signups" })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async signups(): Promise<Request[]> {
+        const to = "GPIB";
+        return await this.exchangeService.signups(to);
     }
 }
