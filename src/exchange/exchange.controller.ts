@@ -1,10 +1,19 @@
-import { Body, Controller, HttpStatus, Inject, Ip, Post } from "@nestjs/common";
+import {
+    Body,
+    Controller,
+    HttpStatus,
+    Get,
+    Inject,
+    Ip,
+    Post
+} from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { SignupResponse } from "../types/general";
 import {
     ExchangeSignupCallBack,
     IExchangeService,
     IThirdPartyService,
+    InvoiceResponse,
     UserSignupRequest
 } from "../interfaces";
 
@@ -44,5 +53,35 @@ export class ExchangeController {
         @Body() request: ExchangeSignupCallBack
     ): Promise<void> {
         return this.exchangeService.pushSignupNotification(request, ip);
+    }
+
+    @ApiOperation({
+        summary: "Get invoices"
+    })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    @Get("invoices")
+    async getInvoices(): Promise<InvoiceResponse[]> {
+        // return this.xeroService.sendInvoices(body);
+
+        const response: InvoiceResponse[] = [];
+        return response;
+
+        // return {
+        //     invoices: [
+        //         {
+        //             invoiceId: "1",
+        //             invoiceNumber: "INV-001",
+        //             invoiceDate: "2021-01-01",
+        //             dueDate: "2021-01-01",
+        //             amount: 100,
+        //             currency: "AUD",
+        //             status: "PAID"
+        //         }
+        //     }
     }
 }
