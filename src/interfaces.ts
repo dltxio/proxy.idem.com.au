@@ -28,9 +28,12 @@ import {
     Fullname,
     LicenceData,
     MedicareData,
-    VerifyProps,
+    VerifyDTO,
     VerifyReturnData
 } from "./types/greenId";
+
+import { Request } from "./data/entities/request.entity";
+import { Partner } from "./data/entities/partner.entity";
 
 export interface IExampleService {
     getById(id: string): string;
@@ -89,7 +92,7 @@ export class AccountMissingIdError extends EntityMissingIdError {
 
 export interface IKYCService {
     formatReturnData(data: VerifyReturnData): Promise<KycResponse>;
-    verify(_props: VerifyProps): Promise<VerifyReturnData>;
+    verify(_props: VerifyDTO): Promise<VerifyReturnData>;
 }
 
 export interface ISmsService {
@@ -127,16 +130,36 @@ export interface IEmailService {
     ): Promise<void>;
 }
 
-export interface IThirdPartyService {
-    signUp(signupInfo: UserSignupRequest, ip: string): Promise<SignupResponse>;
-}
-
 export interface IExchangeService {
     pushSignupNotification(
         signupRequest: ExchangeSignupCallBack,
         ip: string
     ): Promise<void>;
+    requests(): Promise<Request[]>;
+    // TODO: CHANGE TO PRIMARY KEY
+    signups(to: string): Promise<Request[]>;
 }
+
+export interface IPartnerService {
+    get(): Promise<Partner[]>;
+    getById(vendorId: number): Promise<Partner>;
+    getByEmail(email: string): Promise<Partner>;
+    requests(): Promise<Request[]>;
+    signUp(signupInfo: UserSignupRequest, ip: string): Promise<SignupResponse>;
+}
+
+export type LoginRequest = {
+    email: string;
+    password: string;
+};
+
+// Respponse from partner logins
+export type AuthenticatedUser = {
+    id: string;
+    email: string;
+    role: string;
+    token: string;
+};
 
 export interface IVendor {
     name: string;
@@ -327,6 +350,15 @@ export class SendInvoicesRequestBody {
     vendor: VendorEnum;
 }
 
+export type InvoiceDTO = {
+    number: string;
+    issuedDate: Date;
+    dueDate: Date;
+    total: number;
+    currency: string;
+    status: string;
+};
+
 export class VerifyEmailRequestBody {
     @ApiProperty()
     @IsNotEmpty()
@@ -341,3 +373,42 @@ export type RefreshToken = {
     refreshToken: string;
     accessToken: string;
 };
+
+export enum VendorName {
+    GPIB = "Get Paid In Bitcoin",
+    CoinStash = "Coin Stash",
+    EasyCrypto = "Easy Crypto",
+    DigitalSurge = "Digital Surge"
+}
+
+export type Vendor = {
+    id: number;
+    description: string;
+    logo: string;
+    name: string;
+    signup: string;
+    tagline: string;
+    website: string;
+    backgroundColor: string;
+    requiredClaimTypes: RequiredClaimType[];
+    useProxy: boolean;
+    tempPassword: boolean;
+    passwordComplexity: string;
+    verifyClaims: boolean;
+    enabled: boolean;
+};
+
+export type RequiredClaimType = {
+    type: ClaimType;
+    verified: boolean;
+};
+
+export type ClaimType =
+    | "AdultCredential"
+    | "BirthCredential"
+    | "NameCredential"
+    | "EmailCredential"
+    | "MobileCredential"
+    | "AddressCredential"
+    | "TaxCredential"
+    | "ProfileImageCredential";

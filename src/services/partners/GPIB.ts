@@ -14,7 +14,8 @@ export class GPIBVendor implements IVendor {
     constructor(private config: ConfigService, private axios: AxiosInstance) {
         this.baseUrl = this.config.get(ConfigSettings.GPIB_API_ENDPOINT);
     }
-    async signUp(signupInfo: UserSignupRequest) {
+
+    public async signUp(signupInfo: UserSignupRequest) {
         const { firstName, lastName, email, password, verification, mobile } =
             signupInfo;
         const endPoint = `${this.baseUrl}/user/idem`;

@@ -16,7 +16,7 @@ export type GetSourcesResult = {
     };
 };
 
-export type VerifyProps = {
+export type VerifyDTO = {
     user: RegisterVerificationData;
     licence?: LicenceData;
     medicare?: MedicareData;

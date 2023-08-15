@@ -1,8 +1,8 @@
 import {
     Body,
     Controller,
-    HttpStatus,
     Get,
+    HttpStatus,
     Inject,
     Ip,
     Post
@@ -12,16 +12,16 @@ import { SignupResponse } from "../types/general";
 import {
     ExchangeSignupCallBack,
     IExchangeService,
-    IThirdPartyService,
-    InvoiceResponse,
+    IPartnerService,
     UserSignupRequest
 } from "../interfaces";
+import { Request } from "../data/entities/request.entity";
 
 @Controller("exchanges")
 export class ExchangeController {
     constructor(
-        @Inject("IThirdPartyService")
-        private thirdPartyService: IThirdPartyService,
+        @Inject("IPartnerService")
+        private thirdPartyService: IPartnerService,
         @Inject("IExchangeService") private exchangeService: IExchangeService
     ) {}
 
@@ -55,33 +55,29 @@ export class ExchangeController {
         return this.exchangeService.pushSignupNotification(request, ip);
     }
 
-    @ApiOperation({
-        summary: "Get invoices"
-    })
+    @Post("requests")
+    @ApiOperation({ summary: "Get requests" })
     @ApiResponse({
         status: HttpStatus.OK
     })
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    @Get("invoices")
-    async getInvoices(): Promise<InvoiceResponse[]> {
-        // return this.xeroService.sendInvoices(body);
+    async requests(): Promise<Request[]> {
+        return await this.exchangeService.requests();
+        // throw new Error("Not implemented");
+    }
 
-        const response: InvoiceResponse[] = [];
-        return response;
-
-        // return {
-        //     invoices: [
-        //         {
-        //             invoiceId: "1",
-        //             invoiceNumber: "INV-001",
-        //             invoiceDate: "2021-01-01",
-        //             dueDate: "2021-01-01",
-        //             amount: 100,
-        //             currency: "AUD",
-        //             status: "PAID"
-        //         }
-        //     }
+    @Get("signups/:to")
+    @ApiOperation({ summary: "Get signups" })
+    @ApiResponse({
+        status: HttpStatus.OK
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST
+    })
+    async signups(): Promise<Request[]> {
+        const to = "GPIB";
+        return await this.exchangeService.signups(to);
     }
 }

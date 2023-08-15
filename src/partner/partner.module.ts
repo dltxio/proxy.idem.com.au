@@ -1,24 +1,20 @@
-import { ExchangeController } from "./exchange.controller";
+import { PartnerController } from "./partner.controller";
 import { Module } from "@nestjs/common";
 import { userProviders } from "../user/user.providers";
 import { DatabaseModule } from "../data/database.module";
+import { PartnerService } from "./partner.service";
 import { DataSource } from "typeorm";
-import { Partner } from "../data/entities/partner.entity";
-import { PartnerService } from "src/partner/partner.service";
-import { ExchangeService } from "./exchange.service";
+import { Partner } from "src/data/entities/partner.entity";
+import { Request } from "src/data/entities/request.entity";
 
 @Module({
     imports: [DatabaseModule],
-    controllers: [ExchangeController],
+    controllers: [PartnerController],
     providers: [
         ...userProviders,
         {
             provide: "IPartnerService",
             useClass: PartnerService
-        },
-        {
-            provide: "IExchangeService",
-            useClass: ExchangeService
         },
         {
             provide: "PARTNER_REPOSITORY",
@@ -31,7 +27,11 @@ import { ExchangeService } from "./exchange.service";
             useFactory: (dataSource: DataSource) =>
                 dataSource.getRepository(Request),
             inject: ["DATA_SOURCE"]
+        },
+        {
+            provide: Request,
+            useClass: Request
         }
     ]
 })
-export class ExchangeModule {}
+export class PartnerModule {}
