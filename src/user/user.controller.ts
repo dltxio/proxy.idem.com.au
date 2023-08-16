@@ -75,9 +75,12 @@ export class UserController {
             medicare: body.medicareCard
         });
 
+        console.log(response);
+
         // CACHE RESPONSE IN DB
 
         const result = await this.greenIdService.formatReturnData(response);
+        console.log(result);
 
         return result;
     }
