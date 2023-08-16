@@ -252,6 +252,7 @@ class Verification implements KycResponse {
     @IsNotEmpty()
     JWTs: JWT[];
 }
+
 export class UserSignupRequest {
     @ApiProperty({
         example: ["1", "2"]
@@ -329,6 +330,16 @@ export class ResendEmailRequestBody {
     @IsNotEmpty()
     hashedEmail: string;
 }
+
+export type InvoiceResponse = {
+    invoiceId: string;
+    invoiceNumber: string;
+    invoiceDate: string;
+    dueDate: string;
+    amount: number;
+    currency: string;
+    status: string;
+};
 
 export class SendInvoicesRequestBody {
     @ApiProperty()
