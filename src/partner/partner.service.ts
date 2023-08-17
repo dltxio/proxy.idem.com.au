@@ -65,6 +65,12 @@ export class PartnerService implements IPartnerService {
         });
     }
 
+    public async getByApiKey(apiKey: string): Promise<Partner> {
+        return await this.partnerRepository.findOne({
+            where: { apiKey: apiKey }
+        });
+    }
+
     private getVendor(vendorId: number): IVendor {
         switch (vendorId) {
             case VendorEnum.GPIB:

@@ -28,6 +28,7 @@ import {
     Fullname,
     LicenceData,
     MedicareData,
+    RegisterVerificationData,
     VerifyDTO,
     VerifyReturnData
 } from "./types/greenId";
@@ -91,8 +92,8 @@ export class AccountMissingIdError extends EntityMissingIdError {
 }
 
 export interface IKYCService {
-    formatReturnData(data: VerifyReturnData): Promise<KycResponse>;
-    verify(_props: VerifyDTO): Promise<VerifyReturnData>;
+    // formatReturnData(data: VerifyReturnData): Promise<KycResponse>;
+    verify(data: VerifyUserRequest): Promise<KycResponse>;
 }
 
 export interface ISmsService {
@@ -191,6 +192,33 @@ export class UserDto {
     pgpSignedNonce: string;
 }
 
+export class LicenceDataDto {
+    @ApiProperty()
+    @IsNotEmpty()
+    licenceNumber: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    cardNumber: string;
+}
+
+export class MedicareDataDto {
+    @ApiProperty()
+    @IsNotEmpty()
+    colour: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    number: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    nameOnCard: string;
+    @ApiProperty()
+    @IsNotEmpty()
+    individualReferenceNumber: Number;
+    @ApiProperty()
+    @IsNotEmpty()
+    expiry: string;
+}
+
 export class VerifyUserRequest {
     @ApiProperty()
     @IsNotEmpty()
@@ -206,10 +234,10 @@ export class VerifyUserRequest {
     address: Address;
     @ApiProperty()
     @IsNotEmpty()
-    driversLicence: LicenceData;
+    driversLicence: LicenceDataDto;
     @ApiProperty()
     @IsNotEmpty()
-    medicareCard: MedicareData;
+    medicareCard: MedicareDataDto;
 }
 
 export class ExchangeSignupCallBack {

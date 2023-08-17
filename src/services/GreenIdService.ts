@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { IKYCService } from "../interfaces";
+import { IKYCService, VerifyUserRequest } from "../interfaces";
 import soap from "soap";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const soapImport = require("soap");
@@ -44,8 +44,46 @@ export class GreenIdService implements IKYCService {
         this.greenIdPassword = this.config.get(ConfigSettings.GREENID_PASSWORD);
     }
 
-    public async verify(_props: VerifyDTO): Promise<VerifyReturnData> {
-        const { user, licence, medicare } = _props;
+    public async verify(data: VerifyUserRequest): Promise<KycResponse> {
+        const greenIdUser: RegisterVerificationData = {
+            ruleId: "default",
+            name: data.fullName,
+            currentResidentialAddress: data.address,
+            dob: data.dob
+        };
+
+        // Map the type to Green ID required format
+        const licence: LicenceData = {
+            state: "QLD", // body.address.state,
+            licenceNumber: data.driversLicence.licenceNumber,
+            cardNumber: data.driversLicence.cardNumber,
+            name: data.fullName,
+            dob: data.dob
+        };
+
+        const medicare: MedicareData = {
+            colour: "Green", // body.medicareCard.colour,
+            number: data.medicareCard.number,
+            individualReferenceNumber: data.medicareCard.individualReferenceNumber.toString(),
+            name: data.medicareCard.nameOnCard.toLocaleUpperCase(),
+            dob: data.dob,
+            expiry: data.medicareCard.expiry
+        };
+
+        const response = await this._verify({
+            user: greenIdUser,
+            licence: licence,
+            medicare: medicare
+        });
+
+        const result: KycResponse = await this.formatReturnData(response);
+        console.log(result);
+
+        return result;
+    }
+
+    private async _verify(dto: VerifyDTO): Promise<VerifyReturnData> {
+        const { user, licence, medicare } = dto;
         let errorMessage: string;
 
         if (!user.name) errorMessage = "User doesn't have name";
@@ -134,7 +172,7 @@ export class GreenIdService implements IKYCService {
         throw new Error("Error, please contact support");
     }
 
-    public async formatReturnData(
+    private async formatReturnData(
         data: VerifyReturnData
     ): Promise<KycResponse> {
         const credentials = data.didPGPCredentials[0];

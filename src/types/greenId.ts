@@ -87,8 +87,10 @@ export type SetFieldResult = {
     };
 };
 
+// Green ID
 export type State = "QLD" | "NSW" | "ACT" | "VIC" | "NT" | "SA" | "WA" | "TAS";
 
+// Green ID
 export type LicenceData = {
     state: State;
     licenceNumber: string;
@@ -116,6 +118,7 @@ export type DOB = {
     year: number;
 };
 
+// Green ID
 export type MedicareData = {
     colour: "Green" | "Blue" | "Yellow";
     number: string;
