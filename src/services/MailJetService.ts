@@ -11,6 +11,7 @@ import {
 
 import * as fs from "fs";
 import axios from "axios";
+import { getPrivateKey } from "src/utils/pgp";
 
 @Injectable()
 export class MailJetService implements IEmailService {
@@ -79,17 +80,19 @@ export class MailJetService implements IEmailService {
                 text: params.text
             });
 
-            const privateKeyArmored = fs.readFileSync(
-                this.config.get(ConfigSettings.PGP_PRIVATE_KEY),
-                "utf8"
-            );
+            // const privateKeyArmored = fs.readFileSync(
+            //     this.config.get(ConfigSettings.PGP_PRIVATE_KEY),
+            //     "utf8"
+            // );
 
-            if (!privateKeyArmored)
-                throw new Error("sendRawEmail: Idem PGP key not found");
+            // if (!privateKeyArmored)
+            //     throw new Error("sendRawEmail: Idem PGP key not found");
 
-            const privateKeys = await openpgp.readPrivateKeys({
-                armoredKeys: privateKeyArmored
-            });
+            // const privateKeys = await openpgp.readPrivateKeys({
+            //     armoredKeys: privateKeyArmored
+            // });
+
+            const privateKeys = await getPrivateKey(this.config.get(ConfigSettings.PGP_PRIVATE_KEY));
 
             const passphrase = this.config.get(
                 ConfigSettings.PGP_PASSPHRASE

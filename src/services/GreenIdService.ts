@@ -163,7 +163,6 @@ export class GreenIdService implements IKYCService {
                 );
 
             // CACHE THIS
-
             return {
                 success: true,
                 didJWTCredentials: [signedNameCredential, signedDobCredential],
