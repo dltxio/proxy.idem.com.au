@@ -57,44 +57,7 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    // @Type(() => VerifyUserRequest)
     async verify(@Body() body: VerifyUserRequest): Promise<KycResponse> {
-        // const findUser = await this.userService.findOne(body.hashEmail);
-        // if (!findUser) throw new Error("User not found");
-
-        // const greenIdUser: RegisterVerificationData = {
-        //     ruleId: "default",
-        //     name: body.fullName,
-        //     currentResidentialAddress: body.address,
-        //     dob: body.dob
-        // };
-
-        // // Map the type to Green ID required format
-        // const licence: LicenceData = {
-        //     state: "QLD", // body.address.state,
-        //     licenceNumber: body.driversLicence.licenceNumber,
-        //     cardNumber: body.driversLicence.cardNumber,
-        //     name: body.fullName,
-        //     dob: body.dob
-        // };
-
-        // const medicare: MedicareData = {
-        //     colour: "Green", // body.medicareCard.colour,
-        //     number: body.medicareCard.number,
-        //     individualReferenceNumber: body.medicareCard.individualReferenceNumber,
-        //     name: body.medicareCard.nameOnCard,
-        //     dob: body.dob,
-        //     expiry: body.medicareCard.expiry
-        // };
-
-        // const response = await this.kycService.verify({
-        //     user: greenIdUser,
-        //     licence: licence,
-        //     medicare: medicare
-        // });
-
-        // console.log(response);
-
         // CACHE RESPONSE IN DB
 
         const result = await this.kycService.verify(body);

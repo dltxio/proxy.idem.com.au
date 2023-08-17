@@ -64,7 +64,8 @@ export class GreenIdService implements IKYCService {
         const medicare: MedicareData = {
             colour: "Green", // body.medicareCard.colour,
             number: data.medicareCard.number,
-            individualReferenceNumber: data.medicareCard.individualReferenceNumber.toString(),
+            individualReferenceNumber:
+                data.medicareCard.individualReferenceNumber.toString(),
             name: data.medicareCard.nameOnCard.toLocaleUpperCase(),
             dob: data.dob,
             expiry: data.medicareCard.expiry
@@ -77,7 +78,7 @@ export class GreenIdService implements IKYCService {
         });
 
         const result: KycResponse = await this.formatReturnData(response);
-        console.log(result);
+        this.logger.log(result);
 
         return result;
     }
@@ -118,6 +119,8 @@ export class GreenIdService implements IKYCService {
                 input: this.getDriversLicenseeInputs(licence)
             }
         });
+        this.logger.log("Licence result complete");
+        this.logger.log(licenceResult);
 
         if (licenceResult.return.checkResult.state !== "VERIFIED") {
             await this.setFields({
@@ -129,7 +132,9 @@ export class GreenIdService implements IKYCService {
             });
         }
 
-        const result = await this.GetVerificationResult(verificationId);
+        const result = await this.getVerificationResult(verificationId);
+        this.logger.log("Verification result complete");
+        this.logger.log(result);
 
         if (
             result.return.verificationResult.overallVerificationStatus ===
@@ -340,9 +345,11 @@ export class GreenIdService implements IKYCService {
         });
     }
 
-    public async GetVerificationResult(
+    private async getVerificationResult(
         verificationId: string
     ): Promise<GetVerificationResult> {
+        this.logger.log("Getting verification result");
+
         return new Promise<GetVerificationResult>((resolve, reject) => {
             this.greenId.getSources(
                 {
