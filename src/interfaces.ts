@@ -213,7 +213,7 @@ export class MedicareDataDto {
     nameOnCard: string;
     @ApiProperty()
     @IsNotEmpty()
-    individualReferenceNumber: Number;
+    individualReferenceNumber: string;
     @ApiProperty()
     @IsNotEmpty()
     expiry: string;
@@ -221,22 +221,22 @@ export class MedicareDataDto {
 
 export class VerifyUserRequest {
     @ApiProperty()
-    @IsNotEmpty()
+    // @IsNotEmpty()
     fullName: Fullname;
     @ApiProperty()
-    @IsNotEmpty()
+    // @IsNotEmpty()
     dob: DOB;
     @ApiProperty()
-    @IsNotEmpty()
+    // @IsNotEmpty()
     emailHash: string;
     @ApiPropertyOptional()
     @IsOptional()
     address: Address;
     @ApiProperty()
-    @IsNotEmpty()
+    // @IsNotEmpty()
     driversLicence: LicenceDataDto;
     @ApiProperty()
-    @IsNotEmpty()
+    // @IsNotEmpty()
     medicareCard: MedicareDataDto;
 }
 
