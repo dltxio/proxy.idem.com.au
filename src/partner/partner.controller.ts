@@ -6,7 +6,8 @@ import {
     Inject,
     Ip,
     Param,
-    Post
+    Post,
+    UseGuards
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import {
@@ -19,6 +20,7 @@ import { Partner } from "src/data/entities/partner.entity";
 import { Request } from "src/data/entities/request.entity";
 import * as crypto from "crypto";
 
+@UseGuards()
 @Controller("partners")
 export class PartnerController {
     constructor(

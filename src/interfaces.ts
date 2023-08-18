@@ -228,7 +228,7 @@ export class VerifyUserRequest {
     dob: DOB;
     @ApiProperty()
     @IsNotEmpty()
-    hashEmail: string;
+    emailHash: string;
     @ApiPropertyOptional()
     @IsOptional()
     address: Address;
