@@ -221,10 +221,10 @@ export class MedicareDataDto {
 
 export class VerifyUserRequest {
     @ApiProperty()
-    // @IsNotEmpty()
+    @IsNotEmpty()
     fullName: Fullname;
     @ApiProperty()
-    // @IsNotEmpty()
+    @IsNotEmpty()
     dob: DOB;
     @ApiProperty()
     // @IsNotEmpty()
@@ -233,10 +233,10 @@ export class VerifyUserRequest {
     @IsOptional()
     address: Address;
     @ApiProperty()
-    // @IsNotEmpty()
+    @IsNotEmpty()
     driversLicence: LicenceDataDto;
     @ApiProperty()
-    // @IsNotEmpty()
+    @IsNotEmpty()
     medicareCard: MedicareDataDto;
 }
 
