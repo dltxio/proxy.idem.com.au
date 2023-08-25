@@ -1,7 +1,7 @@
 import { ConfigService } from "@nestjs/config";
 import { ConfigSettings, VendorEnum } from "../types/general";
 import sites from "../utils/sites.json";
-import { VendorName } from "src/interfaces";
+import { VendorName } from "../interfaces";
 
 export const getVendorFromSitesJson = (venderId: number) => {
     const vendor = sites.find(site => site.id === venderId);
