@@ -23,7 +23,7 @@ describe("ExchangeController", () => {
                     useFactory: repositoryMockFactory
                 },
                 {
-                    provide: "IThirdPartyService",
+                    provide: "IPartnerService",
                     useClass: ThirdPartyService
                 },
                 {

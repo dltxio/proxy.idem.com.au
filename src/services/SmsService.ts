@@ -21,7 +21,7 @@ export class SmsService implements ISmsService {
         return new Promise<void>((resolve, reject) => {
             this.client.messages.create(
                 {
-                    originator: "IDEM",
+                    originator: "DLTx",
                     recipients: [phoneNumber],
                     body: message
                 },
