@@ -30,13 +30,13 @@ Quick overview of the folder structure:
 ```
 github/ - github CI actions
 dist/ - the build folder
-node_nodules/ - downloadrd 3rd part deps
+node_nodules/ - downloaded 3rd part deps
 src/
     accounts/ - example of an entity that has controller, module, service and references a DTO
     services/ - external connectors e.g. DTOs and APIs
     utils/ - common reusable components e.g. Nest validators and interceptors
     app.module.ts - entry point to the Nest app that defines the dependency injections
-    interfacts.ts - global file of TS interfaces
+    interfaces.ts - global file of TS interfaces
     main.ts - nest setup including swagger config
     mocks.ts - mocked external classes used in tests
 test/ - contains end to end tests
@@ -142,7 +142,7 @@ Replace the values for each key in .env with the token name plus "\_TOKEN". Then
 
 ### Test PGP Key
 
-The test PGP key is submmited to MIT, OpenPGP and Ubuntu.  Live will be from support@idem.com.au.
+The test PGP key is submitted to MIT, OpenPGP and Ubuntu.  Live will be from support@idem.com.au.
 
 * test@idem.com.au
 * Test1234
@@ -212,7 +212,7 @@ PzH2+OC2
     }
     ```
 
-4. Then find the `Send Invoices` endpoint in the DLTX https://hoppscotch.io/ collection  and add the Xero token set along with the Xero client ID.
+4. Then find the `Send Invoices` endpoint in the DLTx https://hoppscotch.io/ collection and add the Xero token set along with the Xero client ID.
 
 NOTE: The access_token will be valid for 30 mins.
 

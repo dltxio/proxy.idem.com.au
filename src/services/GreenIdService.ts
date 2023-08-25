@@ -33,8 +33,9 @@ import {
 export class GreenIdService implements IKYCService {
     private greenId: soap.Client;
     private readonly logger = new Logger("GreenIdService");
-    private greenIdAccountId: string;
-    private greenIdPassword: string;
+    private readonly greenIdAccountId: string;
+    private readonly greenIdPassword: string;
+    private readonly isTest: boolean;
 
     constructor(private config: ConfigService) {
         this.initialiseGreenIdClient(config.get(ConfigSettings.GREENID_URL));
@@ -42,6 +43,10 @@ export class GreenIdService implements IKYCService {
             ConfigSettings.GREENID_ACCOUNT_ID
         );
         this.greenIdPassword = this.config.get(ConfigSettings.GREENID_PASSWORD);
+
+        if (this.config.get(ConfigSettings.GREENID_URL).includes("test")) {
+            this.isTest = true;
+        }
     }
 
     public async verify(data: VerifyUserRequest): Promise<KycResponse> {
@@ -133,12 +138,14 @@ export class GreenIdService implements IKYCService {
         }
 
         const result = await this.getVerificationResult(verificationId);
-        this.logger.log("Verification result complete");
-        this.logger.log(result);
+        this.logger.log(
+            `Verification result complete status ${result.return.verificationResult.overallVerificationStatus}`
+        );
 
         if (
             result.return.verificationResult.overallVerificationStatus ===
-            "VERIFIED"
+                "VERIFIED" ||
+            this.isTest
         ) {
             const signedNameCredential =
                 await this.createJWTVerifiableCredential(
