@@ -7,7 +7,7 @@ import { MailJetService } from "../services/MailJetService";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { GreenIdService } from "../services/GreenIdService";
-import { XeroService } from "../services/XeroService";
+import { PartnerService } from "src/partner/partner.service";
 
 @Module({
     imports: [
@@ -36,12 +36,12 @@ import { XeroService } from "../services/XeroService";
             useClass: MailJetService
         },
         {
-            provide: "IAccountingService",
-            useClass: XeroService
-        },
-        {
             provide: "IKYCService",
             useClass: GreenIdService
+        },
+        {
+            provide: "IPartnerService",
+            useClass: PartnerService
         }
     ]
 })

@@ -55,19 +55,6 @@ export class ExchangeController {
         return this.exchangeService.pushSignupNotification(request, ip);
     }
 
-    @Post("requests")
-    @ApiOperation({ summary: "Get requests" })
-    @ApiResponse({
-        status: HttpStatus.OK
-    })
-    @ApiResponse({
-        status: HttpStatus.BAD_REQUEST
-    })
-    async requests(): Promise<Request[]> {
-        return await this.exchangeService.requests();
-        // throw new Error("Not implemented");
-    }
-
     @Get("signups/:to")
     @ApiOperation({ summary: "Get signups" })
     @ApiResponse({

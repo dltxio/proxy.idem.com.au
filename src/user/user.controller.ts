@@ -3,11 +3,10 @@ import {
     UserDto,
     IUserService,
     VerifyUserRequest,
-    IAccountingService,
-    SendInvoicesRequestBody,
     ResendEmailRequestBody,
     VerifyEmailRequestBody,
-    IKYCService
+    IKYCService,
+    IPartnerService
 } from "./../interfaces";
 import {
     Controller,
@@ -18,7 +17,8 @@ import {
     Get,
     Param,
     Put,
-    UseGuards
+    UseGuards,
+    UnauthorizedException
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { User } from "../data/entities/user.entity";
@@ -26,6 +26,9 @@ import { Public } from "../auth/anonymous";
 import { LocalGuard } from "../auth/auth-local.guard";
 import { hashMessage } from "ethers/lib/utils";
 import { KycResponse, UsersResponse } from "../types/general";
+import { Request } from "../data/entities/request.entity";
+import { logger } from "ethers";
+// import { Request } from "express";
 
 @Controller("users")
 @UseGuards(LocalGuard)
@@ -33,8 +36,9 @@ export class UserController {
     constructor(
         @Inject("IUserService") private userService: IUserService,
         @Inject("IKYCService") private kycService: IKYCService,
-        @Inject("IAccountingService")
-        private xeroService: IAccountingService
+        // @Inject("IAccountingService")
+        // private xeroService: IAccountingService,
+        @Inject("IPartnerService") private partnerService: IPartnerService
     ) {}
 
     @Post("")
@@ -58,10 +62,31 @@ export class UserController {
         status: HttpStatus.BAD_REQUEST
     })
     async verify(@Body() body: VerifyUserRequest): Promise<KycResponse> {
-        // CACHE RESPONSE IN DB
+        const partner = await this.partnerService.getByApiKey(
+            "f746a7c6-4505-4217-b759-b66f9729c39f"
+        );
+        if (!partner) {
+            throw new UnauthorizedException("Invalid API key");
+        }
 
+        // Check if the user is already verified
+
+        // Verify the user
         const result = await this.kycService.verify(body);
-        console.log(result);
+        logger.info(result);
+        // Cache the result
+
+        // Add a request to the db
+        const request = new Request();
+        request.from = partner.name;
+        request.to = "IDEM";
+        request.requestType = "Verify";
+        // request.ipAddress = body.ipAddress;
+
+        logger.info(`Adding request ${request} to the database`);
+        await this.partnerService.create(request);
+
+        // Send the result to the partner
 
         return result;
     }
@@ -140,20 +165,20 @@ export class UserController {
         return this.userService.verifyEmail(body);
     }
 
-    // TODO:  Remove this should be on partner controller
-    @ApiOperation({
-        summary: "Send invoices"
-    })
-    @ApiResponse({
-        status: HttpStatus.OK
-    })
-    @ApiResponse({
-        status: HttpStatus.BAD_REQUEST
-    })
-    @Post("send-invoices")
-    async sendInvoices(@Body() body: SendInvoicesRequestBody): Promise<string> {
-        return this.xeroService.sendInvoices(body);
-    }
+    // // TODO:  Remove this should be on partner controller
+    // @ApiOperation({
+    //     summary: "Send invoices"
+    // })
+    // @ApiResponse({
+    //     status: HttpStatus.OK
+    // })
+    // @ApiResponse({
+    //     status: HttpStatus.BAD_REQUEST
+    // })
+    // @Post("send-invoices")
+    // async sendInvoices(@Body() body: SendInvoicesRequestBody): Promise<string> {
+    //     return this.xeroService.sendInvoices(body);
+    // }
 
     @ApiOperation({
         summary: "Resend email verification"

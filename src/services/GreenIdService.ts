@@ -134,7 +134,7 @@ export class GreenIdService implements IKYCService {
 
         const result = await this.getVerificationResult(verificationId);
         this.logger.log("Verification result complete");
-        this.logger.log(result);
+        // this.logger.log(result);
 
         if (
             result.return.verificationResult.overallVerificationStatus ===

@@ -22,7 +22,7 @@ import { verifyMessage } from "src/utils/wallet";
 @Injectable()
 export class PartnerService implements IPartnerService {
     private readonly logger = new Logger("PartnerService");
-    private axiosWithProxy: AxiosInstance;
+    private readonly axiosWithProxy: AxiosInstance;
 
     constructor(
         @Inject("PARTNER_REPOSITORY")
@@ -84,6 +84,10 @@ export class PartnerService implements IPartnerService {
             default:
                 throw new Error("Invalid vendor id");
         }
+    }
+
+    public async create(request: Request): Promise<void> {
+        await this.requestRepository.create(request);
     }
 
     public async requests(): Promise<Request[]> {

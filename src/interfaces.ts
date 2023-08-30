@@ -142,8 +142,10 @@ export interface IExchangeService {
 }
 
 export interface IPartnerService {
+    create(request: Request): Promise<void>;
     get(): Promise<Partner[]>;
     getById(vendorId: number): Promise<Partner>;
+    getByApiKey(apiKey: string): Promise<Partner>;
     getByEmail(email: string): Promise<Partner>;
     requests(): Promise<Request[]>;
     signUp(signupInfo: UserSignupRequest, ip: string): Promise<SignupResponse>;
@@ -227,7 +229,7 @@ export class VerifyUserRequest {
     @IsNotEmpty()
     dob: DOB;
     @ApiProperty()
-    // @IsNotEmpty()
+    @IsNotEmpty()
     emailHash: string;
     @ApiPropertyOptional()
     @IsOptional()
