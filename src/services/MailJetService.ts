@@ -80,28 +80,7 @@ export class MailJetService implements IEmailService {
                 text: params.text
             });
 
-            // const privateKeyArmored = fs.readFileSync(
-            //     this.config.get(ConfigSettings.PGP_PRIVATE_KEY),
-            //     "utf8"
-            // );
-
-            // if (!privateKeyArmored)
-            //     throw new Error("sendRawEmail: Idem PGP key not found");
-
-            // const privateKeys = await openpgp.readPrivateKeys({
-            //     armoredKeys: privateKeyArmored
-            // });
-
-            const privateKeys = await getPrivateKey(this.config.get(ConfigSettings.PGP_PRIVATE_KEY));
-
-            const passphrase = this.config.get(
-                ConfigSettings.PGP_PASSPHRASE
-            ) as string;
-
-            const privateKey = await openpgp.decryptKey({
-                privateKey: privateKeys[0],
-                passphrase
-            });
+            const privateKey = await getPrivateKey(this.config);
 
             const cleartextMessage = await openpgp.sign({
                 message: unsignedMessage,

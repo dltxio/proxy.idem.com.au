@@ -3,11 +3,11 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { expect } from "chai";
 import { repositoryMockFactory } from "../user/user.service.spec";
 import { ThirdPartyService } from "../services/ThirdPartyService";
-import { ExchangeController } from "./exchange.controller";
-import { ExchangeService } from "./exchange.service";
+import { ExchangeController } from "../exchange/exchange.controller";
+import { ExchangeService } from "../exchange/exchange.service";
 
 describe("PartnerController", () => {
-    let controller: AbortController;
+    let controller: ExchangeController;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -23,7 +23,7 @@ describe("PartnerController", () => {
                     useFactory: repositoryMockFactory
                 },
                 {
-                    provide: "IThirdPartyService",
+                    provide: "IPartnerService",
                     useClass: ThirdPartyService
                 },
                 {
@@ -36,7 +36,6 @@ describe("PartnerController", () => {
                 }
             ]
         }).compile();
-
         controller = module.get<ExchangeController>(ExchangeController);
     });
 
