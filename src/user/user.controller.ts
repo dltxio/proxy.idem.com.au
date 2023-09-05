@@ -12,13 +12,15 @@ import {
     Controller,
     Inject,
     Post,
+    Headers,
     HttpStatus,
     Body,
     Get,
     Param,
     Put,
     UseGuards,
-    UnauthorizedException
+    UnauthorizedException,
+    Ip
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { User } from "../data/entities/user.entity";
@@ -61,15 +63,17 @@ export class UserController {
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST
     })
-    async verify(@Body() body: VerifyUserRequest): Promise<KycResponse> {
-        const partner = await this.partnerService.getByApiKey(
-            "f746a7c6-4505-4217-b759-b66f9729c39f"
-        );
+    async verify(
+        @Body() body: VerifyUserRequest,
+        @Headers("X-Idem-Api-Key") apiKey: string,
+        @Ip() ip: string
+    ): Promise<KycResponse> {
+        const partner = await this.partnerService.getByApiKey(apiKey);
         if (!partner) {
             throw new UnauthorizedException("Invalid API key");
         }
 
-        // Check if the user is already verified
+        // TODO: Check if the user is already verified
 
         // Verify the user
         const result = await this.kycService.verify(body);
@@ -81,7 +85,7 @@ export class UserController {
         request.from = partner.name;
         request.to = "IDEM";
         request.requestType = "Verify";
-        // request.ipAddress = body.ipAddress;
+        request.ipAddress = ip;
 
         logger.info(`Adding request ${request} to the database`);
         await this.partnerService.create(request);
