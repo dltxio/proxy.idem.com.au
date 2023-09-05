@@ -59,7 +59,7 @@ export class GreenIdService implements IKYCService {
 
         // Map the type to Green ID required format
         const licence: LicenceData = {
-            state: "QLD", // body.address.state,
+            state: data.address.state,
             licenceNumber: data.driversLicence.licenceNumber,
             cardNumber: data.driversLicence.cardNumber,
             name: data.fullName,
@@ -67,7 +67,7 @@ export class GreenIdService implements IKYCService {
         };
 
         const medicare: MedicareData = {
-            colour: "Green", // body.medicareCard.colour,
+            colour: data.medicareCard.colour,
             number: data.medicareCard.number,
             individualReferenceNumber:
                 data.medicareCard.individualReferenceNumber.toString(),
@@ -101,12 +101,6 @@ export class GreenIdService implements IKYCService {
         }
 
         this.logger.log("Verifying with GreenID");
-
-        // if (
-        //     this.config.get(ConfigSettings.REALLY_VERIFY_IDENTITY) === "false"
-        // ) {
-        //     this.mockGreenIdCall(_props);
-        // }
 
         const {
             return: {

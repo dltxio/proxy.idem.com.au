@@ -68,7 +68,7 @@ export type Address = {
     streetType: string;
     postcode: string;
     suburb: string;
-    state: string;
+    state: State;
     country: string;
 };
 
@@ -120,7 +120,7 @@ export type DOB = {
 
 // Green ID
 export type MedicareData = {
-    colour: "Green" | "Blue" | "Yellow";
+    colour: string;
     number: string;
     individualReferenceNumber: string;
     name: string;
