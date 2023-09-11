@@ -65,7 +65,7 @@ export class UserController {
     })
     async verify(
         @Body() body: VerifyUserRequest,
-        @Headers("X-Idem-Api-Key") apiKey: string,
+        @Headers("x-idem-api-key") apiKey: string,
         @Ip() ip: string
     ): Promise<KycResponse> {
         const partner = await this.partnerService.getByApiKey(apiKey);
