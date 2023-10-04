@@ -53,7 +53,7 @@ export class PartnerController {
     }
 
     // TODO MOVE TO INVOICE CONTROLLER
-    @Get("/invoices:id")
+    @Get("/invoices/:id")
     @ApiOperation({ summary: "Get Partner Invoices" })
     @ApiResponse({
         status: HttpStatus.OK
