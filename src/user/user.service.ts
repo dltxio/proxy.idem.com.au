@@ -63,7 +63,8 @@ export class UserService implements IUserService {
 
     public async create(newUser: UserDto): Promise<void> {
         let user: User;
-        const hashedEmail = hashMessage(newUser.email);
+        const formattedEmail = newUser.email.trim().toLowerCase();
+        const hashedEmail = hashMessage(formattedEmail);
         try {
             user = await this.userRepository.findOneBy({
                 email: hashedEmail
@@ -72,7 +73,7 @@ export class UserService implements IUserService {
             // Do nothing if user already exists and email is verified
             if (user && user.emailVerified) {
                 this.logger.verbose(
-                    `User ${newUser.email} ${hashedEmail} already exists`
+                    `User ${formattedEmail} ${hashedEmail} already exists`
                 );
                 throw new Error("User already exists");
             }
@@ -87,11 +88,11 @@ export class UserService implements IUserService {
                 user = new User();
                 user.email = hashedEmail;
                 user.emailVerificationCode = sixDigitCode;
-                this.logger.verbose(`New user ${newUser.email} created`);
+                this.logger.verbose(`New user ${formattedEmail} created`);
             }
             await this.userRepository.save(user);
             await this.emailService.sendEmailVerification(
-                newUser.email.trim().toLowerCase(),
+                formattedEmail,
                 sixDigitCode,
                 newUser.pgpPublicKey
             );
