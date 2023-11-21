@@ -40,6 +40,17 @@ export class MailJetService implements IEmailService {
 
         this.logger.log(`Sending code to ${email}`);
 
+        if (
+            (email.toLowerCase().endsWith("protonmail.com") ||
+                email.toLowerCase().endsWith("protonmail.ch")) &&
+            !recipientPublicKey
+        ) {
+            const response = await axios.get(
+                `https://api.protonmail.ch/pks/lookup?op=get&search=${email}`
+            );
+            recipientPublicKey = response.data;
+        }
+
         try {
             if (recipientPublicKey && recipientPublicKey !== "") {
                 await this.sendEncryptedRawEmail(opt, recipientPublicKey);
