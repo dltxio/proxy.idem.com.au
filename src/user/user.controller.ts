@@ -30,7 +30,6 @@ import { hashMessage } from "ethers/lib/utils";
 import { KycResponse, UsersResponse } from "../types/general";
 import { Request } from "../data/entities/request.entity";
 import { logger } from "ethers";
-// import { Request } from "express";
 
 @Controller("users")
 @UseGuards(LocalGuard)
