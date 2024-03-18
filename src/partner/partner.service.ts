@@ -125,13 +125,13 @@ export class PartnerService implements IPartnerService {
             this.logger.verbose(
                 `New user signup for ${vendor.name}, userId: ${userId}`
             );
-            //Save the signup request
-            await this.requestRepository.save({
-                from: "IDEM",
-                // to: getVendorName(signupInfo.source),
-                ipAddress: ip,
-                requestType: RequestType.Signup
-            });
+            // // Save the signup request
+            // await this.requestRepository.save({
+            //     from: "IDEM",
+            //     // to: getVendorName(signupInfo.source),
+            //     ipAddress: ip,
+            //     requestType: RequestType.Signup
+            // });
 
             return { userId: userId, password: password };
         } catch (error) {

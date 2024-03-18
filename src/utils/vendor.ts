@@ -3,10 +3,13 @@ import { ConfigSettings, VendorEnum } from "../types/general";
 import sites from "../utils/sites.json";
 import { VendorName } from "../interfaces";
 
-export const getVendorFromSitesJson = (venderId: number) => {
-    const vendor = sites.find(site => site.id === venderId);
+export const getVendorFromSitesJson = (id: number) => {
+
+    console.log(sites);
+
+    const vendor = sites.find(site => site.id === id);
     if (!vendor) {
-        throw new Error(`Vendor ${venderId} not found`);
+        throw new Error(`Vendor ${id} not found`);
     }
     return vendor;
 };
