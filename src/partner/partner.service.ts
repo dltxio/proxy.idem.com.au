@@ -98,6 +98,7 @@ export class PartnerService implements IPartnerService {
         signupInfo: UserSignupRequest,
         ip: string
     ): Promise<SignupResponse> {
+        console.log("signupInfo", signupInfo);
         const vendorFromSitesJson = getVendorFromSitesJson(signupInfo.source);
         if (vendorFromSitesJson.verifyClaims) {
             const { verification } = signupInfo;
