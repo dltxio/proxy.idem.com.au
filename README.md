@@ -48,11 +48,6 @@ This is a 3 tier API project\
 Controllers are the API endpoints for HTTP requests. They manage input validation and output encoding, agnostic to the business logic. All business logic is handed off to the associated service\
 Modules perform the dependency injection of all dependencies required
 
-### DTOs and DAOS - TODO
-
-A specialised type of service that directly interfaces with an external data object e.g. a database or API\
-These services are typically mocked when performing unit tests
-
 ### Sample Endpoints
 
 This project contains a single entity `accounts` for demo purposes.\
@@ -65,22 +60,6 @@ All related files are stored under the `src/accounts` folder. Simply create copi
 // Get a (vault) account
 
 > GET accounts/:accountId
-
-### Sample external service
-
-This project contains a single external service `EventStore` for demo purposes and is found under `services/EventStore.service.ts`
-
-## Standards
-
--   [Service Oriented Architecture (SoA)](https://www.geeksforgeeks.org/service-oriented-architecture/)
--   [Inversion of Control / Dependency Injection](https://martinfowler.com/articles/injection.html)
--   Unit and Integration/E2E testing
--   Swagger documentation via annotations
-
-### Dependency Management
-
--   Dependencies vs dev-dependencies - if it's not used at run-time then add as a dev-dependency.
--   Major vs minor version upgrades - don't upgrade major versions unless you know what you're doing. There are often breaking changes.
 
 ## Commands
 
