@@ -16,12 +16,13 @@ export enum RequestType {
     Verify = "Verify"
 }
 
-//Add more venders
+// Add more venders
 export enum VendorEnum {
     GPIB = 1,
     CoinStash = 2,
     DigitalSurge = 5,
-    EasyCrypto = 6
+    EasyCrypto = 6,
+    Syla = 7
 }
 
 export enum ConfigSettings {
@@ -78,7 +79,7 @@ export type UsersResponse = {
 export type KycResponse = {
     result: KycResult;
     thirdPartyVerified: boolean;
-    signature: string; //signed claim response
+    signature: string; // signed claim response
     message: ClaimResponsePayload;
     hashedPayload: string;
     JWTs: JWT[];

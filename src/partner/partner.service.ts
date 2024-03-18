@@ -101,8 +101,6 @@ export class PartnerService implements IPartnerService {
         console.log("signupInfo", signupInfo);
         const vendorFromSitesJson = getVendorFromSitesJson(signupInfo.source);
 
-        console.log("vendorFromSitesJson", vendorFromSitesJson);
-
         // if (vendorFromSitesJson.verifyClaims) {
         //     const { verification } = signupInfo;
         //     const { hashedPayload, signature } = verification;
