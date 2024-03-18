@@ -100,19 +100,22 @@ export class PartnerService implements IPartnerService {
     ): Promise<SignupResponse> {
         console.log("signupInfo", signupInfo);
         const vendorFromSitesJson = getVendorFromSitesJson(signupInfo.source);
-        if (vendorFromSitesJson.verifyClaims) {
-            const { verification } = signupInfo;
-            const { hashedPayload, signature } = verification;
-            const isVerified = verifyMessage(
-                hashedPayload,
-                signature,
-                this.config,
-                this.logger
-            );
-            if (!isVerified) {
-                throw new Error("Verification signature is not valid");
-            }
-        }
+
+        console.log("vendorFromSitesJson", vendorFromSitesJson);
+
+        // if (vendorFromSitesJson.verifyClaims) {
+        //     const { verification } = signupInfo;
+        //     const { hashedPayload, signature } = verification;
+        //     const isVerified = verifyMessage(
+        //         hashedPayload,
+        //         signature,
+        //         this.config,
+        //         this.logger
+        //     );
+        //     if (!isVerified) {
+        //         throw new Error("Verification signature is not valid");
+        //     }
+        // }
 
         const vendor = this.getVendor(signupInfo.source);
         // await this.partnerRepository.findOne( { name: vendor.name } );
