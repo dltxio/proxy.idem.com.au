@@ -92,6 +92,6 @@ export class PartnerController {
             throw new Error("Invalid email or password");
         }
 
-        return { id: "4", email: body.email, role: "admin", token: "" };
+        return { id: partner.id.toString(), email: body.email, role: "admin", token: "" };
     }
 }
