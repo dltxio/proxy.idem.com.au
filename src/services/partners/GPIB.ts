@@ -30,8 +30,8 @@ export class GPIBVendor implements IVendor {
             yob: moment(signupInfo.dob, "DD/MM/YYYY").year(),
             trackAddress: true,
             createAddress: true,
-            hashedPayload: verification.hashedPayload,
-            signature: verification.signature
+            hashedPayload: "", //verification.hashedPayload,
+            signature: "" // verification.signature
         };
         const response = await this.axios
             .post<SignupResponse>(endPoint, JSON.stringify(requestBody))
