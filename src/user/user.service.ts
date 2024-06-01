@@ -70,6 +70,7 @@ export class UserService implements IUserService {
                 email: hashedEmail
             });
 
+            // JUST RESEND EMAIL VERIFICATION CODE
             // // Do nothing if user already exists and email is verified
             // if (user && user.emailVerified) {
             //     this.logger.verbose(
@@ -82,7 +83,7 @@ export class UserService implements IUserService {
                 100000 + Math.random() * 900000
             ).toString();
 
-            if (user && !user.emailVerified) {
+            if (user) {
                 user.emailVerificationCode = sixDigitCode;
             } else {
                 user = new User();
@@ -97,7 +98,6 @@ export class UserService implements IUserService {
                 newUser.pgpPublicKey
             );
         } catch (error) {
-            // this.logger.error(error.message);
             throw new Error(error.message);
         }
     }
