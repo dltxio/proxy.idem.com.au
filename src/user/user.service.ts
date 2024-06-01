@@ -70,13 +70,13 @@ export class UserService implements IUserService {
                 email: hashedEmail
             });
 
-            // Do nothing if user already exists and email is verified
-            if (user && user.emailVerified) {
-                this.logger.verbose(
-                    `User ${formattedEmail} ${hashedEmail} already exists`
-                );
-                throw new Error("User already exists");
-            }
+            // // Do nothing if user already exists and email is verified
+            // if (user && user.emailVerified) {
+            //     this.logger.verbose(
+            //         `User ${formattedEmail} ${hashedEmail} already exists`
+            //     );
+            //     throw new Error("User already exists");
+            // }
 
             const sixDigitCode = Math.floor(
                 100000 + Math.random() * 900000
