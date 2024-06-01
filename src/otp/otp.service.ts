@@ -17,10 +17,12 @@ export class OtpService implements IOtpService {
         const expiryTimestamp =
             new Date().getTime() +
             parseInt(this.config.get(ConfigSettings.OTP_EXPIRY_TIME, "60000"));
+
         const salt = this.config.get(
             ConfigSettings.OTP_HASHING_SALT,
             "Hi i'm default salt from idem proxy :)"
         );
+
         const messageForHash = mobile + otp + expiryTimestamp + salt;
         const hash = crypto
             .createHmac(
@@ -30,7 +32,7 @@ export class OtpService implements IOtpService {
             .update(messageForHash)
             .digest("hex");
 
-        const message = `Your OTP code for IDEM is ${otp}`;
+        const message = `Your verfication code for IDEM is ${otp}`;
         await this.smsService.send(mobile, message);
 
         return {
@@ -41,8 +43,8 @@ export class OtpService implements IOtpService {
 
     public async verifyOtp(body: VerifyOtp): Promise<boolean> {
         const { mobileNumber, code, hash, expiryTimestamp } = body;
-        const currentTimestamp = new Date().getTime();
-        if (currentTimestamp > expiryTimestamp) throw new Error("Code expired");
+        // const currentTimestamp = new Date().getTime();
+        // if (currentTimestamp > expiryTimestamp) throw new Error("Code expired");
         const salt = this.config.get(
             ConfigSettings.OTP_HASHING_SALT,
             "Hi i'm default salt from idem proxy :)"

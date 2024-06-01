@@ -34,7 +34,7 @@ export class SmsService implements ISmsService {
                         return reject(error);
                     }
 
-                    this.logger.log("SMS sent via MessageBird", {
+                    this.logger.log(`${message} sent via MessageBird`, {
                         ref: response.href
                     });
                     resolve();
