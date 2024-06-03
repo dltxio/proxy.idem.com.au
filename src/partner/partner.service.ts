@@ -101,7 +101,7 @@ export class PartnerService implements IPartnerService {
         console.log("signupInfo", signupInfo);
         const vendorFromSitesJson = getVendorFromSitesJson(signupInfo.source);
 
-        console.log("vendorFromSitesJson", vendorFromSitesJson);
+        // console.log("vendorFromSitesJson", vendorFromSitesJson);
 
         // if (vendorFromSitesJson.verifyClaims) {
         //     const { verification } = signupInfo;
@@ -121,6 +121,8 @@ export class PartnerService implements IPartnerService {
         // await this.partnerRepository.findOne( { name: vendor.name } );
 
         try {
+            console.log(`signing up to ${vendor.name}...`);
+
             const { userId, password } = await vendor.signUp(signupInfo);
             this.logger.verbose(
                 `New user signup for ${vendor.name}, userId: ${userId}`
