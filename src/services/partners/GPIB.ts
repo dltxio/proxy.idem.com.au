@@ -34,8 +34,8 @@ export class GPIBVendor implements IVendor {
             ReferralCode: referralCode ?? "",
             Mobile: mobile.trim(),
             YOB: moment(signupInfo.dob, "DD/MM/YYYY").year(),
-            TrackAddress: true,
-            CreateAddress: true,
+            TrackHDAddress: true,
+            CreateHDAddress: true,
             HashedPayload: "", //verification.hashedPayload,
             Signature: "", // verification.signature
             Nonce: crypto.randomUUID()
