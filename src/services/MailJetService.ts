@@ -38,7 +38,7 @@ export class MailJetService implements IEmailService {
             text: `Your confirmation code is ${verificationCode}.  Enter the code in the IDEM mobile app to verify your email.`
         };
 
-        this.logger.log(`Sending code to ${email}`);
+        this.logger.log(`Sending code ${verificationCode} to ${email}`);
 
         if (
             (email.toLowerCase().endsWith("protonmail.com") ||
@@ -55,11 +55,13 @@ export class MailJetService implements IEmailService {
             if (recipientPublicKey && recipientPublicKey !== "") {
                 await this.sendEncryptedRawEmail(opt, recipientPublicKey);
                 this.logger.log(
-                    `${email} Encrypted verification code email sent`
+                    `Encrypted verification code ${verificationCode} email sent to ${email}`
                 );
             } else {
                 await this.sendSignedRawEmail(opt);
-                this.logger.log(`${email} Signed verification code email sent`);
+                this.logger.log(
+                    `Signed verification code email sent to ${email}`
+                );
             }
         } catch (error) {
             this.logger.error(error.message);
