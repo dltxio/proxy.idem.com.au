@@ -25,6 +25,10 @@ export class GPIBVendor implements IVendor {
         const endPoint = `${this.baseUrl}/User/idem`;
         const referralCode = this.config.get(ConfigSettings.GPIB_REFERRAL_CODE);
 
+        const yob = signupInfo.dob
+            ? moment(signupInfo.dob, "DD/MM/YYYY").year()
+            : 0;
+
         // GPIB C# needs capitalised keys
         const requestBody = {
             FirstName: firstName,
@@ -33,7 +37,7 @@ export class GPIBVendor implements IVendor {
             Password: password,
             ReferralCode: referralCode ?? "",
             Mobile: mobile.trim(),
-            YOB: moment(signupInfo.dob, "DD/MM/YYYY").year(),
+            YOB: yob,
             TrackHDAddress: true,
             CreateHDAddress: true,
             HashedPayload: "", //verification.hashedPayload,
