@@ -41,6 +41,8 @@ export class GPIBVendor implements IVendor {
             Nonce: crypto.randomUUID()
         };
 
+        console.log("GPIB Signup Request", requestBody);
+
         const response = await axios.request({
             method: "POST",
             url: "https://testapi.getpaidinbitcoin.com.au/User/idem",
